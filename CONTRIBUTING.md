@@ -13,8 +13,7 @@ and D&D 2024 (SRD 5.2.1). The maintainer reads every diff before merging.
 
 Provenance is the one hard rule. Do not contribute:
 
-- text, tables, or art from commercial publisher books;
-- anything from Call of Cthulhu / Chaosium, Avatar Legends, or Brindlewood Bay;
+- text, tables, or art from commercial publisher books, or anything else a publisher has not licensed for this use;
 - translations or data under non-commercial or share-alike licences (such as CC BY-NC-SA), translations
   you did not write yourself, or any unlicensed publisher text.
 
@@ -75,8 +74,7 @@ See `CODE_OF_CONDUCT.md`. Report security problems privately as described in `SE
 感謝你願意幫忙。本儲存庫包含 Skald 角色卡 SDK，以及兩套開放系統：Fate Condensed 與 D&D 2024
 （SRD 5.2.1）。維護者會逐一閱讀每個 diff 後才合併。
 
-**來源是唯一的硬性規則。** 請勿貢獻：商業出版品的文字、表格或美術；Call of Cthulhu／Chaosium、
-Avatar Legends、Brindlewood Bay 的任何內容；非商業或相同方式分享授權（例如 CC BY-NC-SA）的翻譯或資料、
+**來源是唯一的硬性規則。** 請勿貢獻：商業出版品的文字、表格或美術，以及其他未經出版商授權用於此處的內容；非商業或相同方式分享授權（例如 CC BY-NC-SA）的翻譯或資料、
 非你自己撰寫的翻譯，以及任何未經授權的出版商文字。非你自己撰寫的內容，請在 PR 中註明來源與授權。
 D&D 內容限於 SRD 5.2.1（CC-BY-4.0），Fate 內容限於 Fate SRD（CC-BY-3.0）；其他來源須允許商業使用並可與本專案一併再授權（如 CC-BY、CC0、MIT）。
 

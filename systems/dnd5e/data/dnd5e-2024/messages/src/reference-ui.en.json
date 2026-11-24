@@ -223,6 +223,8 @@
       "tab": "Magic Items",
       "search": "Search magic items",
       "category": "Category",
+      "allSources": "All sources",
+      "source": "Source",
       "allCategories": "All categories",
       "rarity": "Rarity",
       "allRarities": "All rarities",

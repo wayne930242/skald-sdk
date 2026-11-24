@@ -166,7 +166,6 @@ export const MeasureLayer = forwardRef<HTMLDivElement, LayoutViewProps>(function
         page={3}
         running={labels.print("running.continuation")}
         name={model.name}
-        labels={labels}
         frames={[{ id: "measure:cont", children: continuationCandidates(content, labels) }, { id: "measure:cont:1", children: null }]}
       />
       {content.spellbook.length > 0 && (
@@ -175,7 +174,6 @@ export const MeasureLayer = forwardRef<HTMLDivElement, LayoutViewProps>(function
           page={4}
           running={labels.print("running.spellbook")}
           name={model.name}
-          labels={labels}
           frames={[{ id: "measure:book", children: <><LineProbe />{spellbookCandidates(content, labels)}</> }, { id: "measure:book:1", children: null }]}
         />
       )}
@@ -286,7 +284,6 @@ export function PrintedPages({ plan, ...props }: LayoutViewProps & { plan: Docum
             page={page}
             running={labels.print("running.continuation")}
             name={name}
-            labels={labels}
             frames={[0, 1].map((index) => ({
               id: `cont:${page}:${index}`,
               children: columns[index] ? <ContinuationColumn column={columns[index]} content={content} labels={labels} /> : null,
@@ -303,7 +300,6 @@ export function PrintedPages({ plan, ...props }: LayoutViewProps & { plan: Docum
             page={page}
             running={labels.print("running.spellbook")}
             name={name}
-            labels={labels}
             frames={[0, 1].map((index) => ({
               id: `book:${page}:${index}`,
               children: columns[index] ? <SpellbookColumn column={columns[index]} content={content} labels={labels} /> : null,

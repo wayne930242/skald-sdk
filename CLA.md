@@ -44,8 +44,7 @@ conspicuously mark "Not a Contribution".
    If you submit work that is not your own, you will identify it in the pull request together with
    its source and licence, and you will mark it "Submitted on behalf of a third party: [name]".
    You will not submit text, data, or art taken from commercial publisher books, from content
-   under non-commercial or share-alike licences, or from Call of Cthulhu / Chaosium, Avatar
-   Legends, or Brindlewood Bay.
+   under non-commercial or share-alike licences.
 5. **No obligation.** You are not expected to provide support. Unless required by law or agreed in
    writing, you provide Contributions "AS IS", without warranties or conditions of any kind,
    including title, non-infringement, merchantability, and fitness for a particular purpose.
@@ -63,5 +62,4 @@ conspicuously mark "Not a Contribution".
 上述英文條款為正式文本；以下為繁體中文摘要，僅供理解。你保留貢獻內容的著作權，同時授予維護者
 （Wei Hung）永久、全球、非專屬、免權利金、不可撤回的著作權與專利授權，可將你的貢獻用於
 維護者的私有產品，並可在 Apache-2.0 以外的條款下再授權。你保證貢獻出於你的原創，或已在
-PR 中註明來源與授權；不得提交商業出版品文字、非商業或相同方式分享授權的內容，或 CoC／Chaosium、
-Avatar Legends、Brindlewood Bay 的內容。任何會員感謝皆為酌情，不構成報酬。本協議以中華民國法律為準據法，並以臺灣臺北地方法院為第一審管轄法院。
+PR 中註明來源與授權；不得提交商業出版品文字，或非商業或相同方式分享授權的內容。任何會員感謝皆為酌情，不構成報酬。本協議以中華民國法律為準據法，並以臺灣臺北地方法院為第一審管轄法院。

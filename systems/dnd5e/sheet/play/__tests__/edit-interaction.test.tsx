@@ -31,7 +31,7 @@ const sheet = {
   weapons: [{ id: "w1", name: "短弓", ability: "dex", proficient: true, magic: 0, ranged: true, damageDice: "1d6", damageType: "穿刺", ref: "baseItem:shortbow", origin: "srd" }],
   spells: [{ id: "s1", level: 0, name: "火焰箭", ref: "spell:fire-bolt", prepared: true, origin: "srd" }],
   features: [{ id: "f1", name: "回氣", ref: "", origin: "custom", text: "你恢復 1d10 點生命值。" }],
-  equipment: [{ id: "e1", qty: 1, name: "鍊甲", ref: "baseItem:chain-mail", equipped: false, origin: "srd" }],
+  equipment: [{ id: "e1", qty: 1, name: "鎖子甲", ref: "baseItem:chain-mail", equipped: false, origin: "srd" }],
   spellAbility: "int",
 };
 
@@ -163,11 +163,11 @@ describe("D&D edit mode: taps open editors (wide)", () => {
     const mounted = await mountDnd(harness, { mode: "edit", extra: sheet });
     await openTab("物品");
     // in edit mode it is a button to the settings, named as every edit tap is
-    expect(screen.queryByRole("switch", { name: /鍊甲/ })).toBeNull();
-    const button = await screen.findByRole("button", { name: "編輯鍊甲" }, { timeout: 10_000 });
+    expect(screen.queryByRole("switch", { name: /鎖子甲/ })).toBeNull();
+    const button = await screen.findByRole("button", { name: "編輯鎖子甲" }, { timeout: 10_000 });
     expect(button).toHaveAttribute("aria-haspopup", "dialog");
     await tap(button);
-    expect(await screen.findByRole("dialog", { name: "設定鍊甲" })).toBeInTheDocument();
+    expect(await screen.findByRole("dialog", { name: "設定鎖子甲" })).toBeInTheDocument();
     expect((mounted.data().equipment as Array<Record<string, unknown>>)[0].equipped).toBe(false);
   });
 });

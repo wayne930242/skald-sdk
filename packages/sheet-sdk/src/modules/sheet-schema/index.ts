@@ -66,9 +66,11 @@ export type {
   TemplateArtifactValidationResult,
   TemplateArtifactValidator,
   TemplateValidationCandidate,
+  TemplateValidationCandidateSubject,
   TemplateValidationCharacter,
   TemplateValidationContext,
   TemplateValidationIssue,
+  TemplateValidationOrganization,
   TemplateValidationRepository,
   TemplateValidationSummary,
 } from "./domain/validation-types";

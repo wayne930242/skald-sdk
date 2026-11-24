@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { useViewState, type LiftedViewState, type MagicItemViewState } from "../reference/view-state";
 import { BookOpen, Plus, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { packLabel } from "./pack-label";
 import { Badge } from "@skald/sheet-sdk/components/ui/badge";
 import { Button } from "@skald/sheet-sdk/components/ui/button";
 import { Input } from "@skald/sheet-sdk/components/ui/input";
@@ -22,6 +23,7 @@ const RARITIES = ["common", "uncommon", "rare", "very rare", "legendary", "artif
 const LIST_LIMIT = 200;
 
 interface ItemRow {
+  packId?: string;
   ref: string;
   name: string;
   english: string;
@@ -46,30 +48,32 @@ export function MagicItemTab({
 }) {
   const t = useTranslations("referenceUi.magicItems");
   const tItem = useTranslations("referenceUi.item");
+  const tUi = useTranslations("referenceUi");
   const tRef = useTranslations("reference");
   const tCompendium = useTranslations("compendium");
   const index = useIndexRows("item-magic", context.locale);
-  const [{ query, category, rarity, attunement }, update] = useViewState(viewState, { query: "", category: ALL, rarity: ALL, attunement: ALL });
+  const [{ query, category, rarity, source: selectedSource, attunement }, update] = useViewState(viewState, { source: ALL, query: "", category: ALL, rarity: ALL, attunement: ALL });
   const setQuery = (value: string) => update({ query: value });
   const setCategory = (value: string) => update({ category: value });
   const setRarity = (value: string) => update({ rarity: value });
   const setAttunement = (value: string) => update({ attunement: value });
 
+  const { packText, packSupplier } = context;
   const rows = useMemo<ItemRow[]>(() => {
-    const entries = [...(index ?? []), ...(context.packText?.magicItems() ?? []).map((item) => ({
-      id: item.id, name: item.name, english: item.englishName, row: item.meta,
+    const entries = [...(index ?? []).map(entry => ({ ...entry, packId: undefined })), ...(packText?.magicItems() ?? []).map((item) => ({
+      packId: packSupplier(item.ref), id: item.id, name: item.name, english: item.englishName, row: item.meta,
     }))];
     const byId = new Map(entries.map((entry) => [entry.id, entry.row]));
-    return entries.map(({ id, name, english, row }) => {
+    return entries.map(({ id, name, english, row, packId }) => {
       const family = typeof row.family === "string" ? byId.get(row.family) : undefined;
       const source = family ?? row;
       return {
-        ref: `item:${id}`, name, english,
+        packId, ref: `item:${id}`, name, english,
         category: String(source.category ?? ""), rarity: String(row.rarity ?? ""),
         attunement: source.attunement !== undefined && source.attunement !== null && source.attunement !== false,
       };
     });
-  }, [index, context.packText]);
+  }, [index, packText, packSupplier]);
   const categories = useMemo(() => [...new Set(rows.map((row) => row.category).filter(Boolean))].sort(), [rows]);
   const label = (group: string, value: string) => (tItem.has(`${group}.${value}` as never) ? tItem(`${group}.${value}` as never) : value);
 
@@ -78,13 +82,14 @@ export function MagicItemTab({
     return rows
       .filter((row) => {
         if (needle && !row.name.toLowerCase().includes(needle) && !row.english.toLowerCase().includes(needle)) return false;
+        if (selectedSource !== ALL && selectedSource !== (row.packId ?? "__srd__")) return false;
         if (category !== ALL && row.category !== category) return false;
         if (rarity !== ALL && row.rarity !== rarity) return false;
         if (attunement !== ALL && row.attunement !== (attunement === "yes")) return false;
         return true;
       })
       .sort((a, b) => a.name.localeCompare(b.name, context.locale));
-  }, [attunement, category, context.locale, query, rarity, rows]);
+  }, [selectedSource, attunement, category, context.locale, query, rarity, rows]);
 
   return (
     <div className="space-y-2" data-magic-item-tab>
@@ -93,6 +98,14 @@ export function MagicItemTab({
           <Search className="absolute left-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("search")} aria-label={t("search")} className="pl-8" />
         </div>
+        <Select value={selectedSource} onValueChange={(source) => update({ source })}>
+          <SelectTrigger className="w-36" aria-label={t("source")}><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ALL}>{t("allSources")}</SelectItem>
+            <SelectItem value="__srd__">SRD</SelectItem>
+            {context.packIds?.map(id => <SelectItem key={id} value={id}>{tUi.has(`packNames.${id}`) ? tUi(`packNames.${id}`) : id}</SelectItem>)}
+          </SelectContent>
+        </Select>
         <Select value={category} onValueChange={setCategory}>
           <SelectTrigger className="w-36" aria-label={t("category")}>
             <SelectValue />
@@ -141,6 +154,7 @@ export function MagicItemTab({
                     {row.name}
                     {row.name !== row.english && <span className="ml-2 text-xs text-muted-foreground">{row.english}</span>}
                   </span>
+                  {row.packId && <Badge variant="outline">{packLabel(tUi, row.packId)}</Badge>}
                   <Badge variant="outline" className="text-2xs">{label("rarity", row.rarity)}</Badge>
                   <Badge variant="secondary" className="hidden text-2xs sm:inline-flex">{label("category", row.category)}</Badge>
                 </div>

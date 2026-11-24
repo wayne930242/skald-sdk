@@ -196,7 +196,7 @@ describe("magic item header (§5.3)", () => {
 
   it.skipIf(zhWithheld("messages/reference/zh-TW.json"))("localizes an attunement condition that names an item, with no English inside the zh line (F006)", async () => {
     await show("item:dwarven-thrower", { locale: "zh-TW" });
-    expect(await screen.findByText(/須由矮人或已與矮人腰帶同調的生物同調/)).toBeInTheDocument();
+    expect(await screen.findByText(/須由矮人或已與矮人族腰帶同調的生物同調/)).toBeInTheDocument();
     expect(screen.queryByText(/by a Dwarf/)).toBeNull();
   });
 

@@ -61,6 +61,23 @@ export function continued(labels: PrintLabels, title: string): string {
   return labels.print("continued", { title });
 }
 
+/**
+ * The `<p>` of parts `[from, to)` of a text: a part that goes on from the one before it (an
+ * over-long paragraph cut in parts, POR-F006) prints in that part's paragraph, so a paragraph is
+ * cut only where a column ends. While measuring, every part is its own `<p>`: the pager's height
+ * for each, never less than what the joined paragraph takes.
+ */
+export function partViews(paragraphs: readonly string[], joined: readonly boolean[], from: number, to: number | undefined, measure: boolean): ReactNode[] {
+  const end = Math.min(to ?? paragraphs.length, paragraphs.length);
+  const groups: Array<{ start: number; text: string }> = [];
+  for (let index = from; index < end; index += 1) {
+    const last = groups[groups.length - 1];
+    if (!measure && last && joined[index]) last.text += paragraphs[index];
+    else groups.push({ start: index, text: paragraphs[index] });
+  }
+  return groups.map((group) => <p key={group.start} data-m-part="">{group.text}</p>);
+}
+
 /** An entry's name line and paragraphs `[from, to)`; a part after the first says 「（續）」. */
 export function EntryView({ entry, from = 0, to, cont = false, labels, measure = false }: {
   entry: EntryContent;
@@ -83,9 +100,7 @@ export function EntryView({ entry, from = 0, to, cont = false, labels, measure =
           {entry.meta && <span className="dnd-print-meta">{entry.meta}</span>}
         </h4>
       )}
-      {entry.paragraphs.slice(from, to).map((paragraph, index) => (
-        <p key={from + index} data-m-part="">{paragraph}</p>
-      ))}
+      {partViews(entry.paragraphs, entry.joined, from, to, measure)}
     </article>
   );
 }

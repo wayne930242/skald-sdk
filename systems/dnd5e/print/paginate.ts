@@ -207,8 +207,50 @@ export function packProse({ capacity, marker, paragraphs }: ProseMeasure): Prose
 const STOPS = new Set(["。", "！", "？", "；", "!", "?", "."]);
 const CLOSERS = new Set(["」", "』", "）", ")", "”", "’", "\"", "'"]);
 
-/** A paragraph's sentences, each with its closing punctuation and the space after it. */
+/**
+ * The longest piece of prose, in characters. The pager places a piece whole, so a piece must stay
+ * far under a column (about 1,500 CJK characters where a column is narrowest, page 2's left half);
+ * a longer run, such as a pasted backstory with no sentence end, is broken (POR-F006). The pieces
+ * print as adjacent inline spans, so a break is invisible inside a column.
+ */
+export const MAX_PIECE = 200;
+
+/** Where a run without a sentence end breaks best: after a space or a soft stop. */
+const SOFT_BREAK = /[\s，、；：,;:]/;
+
+/**
+ * `run` in pieces of at most MAX_PIECE characters: each ends after the last soft break in its last
+ * 40%, else at the limit (never inside a surrogate pair).
+ */
+function breakRun(run: string): string[] {
+  const pieces: string[] = [];
+  let rest = run;
+  while (rest.length > MAX_PIECE) {
+    let end = 0;
+    for (let index = MAX_PIECE; index > MAX_PIECE * 0.6 && !end; index -= 1) {
+      if (SOFT_BREAK.test(rest[index - 1])) end = index;
+    }
+    if (!end) {
+      end = MAX_PIECE;
+      const code = rest.charCodeAt(end);
+      if (code >= 0xdc00 && code <= 0xdfff) end -= 1;
+    }
+    pieces.push(rest.slice(0, end));
+    rest = rest.slice(end);
+  }
+  if (rest) pieces.push(rest);
+  return pieces;
+}
+
+/**
+ * A paragraph's sentences, each with its closing punctuation and the space after it; a sentence
+ * longer than MAX_PIECE in several pieces.
+ */
 export function sentencePieces(paragraph: string): string[] {
+  return sentences(paragraph).flatMap(breakRun);
+}
+
+function sentences(paragraph: string): string[] {
   const pieces: string[] = [];
   let start = 0;
   for (let index = 0; index < paragraph.length; index += 1) {
@@ -374,7 +416,9 @@ export function packFlow(
           while (end < block.parts.length && h + height(block.parts[end], frame) <= room) h += height(block.parts[end++], frame);
         }
         if (end === from && fresh) {
-          // one part taller than a whole column: it prints here, clipped, rather than never
+          // one part taller than a whole column: it prints here, clipped, rather than never. The
+          // content keeps every part far under a column (MAX_PIECE, content.ts MAX_PART), so this
+          // is a last resort, not a path the print takes (POR-F006)
           end = from + 1;
           h = topOf(block, from, frame) + height(block.parts[from], frame);
         }

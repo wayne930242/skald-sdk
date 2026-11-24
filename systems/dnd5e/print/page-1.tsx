@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import type { PrintPaper } from "@skald/sheet-sdk/modules/systems/ui/system-print";
 import { signed } from "../sheet/play/play-model";
-import { PAPER_CONTENT, pt } from "./print-layout";
+import { PrintPage } from "@skald/sheet-sdk/modules/character/ui/print/kit/print-page";
 import type { PrintLabels } from "./print-labels";
 import { IDENTITY_FIELDS, speciesValue, type IdentityField } from "./content";
 
@@ -17,13 +17,15 @@ export type FrameContents = Partial<Record<string, ReactNode>>;
 
 export const PAGE1_FRAMES = ["status", "training", "attacks", "features:0", "features:1", "speciesTraits", "feats"] as const;
 
-export function Page({ paper, page, children, footer, kind }: { paper: PrintPaper; page: number; children: ReactNode; footer: ReactNode; kind: string }) {
-  const size = PAPER_CONTENT[paper];
+/**
+ * A page of the D&D print: the kit's fixed page (the printable area, its footer band kept for the
+ * skald.tw footer), whose body the page's boxes are laid out in.
+ */
+export function Page({ paper, page, children, kind }: { paper: PrintPaper; page: number; children: ReactNode; kind: string }) {
   return (
-    <section className={`dnd-print-page dnd-print-page-${kind}`} data-print-page={page} style={{ width: pt(size.width), height: pt(size.height) }}>
+    <PrintPage paper={paper} page={page} className={`dnd-print-page dnd-print-page-${kind}`} bodyClassName="dnd-print-page-body">
       {children}
-      <footer className="dnd-print-footer">{footer}</footer>
-    </section>
+    </PrintPage>
   );
 }
 
@@ -137,12 +139,7 @@ export function Page1({ model, labels, paper, frames, identity: identityView }: 
   const identity = model.identity;
   const note = acNote(model, labels);
   return (
-    <Page
-      paper={paper}
-      page={1}
-      kind="p1"
-      footer={<span>{print("footer")}</span>}
-    >
+    <Page paper={paper} page={1} kind="p1">
       <div className="dnd-print-p1-top">
         <Box region="identity" className="dnd-print-ident">
           <div

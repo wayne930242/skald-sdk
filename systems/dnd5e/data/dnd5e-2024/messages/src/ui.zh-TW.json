@@ -282,12 +282,12 @@
       "origin": "起源",
       "general": "一般",
       "fightingStyle": "戰鬥風格",
-      "epicBoon": "傳奇恩惠"
+      "epicBoon": "史詩恩賜"
     },
     "orderLore": {
       "none": "無",
-      "thaumaturge": "奇術使（奧秘、宗教）",
-      "magician": "術師（奧秘、自然）"
+      "thaumaturge": "奇術師（奧秘、宗教）",
+      "magician": "術者（奧秘、自然）"
     }
   },
   "macros": {

@@ -7,7 +7,7 @@
 <!-- Every piece of text, data, or art you add must come from you or from a source whose licence allows it here. -->
 
 - [ ] I wrote this myself, or it comes from the SRD 5.2.1, the Fate SRD, or another source listed in `NOTICE`.
-- [ ] It contains no text from commercial publisher books, from Call of Cthulhu / Chaosium, Avatar Legends, or Brindlewood Bay, from translations under non-commercial or share-alike licences, or from translations I did not write.
+- [ ] It contains no text from commercial publisher books, from translations under non-commercial or share-alike licences, or from translations I did not write.
 - Source and licence of any third-party material: <!-- URL + licence, or "none" -->
 
 ## Checks

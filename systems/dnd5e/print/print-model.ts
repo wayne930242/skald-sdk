@@ -427,7 +427,8 @@ export function buildDndPrintModel({ values, blanks, nameOf, compare = (a, b) =>
       shield: values.shield === true,
       acNote,
       initiative: num(values.initiative),
-      speed: Math.max(0, num(values.speed) - 5 * exhaustion),
+      // exhaustion is play state: blanks prints the speed it would reduce (POR-F004)
+      speed: Math.max(0, num(values.speed) - 5 * (blanks ? 0 : exhaustion)),
       baseSpeed: num(values.speed),
       prof: num(values.profBonus, 2),
       passive: num(values.passivePerception, 10),

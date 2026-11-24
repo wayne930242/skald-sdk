@@ -69,6 +69,7 @@ function contextFor(withPack: boolean): ReferenceContextValue {
       return names[kind]?.[id] ?? englishNames[kind]?.[id] ?? id;
     },
     gameSpells: new Map(),
+    packIds: withPack ? [pack.manifest.packId] : [],
     packRefs: new Set(withPack ? pack.entries.map((entry) => entry.ref) : []),
     packSupplier: (ref: string) => (withPack && pack.entries.some((entry) => entry.ref === ref) ? pack.manifest.packId : undefined),
     packText: withPack ? new PackTextIndex(pack, "zh-TW") : null,
@@ -159,8 +160,13 @@ describe("XDMG", () => {
     const { data } = await open({ withPack: true });
     await tab("魔法物品");
     await screen.findByRole("combobox", { name: "稀有度" });
+    await choose("來源", "SRD");
+    expect(listed()).not.toContain("item:sample-pebble");
+    await choose("來源", pack.manifest.packId);
+    expect(listed()).toEqual(["item:sample-pebble"]);
     await choose("稀有度", "稀有");
     const row = (await screen.findByText("Sample Pebble")).closest("li")!;
+    expect(row).toHaveTextContent(`內容包：${pack.manifest.packId}`);
     fireEvent.click(within(row).getByRole("button", { name: "加入" }));
     expect(data().equipment).toEqual([expect.objectContaining({ ref: "item:sample-pebble", origin: "pack", text: "A pebble that hums." })]);
   });
@@ -172,6 +178,7 @@ describe("magic item tab (§5.3)", () => {
     await tab("魔法物品");
     await screen.findByText((_, node) => node?.hasAttribute("data-magic-item-tab") ?? false);
     await waitFor(() => expect(listed().length).toBeGreaterThan(100));
+    await choose("來源", "SRD");
     await choose("稀有度", "稀有");
     await choose("同調", "需要同調");
     expect(listed()).toContain("item:belt-of-hill-giant-strength");
@@ -215,7 +222,7 @@ describe("book reader (§5.5)", () => {
     fireEvent.click(screen.getByRole("button", { name: "目錄" }));
     fireEvent.click(await screen.findByRole("button", { name: "魔法物品" }));
     const items = (await screen.findByText((_, node) => node?.getAttribute("data-ref-list") === "item", undefined, { timeout: 4000 })) as HTMLElement;
-    await waitFor(() => expect(within(items).getByRole("button", { name: "巨人之力腰帶" })).toBeInTheDocument());
+    await waitFor(() => expect(within(items).getByRole("button", { name: "巨人力量腰帶" })).toBeInTheDocument());
     // Variants list under their family (filter family: null).
     expect(within(items).queryByRole("button", { name: "山丘巨人力量腰帶" })).toBeNull();
   });
@@ -223,8 +230,8 @@ describe("book reader (§5.5)", () => {
   it.skipIf(zhWithheld("messages/reference/zh-TW.json"))("filters sections across the book", async () => {
     await open();
     await tab("書籍");
-    fireEvent.change(await screen.findByRole("textbox", { name: "篩選章節" }), { target: { value: "法術描述" } });
-    expect(await screen.findByRole("button", { name: "法術描述" })).toBeInTheDocument();
+    fireEvent.change(await screen.findByRole("textbox", { name: "篩選章節" }), { target: { value: "法術說明" } });
+    expect(await screen.findByRole("button", { name: "法術說明" })).toBeInTheDocument();
   });
 
   it.skipIf(zhWithheld("messages/reference/zh-TW.json"))("puts the pack's Player's Handbook beside the SRD book", async () => {

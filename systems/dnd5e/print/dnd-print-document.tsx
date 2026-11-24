@@ -4,6 +4,7 @@ import { Suspense, use, useCallback, useEffect, useLayoutEffect, useMemo, useSta
 import { useLocale } from "next-intl";
 import { ClientSystemIntlProvider } from "@skald/sheet-sdk/components/providers/client-system-intl-provider";
 import { useSystem } from "@skald/sheet-sdk/components/providers/system-provider";
+import { PrintSheet } from "@skald/sheet-sdk/modules/character/ui/print/kit/print-sheet";
 import { evaluateCharacterFormulaRuntime } from "@skald/sheet-sdk/modules/sheet-schema";
 import type { PrintDocumentProps } from "@skald/sheet-sdk/modules/systems/ui/system-print";
 import { useHostPort } from "@skald/sheet-sdk/modules/systems/ui/host-ports";
@@ -30,6 +31,8 @@ import "./dnd-print.css";
  * comes from the corpus chunks the sheet loads on demand and, for a pack row without its saved text,
  * this device's pack cache. The pages are laid out here, in the browser, before the preview offers
  * 列印 or 下載 PDF; the PDF renderer prints this DOM as it is. Black and white: rules and weights.
+ * The frame is the shared print kit's: its pages, the one skald.tw footer on every page, no page
+ * number or date; the SRD's CC-BY notice prints at the foot of page 2.
  */
 export function DndPrintDocument(props: PrintDocumentProps) {
   return (
@@ -154,16 +157,16 @@ function DndPrintPages({ data, formulaRuntime, paper, blanks, onReadyChange }: P
 
   const view = content && { model, content, labels, paper, portrait, attribution, carry: carryLine(model, labels) };
   return (
-    <div
+    <PrintSheet
       className="dnd-print"
-      data-paper={paper}
-      data-blanks={blanks ? "true" : undefined}
+      paper={paper}
+      blanks={blanks}
       data-dnd-print-settled={settled ? "true" : undefined}
       data-pages={plan?.pages}
       data-layout-ms={ms === null ? undefined : Math.round(ms)}
     >
       {view && !plan && <MeasureLayer ref={ref} {...view} />}
       {view && plan && <PrintedPages plan={plan} {...view} />}
-    </div>
+    </PrintSheet>
   );
 }

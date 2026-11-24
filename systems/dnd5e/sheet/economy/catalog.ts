@@ -71,7 +71,7 @@ const CATEGORY_OF_TYPE: Readonly<Record<string, ShopCategory>> = {
   SCF: "focus",
 };
 
-/** The shop chip an item lists under; the SRD's packs (`*-pack`, p.97) are 套組. */
+/** The shop chip an item lists under; the SRD's packs (`*-pack`, p.97) are 背包. */
 export function shopCategory(item: CatalogItem): ShopCategory {
   if (/^item:[a-z-]+s-pack$/.test(item.ref)) return "pack";
   return CATEGORY_OF_TYPE[item.type] ?? "gear";

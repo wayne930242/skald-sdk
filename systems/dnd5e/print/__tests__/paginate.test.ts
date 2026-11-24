@@ -7,6 +7,7 @@ import {
   packTextRegion,
   paginate,
   sentencePieces,
+  MAX_PIECE,
   type FlowSection,
   type PaginateInput,
 } from "../paginate";
@@ -111,6 +112,34 @@ describe("prose", () => {
   it("splits at sentence ends and keeps the closing punctuation", () => {
     expect(sentencePieces("第一句。第二句！Third one. Fourth")).toEqual(["第一句。", "第二句！", "Third one. ", "Fourth"]);
     expect(sentencePieces("「引號。」之後")).toEqual(["「引號。」", "之後"]);
+  });
+
+  it("breaks a run with no sentence end into pieces no longer than MAX_PIECE, at a soft break where there is one (POR-F006)", () => {
+    // a pasted backstory with no stop: one piece would be taller than a whole column and print clipped
+    const cjk = "他走過長長的山路，".repeat(400);
+    const pieces = sentencePieces(cjk);
+    expect(pieces.length).toBeGreaterThan(1);
+    expect(pieces.join("")).toBe(cjk);
+    for (const piece of pieces) expect(piece.length).toBeLessThanOrEqual(MAX_PIECE);
+    // each break falls after a comma, so a piece that starts a column starts a phrase
+    for (const piece of pieces.slice(0, -1)) expect(piece.endsWith("，")).toBe(true);
+
+    const words = "and then the long road went on ".repeat(200).trim();
+    const english = sentencePieces(words);
+    expect(english.join("")).toBe(words);
+    for (const piece of english) expect(piece.length).toBeLessThanOrEqual(MAX_PIECE);
+    for (const piece of english.slice(0, -1)) expect(piece.endsWith(" ")).toBe(true);
+
+    // nothing to break at: hard breaks, never inside a surrogate pair
+    const solid = "龍".repeat(MAX_PIECE * 3 + 5) + "😀".repeat(MAX_PIECE);
+    const hard = sentencePieces(solid);
+    expect(hard.join("")).toBe(solid);
+    for (const piece of hard) {
+      expect(piece.length).toBeLessThanOrEqual(MAX_PIECE);
+      expect(/^[\uDC00-\uDFFF]|[\uD800-\uDBFF]$/.test(piece)).toBe(false);
+    }
+    // sentences under the limit are untouched
+    expect(sentencePieces("短句。")).toEqual(["短句。"]);
   });
 });
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { PrintAttribution } from "@skald/sheet-sdk/modules/character/ui/print/kit/print-attribution";
 import type { PrintPaper } from "@skald/sheet-sdk/modules/systems/ui/system-print";
 import { signed } from "../sheet/play/play-model";
 import { Page, type FrameContents } from "./page-1";
@@ -60,12 +61,7 @@ export function Page2({ model, labels, paper, frames, portrait, attribution, car
   const { print, sheet } = labels;
   const casting = model.spellcasting;
   return (
-    <Page
-      paper={paper}
-      page={2}
-      kind="p2"
-      footer={<span className="dnd-print-attribution">{attribution}</span>}
-    >
+    <Page paper={paper} page={2} kind="p2">
       <div className="dnd-print-p2-body">
         <div className="dnd-print-p2-left">
           {casting ? (
@@ -152,6 +148,8 @@ export function Page2({ model, labels, paper, frames, portrait, attribution, car
           </Box>
         </div>
       </div>
+      {/* the SRD's CC-BY notice: once, on the sheet players keep, its URLs as links */}
+      <PrintAttribution className="dnd-print-attribution">{attribution}</PrintAttribution>
     </Page>
   );
 }

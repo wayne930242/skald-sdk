@@ -189,6 +189,9 @@ describe("D&D print model: the official sheet's regions", () => {
     expect(print.conditions).toHaveLength(14);
     expect(print.conditions.every((condition) => !condition.active)).toBe(true);
     expect(print.exhaustion).toBe(0);
+    // exhaustion is play state: blanks prints the speed it would reduce, not the reduced one (POR-F004)
+    expect(model("wizard").combat).toMatchObject({ speed: 25, baseSpeed: 30 });
+    expect(print.combat).toMatchObject({ speed: 30, baseSpeed: 30 });
     expect(print.concentration).toBe("");
     expect(print.combat.inspiration).toBe(false);
     // the character's data still prints

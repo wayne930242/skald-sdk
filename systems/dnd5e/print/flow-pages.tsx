@@ -12,6 +12,7 @@ import {
   EntryView,
   EquipmentRow,
   Frame,
+  partViews,
   ProseView,
   RowTable,
   SpellRow,
@@ -116,7 +117,7 @@ export function ContinuationColumn({ column, content, labels }: { column: FlowCo
 }
 
 function SpellbookEntryView({ spell, from = 0, to, cont = false, labels, measure }: { spell: SpellbookEntry; from?: number; to?: number; cont?: boolean; labels: PrintLabels; measure?: boolean }) {
-  const parts = spellParts(spell, labels);
+  const lead = spellLead(spell, labels);
   return (
     <article className="dnd-print-spell" data-m={measure ? `spell:${spell.id}` : undefined} data-print-spell={measure ? undefined : spell.id}>
       <h4 data-m-head="">
@@ -132,13 +133,14 @@ function SpellbookEntryView({ spell, from = 0, to, cont = false, labels, measure
           {spell.tags.map((tag) => <span key={tag} className="dnd-print-tag">{tag}</span>)}
         </h4>
       )}
-      {parts.slice(from, to)}
+      {lead.slice(from, to)}
+      {partViews(spell.paragraphs, spell.joined, Math.max(0, from - lead.length), to === undefined ? undefined : Math.max(0, to - lead.length), Boolean(measure))}
     </article>
   );
 }
 
-/** A spell's parts after its name line: the stat line, its notes, then each paragraph. */
-export function spellParts(spell: SpellbookEntry, labels: PrintLabels): ReactNode[] {
+/** A spell's parts after its name line before its text (`partViews`): the stat line and its notes. */
+function spellLead(spell: SpellbookEntry, labels: PrintLabels): ReactNode[] {
   return [
     ...(spell.stats.length > 0
       ? [
@@ -159,7 +161,6 @@ export function spellParts(spell: SpellbookEntry, labels: PrintLabels): ReactNod
         </p>,
       ]
       : []),
-    ...spell.paragraphs.map((paragraph, index) => <p key={`p${index}`} data-m-part="">{paragraph}</p>),
   ];
 }
 
@@ -236,22 +237,16 @@ export function SpellbookColumn({ column, content, labels }: { column: FlowColum
   return <>{out}</>;
 }
 
-/** A page after the core two: a running head, two column frames and the footer. */
-export function FlowPage({ paper, page, running, name, labels, frames }: {
+/** A page after the core two: a running head and two column frames. */
+export function FlowPage({ paper, page, running, name, frames }: {
   paper: PrintPaper;
   page: number;
   running: string;
   name: string;
-  labels: PrintLabels;
   frames: Array<{ id: string; children: ReactNode }>;
 }) {
   return (
-    <Page
-      paper={paper}
-      page={page}
-      kind="flow"
-      footer={<span>{labels.print("footer")}</span>}
-    >
+    <Page paper={paper} page={page} kind="flow">
       <div className="dnd-print-running">
         <b>{running}</b>
         <span>{name}</span>

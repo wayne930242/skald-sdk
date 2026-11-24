@@ -44,7 +44,7 @@ const fighter: Row = {
   armorLight: true, armorMedium: true, armorHeavy: false, armorShields: true,
   armorType: "medium", armorBase: 13, shield: false, gp: 20, sp: 5, cp: 0, ep: 0, pp: 0,
   equipment: [
-    { id: "e1", qty: 1, name: "鍊甲衫", ref: "baseItem:chain-shirt", equipped: true, origin: "srd" },
+    { id: "e1", qty: 1, name: "鎖子衫", ref: "baseItem:chain-shirt", equipped: true, origin: "srd" },
     { id: "e2", qty: 1, name: "板甲", ref: "baseItem:plate-armor", equipped: false, origin: "srd" },
     { id: "e3", qty: 1, name: "長劍", ref: "baseItem:longsword", equipped: false, origin: "srd" },
   ],
@@ -176,7 +176,7 @@ describe("equip slots, AC inputs and the Strength chip (plan-uat2 §3.3)", () =>
     fireEvent.click(screen.getByRole("switch", { name: "板甲：未裝備" }));
     expect(equipment().map((row) => row.equipped)).toEqual([false, true, false]);
     expect(saved.data).toMatchObject({ armorType: "heavy", armorBase: 18, armorStrReq: 15, armorStealth: true });
-    expect(toast).toHaveBeenCalledWith("已換下鍊甲衫");
+    expect(toast).toHaveBeenCalledWith("已換下鎖子衫");
     // B-024 Q7: the recalc notice replaced 「AC 已依裝備更新」 (no formula runtime here, so no notice)
     expect(toast.success).not.toHaveBeenCalledWith("AC 已依裝備更新");
     // No heavy armor training: a warning only.

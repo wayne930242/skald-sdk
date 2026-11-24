@@ -18,7 +18,10 @@ export interface EntryContent {
   name: string;
   /** Level, feat category, lineage, pack or custom. */
   meta: string;
+  /** The text's parts: its paragraphs, an over-long one in several (`joined`). */
   paragraphs: string[];
+  /** Per part: it goes on from the part before it, in the same paragraph (POR-F006). */
+  joined: boolean[];
   /** The opening words of the text, for a summary line. */
   teaser: string;
 }
@@ -67,7 +70,9 @@ export interface SpellbookEntry {
   /** The stat line: school, casting time, range, components, duration. */
   stats: Array<{ label: string; value: string }>;
   notes: string;
+  /** As an entry's: the parts of the text, and which go on from the part before them. */
   paragraphs: string[];
+  joined: boolean[];
 }
 
 export const IDENTITY_FIELDS = ["name", "background", "className", "species", "subclass", "player"] as const;
@@ -109,6 +114,37 @@ function teaserOf(paragraphs: readonly string[]): string {
   return paragraphs.join(" ").slice(0, 160);
 }
 
+/**
+ * The longest part of an entry's or a spell's text, in characters. The pager places a part whole, so
+ * a part must stay under a column (about 1,500 CJK characters where a column is narrowest, page 2's
+ * left half); a longer paragraph, such as a homebrew feature pasted as one block, is cut into parts
+ * at sentence ends (POR-F006). A part printed after the one before it in the same column goes on in
+ * the same paragraph (`EntryParagraphs`).
+ */
+export const MAX_PART = 1000;
+
+/** The paragraphs as parts of at most MAX_PART characters, and which part goes on from the one before. */
+function partsOf(paragraphs: readonly string[]): { paragraphs: string[]; joined: boolean[] } {
+  const parts: string[] = [];
+  const joined: boolean[] = [];
+  for (const paragraph of paragraphs) {
+    let part = "";
+    let first = true;
+    const close = () => {
+      parts.push(part);
+      joined.push(!first);
+      first = false;
+      part = "";
+    };
+    for (const piece of paragraph.length > MAX_PART ? sentencePieces(paragraph) : [paragraph]) {
+      if (part && part.length + piece.length > MAX_PART) close();
+      part += piece;
+    }
+    if (part) close();
+  }
+  return { paragraphs: parts, joined };
+}
+
 function bodyOf(found: PrintText | undefined, labels: PrintLabels): string[] {
   if (!found) return [];
   if (found.status === "packMissing") return [labels.print("texts.packMissing")];
@@ -132,7 +168,7 @@ function entries(rows: readonly PrintTextRow[], input: ContentInput, keep: (foun
     const found = input.texts.get(entry.line.key);
     if (found?.status === "merged" || !keep(found)) return [];
     const paragraphs = bodyOf(found, input.labels);
-    return [{ id: entry.line.key, name: entry.line.name, meta: entryMeta(entry, found, input.model, input.labels), paragraphs, teaser: teaserOf(paragraphs) }];
+    return [{ id: entry.line.key, name: entry.line.name, meta: entryMeta(entry, found, input.model, input.labels), ...partsOf(paragraphs), teaser: teaserOf(paragraphs) }];
   });
 }
 
@@ -246,7 +282,7 @@ export function buildPrintContent(input: ContentInput): PrintContent {
           .filter((id) => stats[id])
           .map((id) => ({ label: print(`spellbook.stats.${id}`), value: stats[id] })),
         notes: spell.notes,
-        paragraphs: bodyOf(found, labels),
+        ...partsOf(bodyOf(found, labels)),
       };
     }),
   }));

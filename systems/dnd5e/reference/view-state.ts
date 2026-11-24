@@ -23,6 +23,6 @@ export function useViewState<T extends object>(lifted: LiftedViewState<T> | unde
   return [value, (patch) => set({ ...value, ...patch })];
 }
 
-export interface MagicItemViewState { query: string; category: string; rarity: string; attunement: string }
+export interface MagicItemViewState { query: string; category: string; rarity: string; source: string; attunement: string }
 export interface MonsterViewState { query: string; maxCr: string; type: string; size: string }
 export interface BookViewState { book: "srd" | "xphb" | "xdmg"; chapter: string | null; anchor: string | null; query: string }

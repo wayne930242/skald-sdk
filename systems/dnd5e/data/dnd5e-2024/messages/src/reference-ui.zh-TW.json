@@ -48,7 +48,7 @@
       "pbYours": "等於你的熟練加值",
       "yourChoice": "{choice}（由你選擇）",
       "feet": "{value}呎",
-      "hover": "（懸浮）",
+      "hover": "（懸停）",
       "errata": "SRD 勘誤，第 {page} 頁",
       "section": {
         "trait": "特性",
@@ -81,7 +81,7 @@
         "plant": "植物",
         "undead": "不死生物"
       },
-      "swarm": "{size}叢集（{swarmSize}{type}）",
+      "swarm": "{size}群集（{swarmSize}{type}）",
       "swarmType": {
         "beast": "野獸",
         "undead": "不死生物"
@@ -203,7 +203,7 @@
         "by-a-bard-cleric-or-druid": "由吟遊詩人、牧師或德魯伊",
         "by-a-druid": "由德魯伊",
         "by-a-cleric-or-paladin": "由牧師或聖武士",
-        "by-a-dwarf-or-a-creature-attuned-to-a-item-belt-of-dwarvenkind-xdmg": "由矮人或已與矮人腰帶同調的生物"
+        "by-a-dwarf-or-a-creature-attuned-to-a-item-belt-of-dwarvenkind-xdmg": "由矮人或已與矮人族腰帶同調的生物"
       }
     },
     "monsters": {
@@ -223,6 +223,8 @@
       "tab": "魔法物品",
       "search": "搜尋魔法物品",
       "category": "類別",
+      "allSources": "所有來源",
+      "source": "來源",
       "allCategories": "所有類別",
       "rarity": "稀有度",
       "allRarities": "所有稀有度",

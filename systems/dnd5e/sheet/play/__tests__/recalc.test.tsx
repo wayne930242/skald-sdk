@@ -46,7 +46,7 @@ function lastNotice() {
 const fighter = {
   str: 15, dex: 12,
   equipment: [
-    { id: "e1", qty: 1, name: "鍊甲", ref: "baseItem:chain-mail", equipped: false, origin: "srd" },
+    { id: "e1", qty: 1, name: "鎖子甲", ref: "baseItem:chain-mail", equipped: false, origin: "srd" },
     { id: "e2", qty: 1, name: "盾牌", ref: "baseItem:shield", equipped: true, origin: "srd" },
   ],
   shield: true,
@@ -62,7 +62,7 @@ describe("equipping", () => {
   it.skipIf(zhWithheld("messages/play/zh-TW.json", "messages/zh-TW.json"))("shows the AC it recalculated", async () => {
     await mountDnd(harness, { mode: "play", extra: fighter });
     await openTab("物品");
-    await tap(await screen.findByRole("switch", { name: /^鍊甲/ }, { timeout: 10_000 }));
+    await tap(await screen.findByRole("switch", { name: /^鎖子甲/ }, { timeout: 10_000 }));
     await waitFor(() => expect(notices()).toHaveLength(1));
     expect(lastNotice().getByText(/^護甲等級：\d+ → 18$/)).toBeInTheDocument();
     expect(toast.success).not.toHaveBeenCalledWith("AC 已依裝備更新");
@@ -71,7 +71,7 @@ describe("equipping", () => {
   it.skipIf(zhWithheld("messages/play/zh-TW.json", "messages/zh-TW.json"))("keeps an AC override and offers to restore it", async () => {
     const mounted = await mountDnd(harness, { mode: "play", extra: fighter, overrides: { ac: 20 } });
     await openTab("物品");
-    await tap(await screen.findByRole("switch", { name: /^鍊甲/ }, { timeout: 10_000 }));
+    await tap(await screen.findByRole("switch", { name: /^鎖子甲/ }, { timeout: 10_000 }));
     await waitFor(() => expect(notices()).toHaveLength(1));
     const notice = lastNotice();
     expect(notice.getByText(/^護甲等級維持覆寫 20（自動計算 \d+ → 18）$/)).toBeInTheDocument();
@@ -118,7 +118,7 @@ describe("leaving edit mode", () => {
     await mounted.setRemote({ level: 5 });
     await mounted.setMode("play");
     await openTab("物品");
-    expect(await screen.findByRole("switch", { name: /^鍊甲/ }, { timeout: 10_000 })).toBeDisabled();
+    expect(await screen.findByRole("switch", { name: /^鎖子甲/ }, { timeout: 10_000 })).toBeDisabled();
     await new Promise((resolve) => setTimeout(resolve, 50));
     expect(notices()).toHaveLength(0);
   });

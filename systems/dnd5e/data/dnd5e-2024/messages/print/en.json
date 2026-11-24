@@ -1,6 +1,5 @@
 {
   "dndPrint": {
-    "footer": "Printed from the data on screen in Skald",
     "unnamed": "Unnamed character",
     "level": "Level {level}",
     "feet": "{value} ft.",
@@ -86,7 +85,7 @@
       "items": "Item Descriptions",
       "attackTexts": "Weapon Notes",
       "notes": "Notes",
-      "noncaster": "Continued from Page 1"
+      "noncaster": "Continued from the core pages"
     },
     "spells": {
       "ability": "Spellcasting Ability",

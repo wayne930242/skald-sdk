@@ -58,6 +58,7 @@ export interface ReferenceContextValue {
   /** Wizard spell items (tier B) by spell id: level, casting time and range tokens. */
   gameSpells: ReadonlyMap<string, GameSpell>;
   /** Refs of the enabled content packs' entries on this device (none without one). */
+  packIds?: readonly string[];
   packRefs: ReadonlySet<string>;
   /** The `packId` that supplies a ref (entry or overlay), or undefined. */
   packSupplier: (ref: string) => string | undefined;
@@ -243,6 +244,7 @@ export function useReferenceContext(
       nameOf,
       token,
       gameSpells,
+      packIds: packs?.keys ?? [],
       packRefs,
       packSupplier,
       packText,
