@@ -22,12 +22,13 @@ export interface LocalizedBlock {
   english: boolean;
 }
 
-/** The book an overlay's wording comes from. */
-export type TextSource = "xphb" | "xmm" | "xdmg";
+/** The book an overlay's wording comes from, or `pack`: the pack's own wording. */
+export type TextSource = "xphb" | "xmm" | "xdmg" | "pack";
 
-/** A pack overlay on a built-in ref (pack format v2 `payload.overlays[ref]`). */
+/** A pack overlay on a built-in ref (pack format v2 `payload.overlays[ref]`, or the SDK format's). */
 export interface ReferenceOverlay {
-  source: "XPHB" | "XMM" | "XDMG";
+  /** Absent: the pack's own wording, from no book. */
+  source?: "XPHB" | "XMM" | "XDMG";
   en: {
     name?: string;
     entries?: unknown[];
@@ -163,7 +164,7 @@ export function applyOverlay(resolved: ResolvedReference, overlay: ReferenceOver
       resolved.kind !== "creature" || (key !== "habitat" && key !== "treasure"),
     );
   if (!replaces) return out;
-  out.textSource = overlay.source.toLowerCase() as TextSource;
+  out.textSource = overlay.source ? (overlay.source.toLowerCase() as TextSource) : "pack";
   out.srdBlocks = resolved.blocks;
   out.srdHigherLevel = resolved.higherLevel;
   out.srdMeta = resolved.meta;

@@ -12,9 +12,11 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint .",
     "test": "bun run --filter=@skald/dice test && bun run --filter=@skald/formula test && bun run --filter=@skald/sheet-sdk test && bun run --filter=@skald/system-fate test && bun run --filter=@skald/system-dnd5e test",
-    "ci": "bun run typecheck && bun run lint && bun run test && bun run build",
+    "ci": "bun run typecheck && bun run lint && bun run check:packs && bun run test && bun run build",
     "dev": "bun run --filter=@skald/previewer dev",
-    "build": "bun run --filter=@skald/previewer build"
+    "build": "bun run --filter=@skald/previewer build",
+    "pack": "bun systems/dnd5e/content-pack/open/cli.ts",
+    "check:packs": "bun scripts/check-pack-files.ts"
   },
   "overrides": {
     "parse5": "8.0.0"

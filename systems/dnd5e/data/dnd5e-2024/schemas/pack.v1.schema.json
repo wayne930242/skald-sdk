@@ -1,0 +1,1022 @@
+{
+  "$id": "https://skald.local/schemas/dnd5e-2024/pack.v1.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "block": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/node11"
+        },
+        {
+          "not": {
+            "type": "null"
+          }
+        }
+      ]
+    },
+    "node0": {
+      "anyOf": [
+        {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "items": false,
+          "type": "array"
+        },
+        {
+          "additionalProperties": false,
+          "propertyNames": {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "node1": {
+      "anyOf": [
+        {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "items": {
+            "$ref": "#/definitions/node0"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/definitions/node0"
+          },
+          "propertyNames": {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "node10": {
+      "anyOf": [
+        {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "items": {
+            "$ref": "#/definitions/node9"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/definitions/node9"
+          },
+          "propertyNames": {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "node11": {
+      "anyOf": [
+        {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "items": {
+            "$ref": "#/definitions/node10"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/definitions/node10"
+          },
+          "propertyNames": {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "node12": {
+      "anyOf": [
+        {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "items": {
+            "$ref": "#/definitions/node11"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/definitions/node11"
+          },
+          "propertyNames": {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "node2": {
+      "anyOf": [
+        {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "items": {
+            "$ref": "#/definitions/node1"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/definitions/node1"
+          },
+          "propertyNames": {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "node3": {
+      "anyOf": [
+        {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "items": {
+            "$ref": "#/definitions/node2"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/definitions/node2"
+          },
+          "propertyNames": {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "node4": {
+      "anyOf": [
+        {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "items": {
+            "$ref": "#/definitions/node3"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/definitions/node3"
+          },
+          "propertyNames": {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "node5": {
+      "anyOf": [
+        {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "items": {
+            "$ref": "#/definitions/node4"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/definitions/node4"
+          },
+          "propertyNames": {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "node6": {
+      "anyOf": [
+        {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "items": {
+            "$ref": "#/definitions/node5"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/definitions/node5"
+          },
+          "propertyNames": {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "node7": {
+      "anyOf": [
+        {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "items": {
+            "$ref": "#/definitions/node6"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/definitions/node6"
+          },
+          "propertyNames": {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "node8": {
+      "anyOf": [
+        {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "items": {
+            "$ref": "#/definitions/node7"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/definitions/node7"
+          },
+          "propertyNames": {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "node9": {
+      "anyOf": [
+        {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "items": {
+            "$ref": "#/definitions/node8"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/definitions/node8"
+          },
+          "propertyNames": {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "overlay": {
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "$ref": "#/definitions/overlayEn"
+        },
+        "zhTW": {
+          "$ref": "#/definitions/overlayZh"
+        }
+      },
+      "required": [
+        "en"
+      ],
+      "type": "object"
+    },
+    "overlayEn": {
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "entries": {
+          "items": {
+            "$ref": "#/definitions/block"
+          },
+          "maxItems": 5000,
+          "type": "array"
+        },
+        "entriesHigherLevel": {
+          "items": {
+            "$ref": "#/definitions/block"
+          },
+          "maxItems": 5000,
+          "type": "array"
+        },
+        "lore": {
+          "items": {
+            "$ref": "#/definitions/block"
+          },
+          "maxItems": 5000,
+          "type": "array"
+        },
+        "material": {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        "meta": {
+          "additionalProperties": {
+            "$ref": "#/definitions/node12"
+          },
+          "propertyNames": {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "name": {
+          "maxLength": 20000,
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "overlayZh": {
+      "additionalProperties": false,
+      "properties": {
+        "entries": {
+          "items": {
+            "$ref": "#/definitions/node11"
+          },
+          "maxItems": 5000,
+          "type": "array"
+        },
+        "entriesHigherLevel": {
+          "items": {
+            "$ref": "#/definitions/node11"
+          },
+          "maxItems": 5000,
+          "type": "array"
+        },
+        "lore": {
+          "items": {
+            "$ref": "#/definitions/node11"
+          },
+          "maxItems": 5000,
+          "type": "array"
+        },
+        "material": {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        "meta": {
+          "additionalProperties": {
+            "$ref": "#/definitions/node12"
+          },
+          "propertyNames": {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "name": {
+          "maxLength": 20000,
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "description": "A content pack in the SDK format. A validator must also enforce the 12 MB UTF-8 file limit, ref = kind:id, the payload checksum, and the rules on refs and names that equal built-in ones (docs/content-packs.md).",
+  "properties": {
+    "$schema": {
+      "const": "skald/pack/v1"
+    },
+    "manifest": {
+      "additionalProperties": false,
+      "properties": {
+        "systemId": {
+          "const": "dnd5e-2024"
+        },
+        "packId": {
+          "pattern": "^[a-z0-9][a-z0-9/-]{0,199}$",
+          "type": "string"
+        },
+        "packVersion": {
+          "maxLength": 150,
+          "minLength": 1,
+          "type": "string"
+        },
+        "notice": {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        "payloadSha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "requiresBuiltin": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "generatedAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "type": "string"
+        },
+        "locales": {
+          "items": {
+            "enum": [
+              "en",
+              "zh-TW"
+            ]
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "systemId",
+        "packId",
+        "packVersion",
+        "name",
+        "notice",
+        "payloadSha256"
+      ],
+      "type": "object"
+    },
+    "payload": {
+      "additionalProperties": false,
+      "properties": {
+        "entries": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "enum": [
+                  "action",
+                  "background",
+                  "baseItem",
+                  "chapter",
+                  "class",
+                  "classFeature",
+                  "condition",
+                  "creature",
+                  "feat",
+                  "item",
+                  "itemGroup",
+                  "itemMastery",
+                  "itemProperty",
+                  "language",
+                  "lineage",
+                  "optionalFeature",
+                  "rule",
+                  "skill",
+                  "species",
+                  "spell",
+                  "status",
+                  "subclass",
+                  "subclassFeature",
+                  "table"
+                ]
+              },
+              "id": {
+                "pattern": "^[a-z0-9][a-z0-9/-]{0,199}$",
+                "type": "string"
+              },
+              "ref": {
+                "pattern": "^(?:action|background|baseItem|chapter|class|classFeature|condition|creature|feat|item|itemGroup|itemMastery|itemProperty|language|lineage|optionalFeature|rule|skill|species|spell|status|subclass|subclassFeature|table):[a-z0-9][a-z0-9/-]{0,199}$",
+                "type": "string"
+              },
+              "name": {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              "entries": {
+                "items": {
+                  "$ref": "#/definitions/node11"
+                },
+                "maxItems": 5000,
+                "type": "array"
+              },
+              "meta": {
+                "additionalProperties": {
+                  "$ref": "#/definitions/node12"
+                },
+                "propertyNames": {
+                  "maxLength": 20000,
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "lore": {
+                "items": {
+                  "$ref": "#/definitions/block"
+                },
+                "maxItems": 5000,
+                "type": "array"
+              },
+              "source": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,39}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "id",
+              "name",
+              "entries"
+            ],
+            "type": "object"
+          },
+          "maxItems": 5000,
+          "type": "array"
+        },
+        "overlays": {
+          "additionalProperties": {
+            "$ref": "#/definitions/overlay"
+          },
+          "maxProperties": 5000,
+          "propertyNames": {
+            "pattern": "^(?:action|background|baseItem|chapter|class|classFeature|condition|creature|feat|item|itemGroup|itemMastery|itemProperty|language|lineage|optionalFeature|rule|skill|species|spell|status|subclass|subclassFeature|table):[a-z0-9][a-z0-9/-]{0,199}$",
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "wizard": {
+          "additionalProperties": false,
+          "properties": {
+            "backgrounds": {
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "https://skald.local/schemas/dnd5e-2024/game-items.schema.json#/definitions/backgrounds"
+                  },
+                  {
+                    "properties": {
+                      "origin": {
+                        "const": "pack"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 5000,
+              "type": "array"
+            },
+            "class-options": {
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "https://skald.local/schemas/dnd5e-2024/game-items.schema.json#/definitions/class-options"
+                  },
+                  {
+                    "properties": {
+                      "origin": {
+                        "const": "pack"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 5000,
+              "type": "array"
+            },
+            "classes": {
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "https://skald.local/schemas/dnd5e-2024/game-items.schema.json#/definitions/classes"
+                  },
+                  {
+                    "properties": {
+                      "origin": {
+                        "const": "pack"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 5000,
+              "type": "array"
+            },
+            "equipment-packages": {
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "https://skald.local/schemas/dnd5e-2024/game-items.schema.json#/definitions/equipment-packages"
+                  },
+                  {
+                    "properties": {
+                      "origin": {
+                        "const": "pack"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 5000,
+              "type": "array"
+            },
+            "feats": {
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "https://skald.local/schemas/dnd5e-2024/game-items.schema.json#/definitions/feats"
+                  },
+                  {
+                    "properties": {
+                      "origin": {
+                        "const": "pack"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 5000,
+              "type": "array"
+            },
+            "invocations": {
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "https://skald.local/schemas/dnd5e-2024/game-items.schema.json#/definitions/invocations"
+                  },
+                  {
+                    "properties": {
+                      "origin": {
+                        "const": "pack"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 5000,
+              "type": "array"
+            },
+            "languages": {
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "https://skald.local/schemas/dnd5e-2024/game-items.schema.json#/definitions/languages"
+                  },
+                  {
+                    "properties": {
+                      "origin": {
+                        "const": "pack"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 5000,
+              "type": "array"
+            },
+            "lineages": {
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "https://skald.local/schemas/dnd5e-2024/game-items.schema.json#/definitions/lineages"
+                  },
+                  {
+                    "properties": {
+                      "origin": {
+                        "const": "pack"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 5000,
+              "type": "array"
+            },
+            "skills": {
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "https://skald.local/schemas/dnd5e-2024/game-items.schema.json#/definitions/skills"
+                  },
+                  {
+                    "properties": {
+                      "origin": {
+                        "const": "pack"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 5000,
+              "type": "array"
+            },
+            "species": {
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "https://skald.local/schemas/dnd5e-2024/game-items.schema.json#/definitions/species"
+                  },
+                  {
+                    "properties": {
+                      "origin": {
+                        "const": "pack"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 5000,
+              "type": "array"
+            },
+            "spells": {
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "https://skald.local/schemas/dnd5e-2024/game-items.schema.json#/definitions/spells"
+                  },
+                  {
+                    "properties": {
+                      "origin": {
+                        "const": "pack"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 5000,
+              "type": "array"
+            },
+            "tools": {
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "https://skald.local/schemas/dnd5e-2024/game-items.schema.json#/definitions/tools"
+                  },
+                  {
+                    "properties": {
+                      "origin": {
+                        "const": "pack"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 5000,
+              "type": "array"
+            },
+            "weapons": {
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "https://skald.local/schemas/dnd5e-2024/game-items.schema.json#/definitions/weapons"
+                  },
+                  {
+                    "properties": {
+                      "origin": {
+                        "const": "pack"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 5000,
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "zhTW": {
+          "additionalProperties": {
+            "additionalProperties": false,
+            "properties": {
+              "entries": {
+                "items": {
+                  "$ref": "#/definitions/node11"
+                },
+                "maxItems": 5000,
+                "type": "array"
+              },
+              "entriesHigherLevel": {
+                "items": {
+                  "$ref": "#/definitions/node11"
+                },
+                "maxItems": 5000,
+                "type": "array"
+              },
+              "lore": {
+                "items": {
+                  "$ref": "#/definitions/node11"
+                },
+                "maxItems": 5000,
+                "type": "array"
+              },
+              "material": {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              "meta": {
+                "additionalProperties": {
+                  "$ref": "#/definitions/node12"
+                },
+                "propertyNames": {
+                  "maxLength": 20000,
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "name": {
+                "maxLength": 20000,
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "entries"
+            ],
+            "type": "object"
+          },
+          "maxProperties": 5000,
+          "propertyNames": {
+            "pattern": "^(?:action|background|baseItem|chapter|class|classFeature|condition|creature|feat|item|itemGroup|itemMastery|itemProperty|language|lineage|optionalFeature|rule|skill|species|spell|status|subclass|subclassFeature|table):[a-z0-9][a-z0-9/-]{0,199}$",
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "entries"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "$schema",
+    "manifest",
+    "payload"
+  ],
+  "title": "Skald D&D 2024 content pack (SDK format v1)",
+  "type": "object"
+}

@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { NextIntlClientProvider, useLocale, useMessages, useTranslations } from "next-intl";
 import type { EntriesRenderContext } from "../reference/entries-renderer";
+import { useHostPort } from "@skald/sheet-sdk/modules/systems/ui/host-ports";
 import { loadReferenceMessages, type ReferenceCatalog } from "../reference/load-corpus";
 import { TIER_A_TAG_LABELS, type DndKind } from "../reference/tags";
+import { dndPackSourcePort } from "./pack-source-port";
 import type { ReferenceContextValue } from "./use-reference-context";
 
 /**
@@ -32,15 +34,36 @@ export function ReferenceIntl({ children }: { children: ReactNode }) {
       live = false;
     };
   }, [loaded, locale]);
+  const packNames = useHostPackNames(locale);
   const merged = useMemo(() => (loaded ? {
-    ...messages, referenceUi: loaded.referenceUi ?? {}, referenceSearch: loaded.referenceSearch ?? {},
-  } : null), [loaded, messages]);
+    ...messages,
+    referenceUi: packNames ? { ...loaded.referenceUi, packNames } : loaded.referenceUi ?? {},
+    referenceSearch: loaded.referenceSearch ?? {},
+  } : null), [loaded, messages, packNames]);
   if (!merged) return null;
   return (
     <NextIntlClientProvider locale={locale} messages={merged}>
       {children}
     </NextIntlClientProvider>
   );
+}
+
+/**
+ * The pack names the host gives (`DndPackSource.packNames`), as `referenceUi.packNames`; null until
+ * they load, or without the port. A failed load leaves the badges on the pack ids.
+ */
+function useHostPackNames(locale: string): Readonly<Record<string, string>> | null {
+  const source = useHostPort(dndPackSourcePort);
+  const [names, setNames] = useState<{ locale: string; value: Readonly<Record<string, string>> } | null>(null);
+  useEffect(() => {
+    if (!source?.packNames) return;
+    let live = true;
+    source.packNames(locale).then((value) => live && setNames({ locale, value }), () => {});
+    return () => {
+      live = false;
+    };
+  }, [source, locale]);
+  return names?.locale === locale ? names.value : null;
 }
 
 /** Kinds whose label lives in the lazy catalog (tier A names the others under `reference.kind`). */

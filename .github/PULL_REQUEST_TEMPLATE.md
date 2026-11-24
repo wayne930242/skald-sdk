@@ -4,11 +4,12 @@
 
 ## Provenance
 
-<!-- Every piece of text, data, or art you add must come from you or from a source whose licence allows it here. -->
+<!-- Every piece of text, data, or art you add must come from you, or from a source whose licence or fan content policy allows it here (CONTRIBUTING.md). -->
 
-- [ ] I wrote this myself, or it comes from the SRD 5.2.1, the Fate SRD, or another source listed in `NOTICE`.
-- [ ] It contains no text from commercial publisher books, from translations under non-commercial or share-alike licences, or from translations I did not write.
-- Source and licence of any third-party material: <!-- URL + licence, or "none" -->
+- [ ] I wrote this myself, or it comes from the SRD 5.2.1, the Fate SRD, another source listed in `NOTICE`, or a publisher's fan or community content policy that allows it here (linked below).
+- [ ] It contains no other text from commercial publisher books, no translations under non-commercial or share-alike licences, and no translations I did not write.
+- [ ] It adds no content pack file and no text from one (`docs/content-packs.md`).
+- Source and licence or policy of any third-party material: <!-- URL + licence, or policy URL + the terms that allow it, or "none" -->
 
 ## Checks
 

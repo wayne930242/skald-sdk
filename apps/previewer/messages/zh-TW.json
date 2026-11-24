@@ -31,7 +31,28 @@
       "empty": "在角色卡上擲的骰會列在這裡。",
       "clear": "清除"
     },
-    "unavailable": "預覽器沒有的功能：遊戲桌、上傳肖像、下載 PDF、Excel 公式與擴充包。",
+    "packs": {
+      "title": "內容包",
+      "load": "載入內容包檔案",
+      "checking": "檢查中…",
+      "note": "skald/pack/v1 格式的 D&D 2024 內容包。只留在這個分頁的記憶體，重新整理就會清除。",
+      "loaded": "已載入「{name}」。",
+      "version": "{packId} {version}",
+      "supplies": "{entries} 筆條目、{overlays} 則覆蓋文字",
+      "dropped": "捨棄 {count} 筆：{refs}",
+      "mismatch": "這個內容包是對照其他版本的內建資料製作的，部分連結可能無法解析。",
+      "remove": "移除",
+      "error": {
+        "tooLarge": "檔案超過 12 MB。",
+        "notJson": "這個檔案不是 JSON 物件。",
+        "schema": "不是有效的內容包（{detail}）。",
+        "wrongSystem": "這個檔案不是 skald/pack/v1 格式的 D&D 2024 內容包。",
+        "unsupportedVersion": "這個內容包需要較新版的預覽器。",
+        "shaMismatch": "校驗碼不符：每次修改後都要重新封裝內容包。",
+        "failed": "無法檢查這個內容包，請再試一次。"
+      }
+    },
+    "unavailable": "預覽器沒有的功能：遊戲桌、上傳肖像、下載 PDF 與 Excel 公式。",
     "locales": {
       "en": "English",
       "zh-TW": "繁體中文"

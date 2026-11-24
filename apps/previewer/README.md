@@ -30,9 +30,13 @@ Open `/en` or `/zh-TW` and pick a system and a mode, or go straight to
 - Rolls you make on the sheet land in the roll log beside it. Nothing is sent anywhere.
 - **Character**: load the sample character (`characters/<system>.json`) or a blank sheet, import a
   character JSON file, or export the one on screen.
+- **Content packs** (D&D 2024): load a pack file in the `skald/pack/v1` format from your computer. The
+  previewer checks it as `bun run pack check` does, lists what it supplies and drops, and shows its
+  entries and overlays on the sheet. Packs stay in the tab's memory; a reload clears them. See
+  [docs/content-packs.md](../../docs/content-packs.md).
 
 These features need the Skald service and show as unavailable here: table sessions, portrait upload,
-PDF download, Excel formulas and content packs.
+PDF download and Excel formulas.
 
 ## Manual check before a pull request
 
@@ -44,4 +48,6 @@ For each system (`fate-condensed`, `dnd5e-2024`), each locale (`en`, `zh-TW`) an
 3. Edit: change a value, reload the page; the value is still there.
 4. Print: the preview shows the character's pages; A4 and Letter switch the paper.
 5. D&D in zh-TW: the notice above the sheet says some text shows in English.
-6. The browser console shows no errors.
+6. D&D with packs: load `systems/dnd5e/content-pack/open/example/lantern-table.pack.json`; the pack
+   lists one entry and one overlay, and the reference for the Light spell shows the pack's wording.
+7. The browser console shows no errors.

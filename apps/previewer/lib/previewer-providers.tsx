@@ -8,6 +8,7 @@ import { bindHostPort, HostPortsProvider, type HostPortBinding } from "@skald/sh
 import { corePorts } from "@skald/sheet-sdk/modules/systems/ui/core-ports";
 import { SystemPluginProvider } from "@skald/sheet-sdk/modules/systems/ui/system-plugin-provider";
 import type { GameIconSource } from "@skald/sheet-sdk/lib/game-icons/client";
+import { dndPackSourcePort } from "@skald/system-dnd5e/sheet/pack-source-port";
 import sdkEn from "@skald/sheet-sdk/messages/en.json";
 import sdkZhTW from "@skald/sheet-sdk/messages/zh-TW.json";
 import previewerEn from "../messages/en.json";
@@ -20,6 +21,7 @@ import {
   PLUGIN_UI_CATALOG,
   type Locale,
 } from "./systems";
+import { previewerPackSource } from "./content-packs";
 
 const MESSAGES: Record<Locale, Record<string, unknown>> = {
   en: { ...sdkEn, ...previewerEn },
@@ -38,13 +40,15 @@ function PlainLink(props: AnchorHTMLAttributes<HTMLAnchorElement> & { href: stri
 }
 
 /**
- * The host ports the previewer serves: only harmless local ones. Table sessions, portrait upload,
- * PDF download, the Excel engine and content packs stay unregistered, so their controls show
- * as unavailable, as they would in any host that lacks them.
+ * The host ports the previewer serves: only harmless local ones, and D&D's content packs from local
+ * files kept in memory (`content-packs.ts`). Table sessions, portrait upload, PDF download and the
+ * Excel engine stay unregistered, so their controls show as unavailable, as they would in any host
+ * that lacks them.
  */
 const PREVIEWER_PORTS: readonly HostPortBinding[] = [
   bindHostPort(corePorts.gameIconSource, localGameIcons),
   bindHostPort(corePorts.navigationLink, PlainLink),
+  bindHostPort(dndPackSourcePort, previewerPackSource),
 ];
 
 const DATA_CATALOG = {

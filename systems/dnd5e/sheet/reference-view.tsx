@@ -376,8 +376,8 @@ export function ReferenceView({ resolved, showSrd, onShowSrdChange, embedded = f
     <div data-reference={resolved.ref} data-text-source={srd ? "srd" : resolved.textSource}>
       {resolved.textSource && (
         <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md bg-muted/50 px-2 py-1 text-xs" data-overlay-bar>
-          <Badge variant="outline" className="text-2xs">{tUi("overlay.badge")}</Badge>
-          <span className="text-muted-foreground">{tUi(`overlay.source.${resolved.textSource}`)}</span>
+          <Badge variant="outline" className="text-2xs">{tUi(resolved.textSource === "pack" ? "overlay.badgePack" : "overlay.badge")}</Badge>
+          {resolved.textSource !== "pack" && <span className="text-muted-foreground">{tUi(`overlay.source.${resolved.textSource}`)}</span>}
           {toggleable && (
             <label className="ml-auto flex items-center gap-1.5">
               <Switch checked={showSrd} onCheckedChange={onShowSrdChange} aria-label={tUi("overlay.showSrd")} />

@@ -15,6 +15,7 @@
     },
     "overlay": {
       "badge": "原文（內容包）",
+      "badgePack": "內容包的文字",
       "source": {
         "xphb": "出處：《玩家手冊》（2024）",
         "xmm": "出處：2024 年版怪物書（XMM）",
@@ -253,10 +254,6 @@
     "compendium": {
       "featureLevel": "{level} 級"
     },
-    "packFrom": "內容包：{name}",
-    "packNames": {
-      "xdmg-extras": "XDMG 擴充內容",
-      "xphb-extras": "XPHB 擴充內容"
-    }
+    "packFrom": "內容包：{name}"
   }
 }

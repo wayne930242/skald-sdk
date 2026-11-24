@@ -44,6 +44,7 @@ See the [previewer guide](apps/previewer/README.md) for direct links and what to
 - To change a sheet, start with the system’s `schema.json` and `template.json`. The [Fate Condensed data](systems/fate/data/fate-condensed/) shows how the schema defines fields and the template arranges them. See the [schema and template types][sheet-types].
 - To add a system, use the [Fate plugin](systems/fate/plugin.ts) as an example. Implement the [`SystemPlugin` contract][plugin-contract], have `loadBuiltinData` return the schema, template, and default character data as [`BuiltinLocalSystemData`][builtin-data], and register the plugin in the [previewer registry](apps/previewer/lib/systems.ts).
 - Check the sheet in play, edit, and print modes in the previewer.
+- To write a D&D 2024 content pack, check it, and load it in the previewer, see [Content packs](docs/content-packs.md).
 
 ## Contributing
 
@@ -58,6 +59,7 @@ The project is licensed under [Apache-2.0](LICENSE), except for third-party mate
 D&D SRD 5.2.1 material is CC BY 4.0, and Fate SRD material is CC BY 3.0.
 Game-Icons.net icons are CC BY 3.0 unless listed as CC0 or public domain.
 See [NOTICE](NOTICE) for full attributions and [TRADEMARKS.md](TRADEMARKS.md) for trademark terms.
+Text this repository may not redistribute, such as material from a book you own, belongs in a content pack that each player keeps for themselves; [Content packs](docs/content-packs.md) explains where the line runs.
 
 [sheet-types]: packages/types/src/schema.ts
 [plugin-contract]: packages/sheet-sdk/src/modules/systems/domain/system-plugin.ts

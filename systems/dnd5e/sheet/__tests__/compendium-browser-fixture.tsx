@@ -16,7 +16,7 @@ const pack = "compendium-layout-fixture";
 const id = "fighter/example/ward-l18";
 const ref = `subclassFeature:${id}`;
 const packs: EffectivePacks = {
-  keys: [pack, 'xdmg-extras'], supplier: { [ref]: pack, ...Object.fromEntries(sampleDm.entries.map(entry => [entry.ref, 'xdmg-extras'])) }, aliases: {}, shadowed: {},
+  keys: [pack, 'sample-dm-pack'], supplier: { [ref]: pack, ...Object.fromEntries(sampleDm.entries.map(entry => [entry.ref, 'sample-dm-pack'])) }, aliases: {}, shadowed: {},
   content: {
     entries: [...sampleDm.entries, { kind: 'chapter', id: 'xphb/sample', ref: 'chapter:xphb/sample', name: 'Sample Chapter', entries: [], meta: { bookChapter: 0 } }, { kind: "subclassFeature", id, ref, name: "Bright Ward of the Winter Stars", entries: [], meta: {} }],
     zhTW: { ...sampleDm.zhTW, [ref]: { name: "冬星守衛", entries: [] } }, wizard: {},

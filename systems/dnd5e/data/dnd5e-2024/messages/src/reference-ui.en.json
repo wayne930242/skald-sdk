@@ -15,6 +15,7 @@
     },
     "overlay": {
       "badge": "Original text (content pack)",
+      "badgePack": "Content pack wording",
       "source": {
         "xphb": "Source: Player's Handbook (2024)",
         "xmm": "Source: 2024 bestiary (XMM)",
@@ -253,10 +254,6 @@
     "compendium": {
       "featureLevel": "Level {level}"
     },
-    "packFrom": "Pack: {name}",
-    "packNames": {
-      "xdmg-extras": "XDMG Extras",
-      "xphb-extras": "XPHB extras"
-    }
+    "packFrom": "Pack: {name}"
   }
 }

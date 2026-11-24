@@ -19,6 +19,11 @@ import { getSystemMessages, loadSystem, loadSystemPrint, type PreviewMode } from
 import { RollLog } from "./roll-log";
 import { CharacterBar, type CharacterSource } from "./character-bar";
 import { initialCharacter, readStoredCharacter, storeCharacter } from "./characters";
+import { packsKey, usePreviewPacks } from "./content-packs";
+import { PackBar } from "./pack-bar";
+
+/** Systems whose sheet reads content packs (docs/content-packs.md). */
+const PACK_SYSTEMS: ReadonlySet<string> = new Set(["dnd5e-2024"]);
 
 type CharacterData = Record<string, unknown>;
 
@@ -190,6 +195,8 @@ function LoadedPreview({
   const preview = use(load);
   const { system } = preview;
   const [character, setCharacter] = useState(() => initialCharacter(slug, system.defaultData));
+  const packs = usePreviewPacks();
+  const readsPacks = PACK_SYSTEMS.has(slug);
   const replace = useCallback((source: CharacterSource, data: CharacterData) => {
     storeCharacter(slug, data);
     setCharacter((current) => ({ key: current.key + 1, source, data }));
@@ -206,8 +213,9 @@ function LoadedPreview({
             onReplace={replace}
             currentData={() => readStoredCharacter(slug) ?? character.data}
           />
+          {readsPacks && <PackBar />}
           <SheetBody
-            key={character.key}
+            key={readsPacks ? `${character.key}:${packsKey(packs)}` : character.key}
             preview={preview}
             slug={slug}
             mode={mode}

@@ -44,7 +44,7 @@ export const fatePlugin: SystemPlugin = {
   systems: {
     "fate-condensed": {
       config: config as SystemConfig,
-      presentation: { icon: "dices", hue: 165 },
+      presentation: { icon: "dices", hue: 165, coverUrl: "/assets/system-covers/fate-condensed.webp" },
       loadBuiltinData: loadFateCondensedData,
       loadMessages: loadFateMessages,
     },

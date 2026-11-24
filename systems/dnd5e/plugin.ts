@@ -19,7 +19,7 @@ export const dnd5ePlugin: SystemPlugin = {
   systems: {
     "dnd5e-2024": {
       config: config as SystemConfig,
-      presentation: { icon: "dices", hue: 20 },
+      presentation: { icon: "dices", hue: 20, coverUrl: "/assets/system-covers/dnd5e-2024.webp" },
       loadBuiltinData: loadDnd5e2024Data,
       loadMessages: loadDnd5e2024Messages,
     },

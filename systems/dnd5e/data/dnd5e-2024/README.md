@@ -3,25 +3,22 @@
 This work includes material from the System Reference Document 5.2.1 ("SRD 5.2.1") by Wizards of the Coast LLC, available at https://www.dndbeyond.com/srd.
 The SRD 5.2.1 is licensed under the Creative Commons Attribution 4.0 International License, available at https://creativecommons.org/licenses/by/4.0/legalcode.
 
-Traditional Chinese translation by Skald (machine-assisted); structured data adapted from 5etools (5etools-mirror-3/5etools-src).
+Traditional Chinese translation by Skald (machine-assisted).
+The structure and markup of the data files are adapted from a third-party project; [NOTICE](../../../../NOTICE) gives its name, source and licence.
 
-## Regeneration
+## Files
 
-Run the following from `apps/web`:
+| Path | Contents |
+| --- | --- |
+| `system.json`, `schema.json`, `template.json`, `default-data.json` | The system's sheet: its configuration, fields, layout and a blank character. |
+| `game/` | Character creation data: classes, species, backgrounds, feats, spells, equipment and the rest. |
+| `corpus/en/`, `corpus/zh-TW/` | The rules text of every built-in entry, keyed by its ref (`kind:id`), read when a reference view opens. |
+| `corpus/index/`, `corpus/parts.json`, `import/`, `coverage/` | Search indexes, the corpus file list, the spell index and the coverage report the data build writes. |
+| `messages/` | Interface labels and entry names in `en` and `zh-TW`; `messages/src/` holds the parts the catalogs merge. |
+| `economy/` | The item catalog with prices. |
+| `dsl-*.json`, `roll-macros.json` | Dice rules and roll macros. |
+| `schemas/` | JSON Schemas for character creation items and content packs; see [schemas/README.md](schemas/README.md). |
+| `zh-availability.json` | The zh-TW files this repository does not carry yet; each holds the English text. |
 
-```bash
-bun run dnd2024:fetch
-bun run dnd2024:data
-```
-
-If the pinned local workbook is outside this checkout, set `DND2024_BOSS_WORKBOOK` to its path before fetching.
-The fetch command checks every input against `pipeline.lock.json`.
-Use `--update-lock` only for a reviewed pin or input change.
-The data command works offline, checks the English input hashes again, and generates `game/`, `corpus/en/`, `import/spell-index.json`, `coverage/en.json`, and the English name messages.
-Only `game/` is for wizard data loading; `corpus/` is for lazy reference loading, not seeding or eager imports.
-`dnd2024:messages` rebuilds the catalogs from the disjoint parts in `messages/src/`.
-
-`bun run dnd2024:pack` is separate and offline.
-Its output is private, written outside `apps/` to `content-packs/dnd5e-2024/dist/`.
-That directory is committed only while this repository is private and is excluded from every deploy path; its README covers the workflow.
-Never bundle or serve the pack from the app.
+These files are generated: report a data error in an issue instead of editing them (see [CONTRIBUTING.md](../../../../CONTRIBUTING.md)).
+The built-in content is the SRD 5.2.1. Other content belongs in a content pack, which each player keeps for themselves; see [docs/content-packs.md](../../../../docs/content-packs.md).

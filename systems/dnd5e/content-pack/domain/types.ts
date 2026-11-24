@@ -51,7 +51,8 @@ export interface PackOverlayZh {
 
 /** A pack overlay on a built-in ref (plan T2b §3): shown over the SRD text while the pack is loaded. */
 export interface PackOverlay {
-  source: PackSource;
+  /** The book the wording comes from; absent for a pack's own wording (the SDK format, `open/format.ts`). */
+  source?: PackSource;
   en: PackOverlayText;
   zhTW?: PackOverlayZh;
 }

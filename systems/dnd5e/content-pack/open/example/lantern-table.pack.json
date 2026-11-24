@@ -1,0 +1,85 @@
+{
+  "$schema": "skald/pack/v1",
+  "manifest": {
+    "systemId": "dnd5e-2024",
+    "packId": "lantern-table",
+    "packVersion": "1.0.0",
+    "name": "Lantern Table house rules",
+    "notice": "An example pack written for the Skald SDK documentation. Its text is original and is released under the Apache License 2.0 with this repository.",
+    "locales": [
+      "en",
+      "zh-TW"
+    ],
+    "payloadSha256": "b2f9cd610bbe0847978042a13e96af31e45011c80874ea9a77f32be4f60b98c2"
+  },
+  "payload": {
+    "entries": [
+      {
+        "kind": "feat",
+        "id": "lantern-watcher",
+        "name": "Lantern Watcher",
+        "source": "homebrew",
+        "entries": [
+          "You have kept watch through many long nights.",
+          {
+            "type": "entries",
+            "name": "Steady Light",
+            "entries": [
+              "While you hold a lit lantern, you have Advantage on Wisdom (Perception) checks made at night."
+            ]
+          }
+        ],
+        "meta": {
+          "category": "general",
+          "grants": {},
+          "repeatable": false
+        }
+      }
+    ],
+    "zhTW": {
+      "feat:lantern-watcher": {
+        "name": "守燈人",
+        "entries": [
+          "你曾守過許多漫長的夜。",
+          {
+            "type": "entries",
+            "name": "穩定的光",
+            "entries": [
+              "你手持點亮的提燈時，夜間進行的感知（察覺）檢定具有優勢。"
+            ]
+          }
+        ]
+      }
+    },
+    "wizard": {
+      "feats": [
+        {
+          "id": "lantern-watcher",
+          "ref": "feat:lantern-watcher",
+          "origin": "pack",
+          "label": {
+            "en": "Lantern Watcher",
+            "zh-TW": "守燈人"
+          },
+          "category": "general",
+          "grants": {},
+          "repeatable": false
+        }
+      ]
+    },
+    "overlays": {
+      "spell:light": {
+        "en": {
+          "entries": [
+            "At our table, the light this spell makes is the warm yellow of a lantern flame. Otherwise the spell works as written."
+          ]
+        },
+        "zhTW": {
+          "entries": [
+            "在我們這桌，這道法術發出的光是提燈火焰那種溫暖的黃光；其餘照原本的規則運作。"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@ export type SystemMessages = Record<string, unknown>;
 
 export interface SystemPresentation {
   readonly hue: number;
+  readonly coverUrl?: string;
   readonly icon: "anchor" | "dices" | "glasses" | "wind";
 }
 

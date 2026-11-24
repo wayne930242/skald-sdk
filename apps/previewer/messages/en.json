@@ -31,7 +31,28 @@
       "empty": "Rolls you make on the sheet appear here.",
       "clear": "Clear"
     },
-    "unavailable": "Not available in the previewer: table sessions, portrait upload, PDF download, Excel formulas and content packs.",
+    "packs": {
+      "title": "Content packs",
+      "load": "Load a pack file",
+      "checking": "Checking…",
+      "note": "D&D 2024 packs in the skald/pack/v1 format. They stay in this tab's memory; a reload clears them.",
+      "loaded": "Loaded “{name}”.",
+      "version": "{packId} {version}",
+      "supplies": "{entries, plural, one {# entry} other {# entries}}, {overlays, plural, one {# overlay} other {# overlays}}",
+      "dropped": "{count, plural, one {# dropped} other {# dropped}}: {refs}",
+      "mismatch": "Built for other built-in data; some links may not resolve.",
+      "remove": "Remove",
+      "error": {
+        "tooLarge": "The file is over 12 MB.",
+        "notJson": "The file is not a JSON object.",
+        "schema": "Not a valid content pack ({detail}).",
+        "wrongSystem": "This file isn't a D&D 2024 content pack in the skald/pack/v1 format.",
+        "unsupportedVersion": "This pack needs a newer version of the previewer.",
+        "shaMismatch": "The checksum doesn't match: seal the pack again after every change.",
+        "failed": "Couldn't check the pack. Try again."
+      }
+    },
+    "unavailable": "Not available in the previewer: table sessions, portrait upload, PDF download and Excel formulas.",
     "locales": {
       "en": "English",
       "zh-TW": "繁體中文"
