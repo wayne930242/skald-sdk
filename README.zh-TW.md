@@ -28,7 +28,16 @@ bun run dev
 
 ## 畫面
 
-<!-- screenshots: added after selection -->
+![D&D 2024 遊戲桌（GM 視角）：桌務、角色卡、聊天與擲骰](docs/screenshots/zh-TW/table-gm.webp)
+
+| | |
+|---|---|
+| ![D&D 2024 角色卡遊玩畫面](docs/screenshots/zh-TW/sheet-play.webp) | ![D&D 2024 建角精靈](docs/screenshots/zh-TW/wizard.webp) |
+| D&D 2024 角色卡 | 建角精靈 |
+| ![D&D 2024 列印預覽](docs/screenshots/zh-TW/print.webp) | ![Fate Condensed 角色卡](docs/screenshots/zh-TW/fate-sheet.webp) |
+| 列印預覽 | Fate Condensed 角色卡 |
+| ![手機版角色卡](docs/screenshots/zh-TW/mobile.webp) | ![深色模式](docs/screenshots/zh-TW/dark.webp) |
+| 手機版 | 深色模式 |
 
 ## 儲存庫結構
 

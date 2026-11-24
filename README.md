@@ -28,7 +28,16 @@ See the [previewer guide](apps/previewer/README.md) for direct links and what to
 
 ## Screenshots
 
-<!-- screenshots: added after selection -->
+![D&D 2024 table, GM view: table info, character cards, chat and dice](docs/screenshots/en/table-gm.webp)
+
+| | |
+|---|---|
+| ![D&D 2024 sheet in play mode](docs/screenshots/en/sheet-play.webp) | ![D&D 2024 character wizard](docs/screenshots/en/wizard.webp) |
+| D&D 2024 sheet | Character wizard |
+| ![D&D 2024 print preview](docs/screenshots/en/print.webp) | ![Fate Condensed sheet](docs/screenshots/en/fate-sheet.webp) |
+| Print preview | Fate Condensed sheet |
+| ![Table on a phone](docs/screenshots/en/mobile.webp) | ![Dark theme](docs/screenshots/en/dark.webp) |
+| On a phone | Dark theme |
 
 ## Repository layout
 
