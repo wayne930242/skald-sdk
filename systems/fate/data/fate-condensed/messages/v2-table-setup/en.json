@@ -1,0 +1,47 @@
+{
+  "fateTableSetup": {
+    "items": {
+      "skills": "Skill list",
+      "allocation": "Starting allocation",
+      "stress": "Stress",
+      "injuries": "Injuries",
+      "extreme": "Extreme consequences",
+      "ratings": "Weapon and armor",
+      "scale": "Scale",
+      "pointBudget": "Point budget",
+      "pointCap": "Rating cap"
+    },
+    "points": "{value}",
+    "issues": {
+      "invalid": "This item could not be read and was skipped",
+      "unknownItem": "This item is not known and was skipped"
+    },
+    "blocked": {
+      "stress": "Clear the marked stress before switching the stress model",
+      "injuries": "Deal with the current injuries before switching the injury model",
+      "harm": "This rule would strand current injuries or marks. Deal with them first.",
+      "preset": "This recipe is not supported. Reload the page"
+    },
+    "editor": {
+      "shortcuts": "Recipe shortcuts",
+      "shortcutsHint": "Newly set items start locked.",
+      "importRecipe": "Import a character's recipe",
+      "importLoading": "Loading your characters…",
+      "importFailed": "Could not load your characters. Try again.",
+      "importEmpty": "You have no Fate Condensed characters in your vault or at this table",
+      "importChoose": "Choose a character",
+      "importPlaceholder": "Select a character…",
+      "importLocation": { "vault": "Your vault", "table": "This table" },
+      "choices": "Rule items",
+      "playerChoice": "Player's choice",
+      "policy": "Policy for {item}",
+      "locked": "Locked",
+      "default": "Default, players may change",
+      "points": "Point buy",
+      "pointsHint": "Leave blank to use the rulebook values.",
+      "unknownOption": "The rules catalog no longer has this option. Players will get the default.",
+      "loading": "Loading the rules catalog…",
+      "failed": "The rules catalog could not be loaded"
+    }
+  }
+}

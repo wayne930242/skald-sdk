@@ -1,0 +1,41 @@
+{
+  "name": "Bram Anvilson",
+  "player": "Previewer",
+  "className": "Fighter",
+  "classId": "fighter",
+  "level": 1,
+  "background": "Soldier",
+  "backgroundId": "soldier",
+  "species": "Human",
+  "speciesId": "human",
+  "str": 16, "dex": 12, "con": 15, "int": 10, "wis": 13, "cha": 8,
+  "strSaveProf": true, "conSaveProf": true,
+  "athleticsProf": "proficient", "intimidationProf": "proficient", "perceptionProf": "proficient", "survivalProf": "proficient",
+  "speed": 30,
+  "armorType": "heavy", "armorBase": 16, "shield": true,
+  "hitDieFaces": 10,
+  "armorLight": true, "armorMedium": true, "armorHeavy": true, "armorShields": true,
+  "weaponProficiencies": "Simple weapons, martial weapons",
+  "initiativeMisc": 2,
+  "gp": 14,
+  "weapons": [
+    { "id": "w1", "name": "Longsword", "ability": "str", "proficient": true, "magic": 0, "ranged": false, "damageDice": "1d8", "damageType": "Slashing", "mastery": "Sap", "notes": "Versatile (1d10)", "ref": "baseItem:longsword", "origin": "srd" },
+    { "id": "w2", "name": "Javelin", "ability": "str", "proficient": true, "magic": 0, "ranged": false, "damageDice": "1d6", "damageType": "Piercing", "mastery": "Slow", "notes": "Thrown (30/120)", "ref": "baseItem:javelin", "origin": "srd" }
+  ],
+  "features": [
+    { "id": "f1", "ref": "classFeature:fighter/fighting-style-l1", "name": "Fighting Style", "level": 1, "origin": "srd", "text": "" },
+    { "id": "f2", "ref": "classFeature:fighter/second-wind-l1", "name": "Second Wind", "level": 1, "origin": "srd", "text": "" },
+    { "id": "f3", "ref": "classFeature:fighter/weapon-mastery-l1", "name": "Weapon Mastery", "level": 1, "origin": "srd", "text": "" }
+  ],
+  "feats": [
+    { "id": "t1", "ref": "feat:alert", "name": "Alert", "category": "origin", "origin": "srd", "text": "" },
+    { "id": "t2", "ref": "feat:defense", "name": "Defense", "category": "fightingStyle", "origin": "srd", "text": "" }
+  ],
+  "languages": [{ "id": "l1", "ref": "language:common", "name": "Common", "origin": "srd", "text": "" }],
+  "equipment": [
+    { "id": "e1", "qty": 1, "name": "Chain Mail", "equipped": true, "ref": "baseItem:chain-mail", "origin": "srd", "text": "" },
+    { "id": "e2", "qty": 1, "name": "Shield", "equipped": true, "ref": "baseItem:shield", "origin": "srd", "text": "" },
+    { "id": "e3", "qty": 8, "name": "Javelin", "equipped": false, "ref": "baseItem:javelin", "origin": "srd", "text": "" }
+  ],
+  "backstory": "Sample character for the Skald sheet previewer. Every name is made up."
+}

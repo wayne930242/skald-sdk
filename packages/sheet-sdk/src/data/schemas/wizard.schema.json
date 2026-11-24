@@ -1,0 +1,993 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "skald/wizard/v1",
+  "title": "Skald Character Creation Wizard",
+  "description": "Declarative character creation wizard owned by a Character Sheet Template Version (ADR 0011). TypeScript twin: packages/types/src/wizard.ts. Size limits are enforced by the publish validator, not by this schema.",
+  "type": "object",
+  "required": ["$schema", "steps"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "const": "skald/wizard/v1" },
+    "title": { "$ref": "#/definitions/localizedText" },
+    "variables": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/definitions/id" },
+      "additionalProperties": { "$ref": "#/definitions/variable" }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/step" }
+    },
+    "finalize": { "$ref": "#/definitions/finalize" },
+    "entryBases": {
+      "type": "array",
+      "maxItems": 8,
+      "items": { "$ref": "#/definitions/entryBases" }
+    },
+    "tableSetup": { "$ref": "#/definitions/tableSetup" }
+  },
+  "definitions": {
+    "tableSetup": {
+      "type": "object",
+      "description": "Extension E5 (ADR 0016): the variables and step choices a table's GM may preset or lock.",
+      "additionalProperties": false,
+      "properties": {
+        "variables": {
+          "type": "array",
+          "maxItems": 60,
+          "items": {
+            "oneOf": [
+              { "$ref": "#/definitions/id" },
+              {
+                "type": "object",
+                "required": ["var"],
+                "additionalProperties": false,
+                "properties": {
+                  "var": { "$ref": "#/definitions/id" },
+                  "label": { "$ref": "#/definitions/localizedText" }
+                }
+              }
+            ]
+          }
+        },
+        "steps": {
+          "type": "object",
+          "propertyNames": { "$ref": "#/definitions/id" },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "choice": { "type": "boolean" },
+              "methods": { "type": "boolean" },
+              "label": { "$ref": "#/definitions/localizedText" }
+            }
+          }
+        }
+      }
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "description": "Stable id: letters, digits, _ and -"
+    },
+    "macroId": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+      "description": "Roll macro id: the form a {{#id[...]}} reference can spell"
+    },
+    "localizedText": {
+      "type": "string",
+      "minLength": 1,
+      "description": "{{i18n:key}} or plain text in the author's language"
+    },
+    "formula": {
+      "type": "string",
+      "pattern": "^=",
+      "description": "skald-excel-v1 formula, starting with ="
+    },
+    "literal": { "type": ["number", "string", "boolean"] },
+    "formulaOrLiteral": {
+      "type": ["number", "string", "boolean"],
+      "description": "A string starting with = is a formula; any other value is a literal"
+    },
+    "formulaOrNumber": {
+      "type": ["number", "string"],
+      "if": { "type": "string" },
+      "then": { "$ref": "#/definitions/formula" }
+    },
+    "path": {
+      "type": "string",
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*$",
+      "description": "Dotted path into a game data item"
+    },
+    "entryKey": { "type": "string", "minLength": 1 },
+    "variable": {
+      "type": "object",
+      "required": ["type", "default"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "enum": ["number", "string", "boolean"] },
+        "default": { "$ref": "#/definitions/literal" }
+      }
+    },
+    "fieldTarget": {
+      "type": "object",
+      "required": ["field"],
+      "additionalProperties": false,
+      "properties": {
+        "field": { "$ref": "#/definitions/id" },
+        "part": { "enum": ["value", "current"] },
+        "member": { "$ref": "#/definitions/id" }
+      }
+    },
+    "variableTarget": {
+      "type": "object",
+      "required": ["var"],
+      "additionalProperties": false,
+      "properties": {
+        "var": { "$ref": "#/definitions/id" }
+      }
+    },
+    "listEntryTarget": {
+      "type": "object",
+      "required": ["list", "key", "field"],
+      "additionalProperties": false,
+      "properties": {
+        "list": { "$ref": "#/definitions/id" },
+        "key": { "$ref": "#/definitions/entryKey" },
+        "field": { "$ref": "#/definitions/id" }
+      }
+    },
+    "targetRef": {
+      "type": "object",
+      "description": "{ field, part?, member? } | { var } | { list, key, field }",
+      "if": { "required": ["var"] },
+      "then": { "$ref": "#/definitions/variableTarget" },
+      "else": {
+        "if": { "required": ["list"] },
+        "then": { "$ref": "#/definitions/listEntryTarget" },
+        "else": { "$ref": "#/definitions/fieldTarget" }
+      }
+    },
+    "dataRef": {
+      "type": "object",
+      "required": ["gameData"],
+      "additionalProperties": false,
+      "properties": {
+        "gameData": { "$ref": "#/definitions/id" },
+        "path": { "$ref": "#/definitions/path" }
+      }
+    },
+    "macroRef": {
+      "type": "object",
+      "required": ["macro"],
+      "additionalProperties": false,
+      "properties": {
+        "macro": { "$ref": "#/definitions/macroId" },
+        "args": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/definitions/formulaOrNumber" }
+        }
+      }
+    },
+    "constSource": {
+      "type": "object",
+      "required": ["const"],
+      "additionalProperties": false,
+      "properties": {
+        "const": { "$ref": "#/definitions/literal" }
+      }
+    },
+    "formulaSource": {
+      "type": "object",
+      "required": ["formula"],
+      "additionalProperties": false,
+      "properties": {
+        "formula": { "$ref": "#/definitions/formula" }
+      }
+    },
+    "itemSource": {
+      "type": "object",
+      "required": ["item"],
+      "additionalProperties": false,
+      "properties": {
+        "item": { "$ref": "#/definitions/path" },
+        "default": { "$ref": "#/definitions/literal" },
+        "localize": { "type": "boolean" },
+        "chooseOne": { "type": "boolean" }
+      }
+    },
+    "dataFormulaSource": {
+      "type": "object",
+      "required": ["dataFormula"],
+      "additionalProperties": false,
+      "properties": {
+        "dataFormula": { "$ref": "#/definitions/path" }
+      }
+    },
+    "valueSource": {
+      "type": "object",
+      "description": "{ const } | { formula } | { item, default?, localize?, chooseOne? } | { dataFormula }",
+      "if": { "required": ["const"] },
+      "then": { "$ref": "#/definitions/constSource" },
+      "else": {
+        "if": { "required": ["formula"] },
+        "then": { "$ref": "#/definitions/formulaSource" },
+        "else": {
+          "if": { "required": ["dataFormula"] },
+          "then": { "$ref": "#/definitions/dataFormulaSource" },
+          "else": { "$ref": "#/definitions/itemSource" }
+        }
+      }
+    },
+    "entrySet": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "$ref": "#/definitions/id" },
+      "additionalProperties": { "$ref": "#/definitions/valueSource" }
+    },
+    "localValueSource": {
+      "type": "object",
+      "description": "{ const } | { formula }: a value source with no picked data item in scope",
+      "if": { "required": ["const"] },
+      "then": { "$ref": "#/definitions/constSource" },
+      "else": { "$ref": "#/definitions/formulaSource" }
+    },
+    "localEntrySet": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "$ref": "#/definitions/id" },
+      "additionalProperties": { "$ref": "#/definitions/localValueSource" }
+    },
+    "check": {
+      "type": "object",
+      "required": ["rule", "severity", "message"],
+      "additionalProperties": false,
+      "properties": {
+        "rule": { "$ref": "#/definitions/formula" },
+        "severity": { "enum": ["error", "warning"] },
+        "message": { "$ref": "#/definitions/localizedText" }
+      }
+    },
+    "setEffect": {
+      "type": "object",
+      "required": ["target", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "when": { "$ref": "#/definitions/formula" },
+        "target": { "$ref": "#/definitions/targetRef" },
+        "value": { "$ref": "#/definitions/formulaOrLiteral" }
+      }
+    },
+    "appendEntryEffect": {
+      "type": "object",
+      "required": ["appendEntry"],
+      "additionalProperties": false,
+      "properties": {
+        "when": { "$ref": "#/definitions/formula" },
+        "appendEntry": {
+          "type": "object",
+          "required": ["list", "set"],
+          "additionalProperties": false,
+          "properties": {
+            "list": { "$ref": "#/definitions/id" },
+            "set": { "$ref": "#/definitions/localEntrySet" }
+          }
+        }
+      }
+    },
+    "effect": {
+      "type": "object",
+      "description": "{ when?, target, value } | { when?, appendEntry }",
+      "if": { "required": ["appendEntry"] },
+      "then": { "$ref": "#/definitions/appendEntryEffect" },
+      "else": { "$ref": "#/definitions/setEffect" }
+    },
+    "bound": {
+      "description": "number | formula | \"baseline\" | { entryField }",
+      "type": ["number", "string", "object"],
+      "if": { "type": "string" },
+      "then": {
+        "anyOf": [{ "const": "baseline" }, { "$ref": "#/definitions/formula" }]
+      },
+      "else": {
+        "if": { "type": "object" },
+        "then": {
+          "required": ["entryField"],
+          "additionalProperties": false,
+          "properties": {
+            "entryField": { "$ref": "#/definitions/id" }
+          }
+        }
+      }
+    },
+    "pickCount": {
+      "type": "object",
+      "required": ["min", "max"],
+      "additionalProperties": false,
+      "description": "Each bound is a literal integer or a numeric formula evaluated on the values the step starts from",
+      "properties": {
+        "min": {
+          "type": ["integer", "string"],
+          "if": { "type": "string" },
+          "then": { "$ref": "#/definitions/formula" },
+          "else": { "minimum": 0 }
+        },
+        "max": {
+          "type": ["integer", "string"],
+          "if": { "type": "string" },
+          "then": { "$ref": "#/definitions/formula" },
+          "else": { "minimum": 1 }
+        }
+      }
+    },
+    "pickReference": {
+      "type": "object",
+      "required": ["title", "source", "display"],
+      "additionalProperties": false,
+      "description": "A list of game data shown beside the step's items. Read-only unless it has apply: then one of its items can be picked instead of the step's own, applying these ops in place of the step's",
+      "properties": {
+        "title": { "$ref": "#/definitions/localizedText" },
+        "source": { "$ref": "#/definitions/dataRef" },
+        "filter": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/definitions/pickFilter" }
+        },
+        "display": {
+          "type": "object",
+          "required": ["label"],
+          "additionalProperties": false,
+          "properties": {
+            "label": { "$ref": "#/definitions/path" },
+            "description": { "$ref": "#/definitions/path" }
+          }
+        },
+        "apply": {
+          "type": "array",
+          "maxItems": 40,
+          "items": { "$ref": "#/definitions/applyOp" }
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "required": ["id", "type"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "type": { "enum": ["fill", "generate", "pick", "allocate"] },
+        "presentation": { "enum": ["page", "hidden"] }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["presentation"],
+            "properties": { "presentation": { "const": "hidden" } }
+          },
+          "else": { "required": ["title"] }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "fill" } } },
+          "then": { "$ref": "#/definitions/fillStep" }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "generate" } } },
+          "then": { "$ref": "#/definitions/generateStep" }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "pick" } } },
+          "then": { "$ref": "#/definitions/pickStep" }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "allocate" } } },
+          "then": { "$ref": "#/definitions/allocateStep" }
+        }
+      ]
+    },
+    "variableInput": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "enum": ["number", "text", "toggle", "select"] },
+        "options": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 200,
+          "items": {
+            "type": "object",
+            "required": ["value", "label"],
+            "additionalProperties": false,
+            "properties": {
+              "value": { "$ref": "#/definitions/literal" },
+              "label": { "$ref": "#/definitions/localizedText" },
+              "when": {
+                "$ref": "#/definitions/formula",
+                "description": "Extension E4: the option is offered only while this holds, on the values the input sees"
+              }
+            }
+          }
+        },
+        "min": { "type": "number" },
+        "max": { "type": "number" }
+      }
+    },
+    "fillInput": {
+      "type": "object",
+      "required": ["target"],
+      "additionalProperties": false,
+      "properties": {
+        "target": { "$ref": "#/definitions/targetRef" },
+        "label": { "$ref": "#/definitions/localizedText" },
+        "when": { "$ref": "#/definitions/formula" },
+        "required": { "type": "boolean" },
+        "prefill": { "$ref": "#/definitions/formulaOrLiteral" },
+        "followPrefill": { "type": "boolean" },
+        "input": { "$ref": "#/definitions/variableInput" }
+      }
+    },
+    "fillStep": {
+      "type": "object",
+      "required": ["id", "type", "inputs"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "type": { "const": "fill" },
+        "title": { "$ref": "#/definitions/localizedText" },
+        "description": { "$ref": "#/definitions/localizedText" },
+        "when": { "$ref": "#/definitions/formula" },
+        "optional": { "type": "boolean" },
+        "presentation": { "enum": ["page", "hidden"] },
+        "checks": { "type": "array", "items": { "$ref": "#/definitions/check" } },
+        "effects": { "type": "array", "items": { "$ref": "#/definitions/effect" } },
+        "inputs": {
+          "type": "array",
+          "description": "May be empty for a step that only applies effects",
+          "items": { "$ref": "#/definitions/fillInput" }
+        }
+      }
+    },
+    "rollMethod": {
+      "type": "object",
+      "required": ["id", "kind", "action", "assign"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "label": { "$ref": "#/definitions/localizedText" },
+        "kind": { "const": "roll" },
+        "action": { "$ref": "#/definitions/macroRef" },
+        "count": { "$ref": "#/definitions/formulaOrNumber" },
+        "combine": { "enum": ["max", "min", "sum"] },
+        "assign": { "enum": ["ordered", "free"] }
+      }
+    },
+    "rollWritesMethod": {
+      "type": "object",
+      "required": ["id", "kind", "action", "repeat"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "label": { "$ref": "#/definitions/localizedText" },
+        "kind": { "const": "rollWrites" },
+        "action": { "$ref": "#/definitions/macroRef" },
+        "repeat": { "$ref": "#/definitions/formulaOrNumber" }
+      }
+    },
+    "presetMethod": {
+      "type": "object",
+      "required": ["id", "kind", "source", "valuesPath", "assign"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "label": { "$ref": "#/definitions/localizedText" },
+        "kind": { "const": "preset" },
+        "source": { "$ref": "#/definitions/dataRef" },
+        "valuesPath": { "$ref": "#/definitions/path" },
+        "pickByRoll": { "$ref": "#/definitions/macroRef" },
+        "assign": { "enum": ["ordered", "free"] }
+      }
+    },
+    "pointBuyMethod": {
+      "type": "object",
+      "required": ["id", "kind", "pool", "rule"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "label": { "$ref": "#/definitions/localizedText" },
+        "kind": { "const": "pointBuy" },
+        "pool": { "$ref": "#/definitions/formulaOrNumber" },
+        "rule": { "enum": ["exact", "max"] },
+        "min": { "$ref": "#/definitions/formulaOrNumber" },
+        "max": { "$ref": "#/definitions/formulaOrNumber" },
+        "warnMin": { "$ref": "#/definitions/formulaOrNumber" },
+        "warnMax": { "$ref": "#/definitions/formulaOrNumber" },
+        "seedFrom": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": { "$ref": "#/definitions/id" },
+          "description": "Sibling roll (without combine) or preset methods whose numbers the user can carry into this point buy: the step offers a switch to point buy once that method has values; the pool rule is unchanged"
+        },
+        "cost": {
+          "type": "object",
+          "required": ["lookup"],
+          "additionalProperties": false,
+          "description": "Extension E2: each score costs LOOKUP(score, lookup) from a System lookup table; spent is the sum of the costs. Needs literal min and max",
+          "properties": {
+            "lookup": { "type": "string", "minLength": 1, "maxLength": 100 }
+          }
+        }
+      }
+    },
+    "generateMethod": {
+      "type": "object",
+      "required": ["id", "kind"],
+      "properties": {
+        "kind": { "enum": ["roll", "rollWrites", "preset", "pointBuy"] }
+      },
+      "allOf": [
+        {
+          "if": { "required": ["kind"], "properties": { "kind": { "const": "roll" } } },
+          "then": { "$ref": "#/definitions/rollMethod" }
+        },
+        {
+          "if": { "required": ["kind"], "properties": { "kind": { "const": "rollWrites" } } },
+          "then": { "$ref": "#/definitions/rollWritesMethod" }
+        },
+        {
+          "if": { "required": ["kind"], "properties": { "kind": { "const": "preset" } } },
+          "then": { "$ref": "#/definitions/presetMethod" }
+        },
+        {
+          "if": { "required": ["kind"], "properties": { "kind": { "const": "pointBuy" } } },
+          "then": { "$ref": "#/definitions/pointBuyMethod" }
+        }
+      ]
+    },
+    "generateStep": {
+      "type": "object",
+      "required": ["id", "type", "targets", "methods"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "type": { "const": "generate" },
+        "title": { "$ref": "#/definitions/localizedText" },
+        "description": { "$ref": "#/definitions/localizedText" },
+        "when": { "$ref": "#/definitions/formula" },
+        "optional": { "type": "boolean" },
+        "presentation": { "enum": ["page", "hidden"] },
+        "checks": { "type": "array", "items": { "$ref": "#/definitions/check" } },
+        "effects": { "type": "array", "items": { "$ref": "#/definitions/effect" } },
+        "targets": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 60,
+          "items": { "$ref": "#/definitions/targetRef" }
+        },
+        "methodVar": { "$ref": "#/definitions/id" },
+        "methods": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": { "$ref": "#/definitions/generateMethod" }
+        },
+        "rerollable": {
+          "type": "boolean",
+          "description": "Whether the step may be rolled again; every roll and reroll is kept in the Creation Roll Log, which drops its oldest entries when full"
+        }
+      }
+    },
+    "pickFilter": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["path", "op", "value"],
+          "additionalProperties": false,
+          "properties": {
+            "path": { "$ref": "#/definitions/path" },
+            "op": { "enum": ["equals", "includes", "absentOrIncludes"] },
+            "value": { "$ref": "#/definitions/formulaOrLiteral" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["path", "op", "list", "field"],
+          "additionalProperties": false,
+          "description": "Extension E3: the item passes when its scalar at path matches (inList), or matches none of (notInList), row field `field` of the entries List `list` holds on entering the step, among those `where` selects",
+          "properties": {
+            "path": { "$ref": "#/definitions/path" },
+            "op": { "enum": ["inList", "notInList"] },
+            "list": { "$ref": "#/definitions/id" },
+            "field": { "$ref": "#/definitions/id" },
+            "where": {
+              "type": "object",
+              "required": ["field", "equals"],
+              "additionalProperties": false,
+              "properties": {
+                "field": { "$ref": "#/definitions/id" },
+                "equals": { "$ref": "#/definitions/literal" }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "chooseSpec": {
+      "type": "object",
+      "required": ["when", "group", "optionsFrom", "allowCustomName"],
+      "additionalProperties": false,
+      "properties": {
+        "when": { "$ref": "#/definitions/path" },
+        "group": { "$ref": "#/definitions/path" },
+        "options": { "$ref": "#/definitions/path" },
+        "optionsFrom": { "$ref": "#/definitions/dataRef" },
+        "filter": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/definitions/pickFilter" }
+        },
+        "allowCustomName": { "type": "boolean" },
+        "entryFields": { "$ref": "#/definitions/entryFields" },
+        "valueField": { "$ref": "#/definitions/id" }
+      }
+    },
+    "entryFields": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "group": { "$ref": "#/definitions/id" },
+        "option": { "$ref": "#/definitions/id" },
+        "name": { "$ref": "#/definitions/id" },
+        "base": { "$ref": "#/definitions/id" }
+      }
+    },
+    "setOp": {
+      "type": "object",
+      "required": ["op", "target", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "op": { "const": "set" },
+        "target": { "$ref": "#/definitions/targetRef" },
+        "value": { "$ref": "#/definitions/valueSource" }
+      }
+    },
+    "entriesOp": {
+      "type": "object",
+      "required": ["op", "list", "from", "key", "set"],
+      "additionalProperties": false,
+      "properties": {
+        "op": { "enum": ["replaceEntries", "updateEntries"] },
+        "list": { "$ref": "#/definitions/id" },
+        "from": { "$ref": "#/definitions/path" },
+        "key": { "$ref": "#/definitions/path" },
+        "set": { "$ref": "#/definitions/entrySet" }
+      }
+    },
+    "upsertEntriesOp": {
+      "type": "object",
+      "required": ["op", "list", "from", "key", "set"],
+      "additionalProperties": false,
+      "properties": {
+        "op": { "const": "upsertEntries" },
+        "list": { "$ref": "#/definitions/id" },
+        "from": { "$ref": "#/definitions/path" },
+        "key": { "$ref": "#/definitions/path" },
+        "set": { "$ref": "#/definitions/entrySet" },
+        "choose": { "$ref": "#/definitions/chooseSpec" }
+      }
+    },
+    "appendEntryOp": {
+      "type": "object",
+      "required": ["op", "list", "set"],
+      "additionalProperties": false,
+      "properties": {
+        "op": { "const": "appendEntry" },
+        "list": { "$ref": "#/definitions/id" },
+        "set": { "$ref": "#/definitions/entrySet" }
+      }
+    },
+    "applyOp": {
+      "type": "object",
+      "required": ["op"],
+      "properties": {
+        "op": {
+          "enum": ["set", "replaceEntries", "upsertEntries", "updateEntries", "appendEntry"]
+        }
+      },
+      "allOf": [
+        {
+          "if": { "required": ["op"], "properties": { "op": { "const": "set" } } },
+          "then": { "$ref": "#/definitions/setOp" }
+        },
+        {
+          "if": { "required": ["op"], "properties": { "op": { "enum": ["replaceEntries", "updateEntries"] } } },
+          "then": { "$ref": "#/definitions/entriesOp" }
+        },
+        {
+          "if": { "required": ["op"], "properties": { "op": { "const": "upsertEntries" } } },
+          "then": { "$ref": "#/definitions/upsertEntriesOp" }
+        },
+        {
+          "if": { "required": ["op"], "properties": { "op": { "const": "appendEntry" } } },
+          "then": { "$ref": "#/definitions/appendEntryOp" }
+        }
+      ]
+    },
+    "pickStep": {
+      "type": "object",
+      "required": ["id", "type", "source", "apply"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "type": { "const": "pick" },
+        "title": { "$ref": "#/definitions/localizedText" },
+        "description": { "$ref": "#/definitions/localizedText" },
+        "when": { "$ref": "#/definitions/formula" },
+        "optional": { "type": "boolean" },
+        "presentation": { "enum": ["page", "hidden"] },
+        "checks": { "type": "array", "items": { "$ref": "#/definitions/check" } },
+        "effects": { "type": "array", "items": { "$ref": "#/definitions/effect" } },
+        "source": { "$ref": "#/definitions/dataRef" },
+        "filter": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/definitions/pickFilter" }
+        },
+        "count": { "$ref": "#/definitions/pickCount" },
+        "select": { "$ref": "#/definitions/formula" },
+        "pickByRoll": { "$ref": "#/definitions/macroRef" },
+        "allowCustom": {
+          "type": "object",
+          "required": ["var", "value", "label"],
+          "additionalProperties": false,
+          "properties": {
+            "var": { "$ref": "#/definitions/id" },
+            "value": { "$ref": "#/definitions/literal" },
+            "label": { "$ref": "#/definitions/localizedText" }
+          }
+        },
+        "store": { "$ref": "#/definitions/targetRef" },
+        "display": {
+          "type": "object",
+          "required": ["label"],
+          "additionalProperties": false,
+          "properties": {
+            "label": { "$ref": "#/definitions/path" },
+            "description": { "$ref": "#/definitions/path" },
+            "badges": {
+              "type": "array",
+              "maxItems": 8,
+              "items": { "$ref": "#/definitions/path" }
+            }
+          }
+        },
+        "reference": { "$ref": "#/definitions/pickReference" },
+        "apply": {
+          "type": "array",
+          "maxItems": 40,
+          "items": { "$ref": "#/definitions/applyOp" }
+        },
+        "rerollable": {
+          "type": "boolean",
+          "description": "Whether pickByRoll may be rolled again; every roll and reroll is kept in the Creation Roll Log, which drops its oldest entries when full"
+        }
+      }
+    },
+    "allocateTargets": {
+      "type": "object",
+      "description": "{ fields } | { list, where?, include?, exclude? }",
+      "if": { "required": ["fields"] },
+      "then": {
+        "additionalProperties": false,
+        "properties": {
+          "fields": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 60,
+            "uniqueItems": true,
+            "items": { "$ref": "#/definitions/id" }
+          }
+        }
+      },
+      "else": {
+        "required": ["list"],
+        "additionalProperties": false,
+        "properties": {
+          "list": { "$ref": "#/definitions/id" },
+          "where": {
+            "type": "object",
+            "required": ["field", "equals"],
+            "additionalProperties": false,
+            "properties": {
+              "field": { "$ref": "#/definitions/id" },
+              "equals": { "$ref": "#/definitions/literal" }
+            }
+          },
+          "include": {
+            "type": "array",
+            "maxItems": 2000,
+            "uniqueItems": true,
+            "items": { "$ref": "#/definitions/entryKey" }
+          },
+          "exclude": {
+            "type": "array",
+            "maxItems": 2000,
+            "uniqueItems": true,
+            "items": { "$ref": "#/definitions/entryKey" }
+          }
+        }
+      }
+    },
+    "allocateStep": {
+      "type": "object",
+      "required": ["id", "type", "targets", "direction", "pool", "rule"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "type": { "const": "allocate" },
+        "title": { "$ref": "#/definitions/localizedText" },
+        "description": { "$ref": "#/definitions/localizedText" },
+        "when": { "$ref": "#/definitions/formula" },
+        "optional": { "type": "boolean" },
+        "presentation": { "enum": ["page", "hidden"] },
+        "checks": { "type": "array", "items": { "$ref": "#/definitions/check" } },
+        "effects": { "type": "array", "items": { "$ref": "#/definitions/effect" } },
+        "targets": { "$ref": "#/definitions/allocateTargets" },
+        "pickTargets": {
+          "type": "object",
+          "required": ["min", "max"],
+          "additionalProperties": false,
+          "properties": {
+            "min": { "type": "integer", "minimum": 0 },
+            "max": { "type": "integer", "minimum": 1 },
+            "required": {
+              "type": "array",
+              "maxItems": 2000,
+              "uniqueItems": true,
+              "items": { "$ref": "#/definitions/entryKey" }
+            },
+            "preselected": {
+              "type": "object",
+              "required": ["where", "release"],
+              "additionalProperties": false,
+              "description": "Entries an earlier step marked start picked; one the user unpicks returns to release, its points go back to the pool, and releaseSet is written to it",
+              "properties": {
+                "where": {
+                  "type": "object",
+                  "required": ["field", "equals"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "field": { "$ref": "#/definitions/id" },
+                    "equals": { "$ref": "#/definitions/literal" }
+                  }
+                },
+                "release": { "$ref": "#/definitions/bound" },
+                "releaseSet": { "$ref": "#/definitions/localEntrySet" }
+              }
+            }
+          }
+        },
+        "addEntries": {
+          "type": "object",
+          "required": ["optionsFrom", "groupField", "allowCustomName"],
+          "additionalProperties": false,
+          "properties": {
+            "optionsFrom": { "$ref": "#/definitions/dataRef" },
+            "itemsFrom": { "$ref": "#/definitions/dataRef" },
+            "itemsLabel": { "$ref": "#/definitions/localizedText" },
+            "filter": {
+              "type": "array",
+              "maxItems": 8,
+              "items": { "$ref": "#/definitions/pickFilter" }
+            },
+            "groupField": { "$ref": "#/definitions/id" },
+            "allowCustomName": { "type": "boolean" },
+            "entryFields": { "$ref": "#/definitions/entryFields" }
+          }
+        },
+        "valueField": { "$ref": "#/definitions/id" },
+        "baseline": { "const": "current" },
+        "direction": { "enum": ["increase", "decrease", "transfer"] },
+        "pool": { "$ref": "#/definitions/formulaOrNumber" },
+        "rule": { "enum": ["exact", "max"] },
+        "warnUnspent": { "type": "boolean" },
+        "min": { "$ref": "#/definitions/bound" },
+        "max": { "$ref": "#/definitions/bound" },
+        "warnMin": { "$ref": "#/definitions/bound" },
+        "warnMax": { "$ref": "#/definitions/bound" },
+        "targetRules": {
+          "type": "array",
+          "maxItems": 64,
+          "description": "Rules of single targets: a prefilled start spent from the pool, and the target's own suggested range, checked even at its baseline",
+          "items": {
+            "type": "object",
+            "required": ["target"],
+            "additionalProperties": false,
+            "properties": {
+              "target": { "$ref": "#/definitions/entryKey" },
+              "when": { "$ref": "#/definitions/formula" },
+              "prefill": { "$ref": "#/definitions/formulaOrNumber" },
+              "warnMin": { "$ref": "#/definitions/formulaOrNumber" },
+              "warnMax": { "$ref": "#/definitions/formulaOrNumber" }
+            }
+          }
+        },
+        "mark": { "$ref": "#/definitions/localEntrySet" },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "purchaseRelated": { "$ref": "#/definitions/purchaseRelated" }
+          }
+        }
+      }
+    },
+    "ratio": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1
+    },
+    "groupIds": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": { "$ref": "#/definitions/id" }
+    },
+    "purchaseRelated": {
+      "type": "object",
+      "description": "Extension E1: a specialization bought for the first time may start at FLOOR(related value x ratio)",
+      "required": ["groupsFrom", "baseField", "playerDeclared", "ratio"],
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "$ref": "#/definitions/formula" },
+        "groupsFrom": { "$ref": "#/definitions/dataRef" },
+        "baseField": { "$ref": "#/definitions/id" },
+        "autoRelatedGroups": { "$ref": "#/definitions/groupIds" },
+        "playerDeclared": { "type": "boolean" },
+        "ratio": { "$ref": "#/definitions/ratio" }
+      }
+    },
+    "groupFloor": {
+      "type": "object",
+      "description": "Extension E1: at Wizard Commit, each specialization of a group is raised to FLOOR(highest of the group x ratio)",
+      "required": ["list", "groups", "ratio"],
+      "additionalProperties": false,
+      "properties": {
+        "when": { "$ref": "#/definitions/formula" },
+        "list": { "$ref": "#/definitions/id" },
+        "groups": { "$ref": "#/definitions/groupIds" },
+        "ratio": { "$ref": "#/definitions/ratio" },
+        "valueField": { "$ref": "#/definitions/id" }
+      }
+    },
+    "entryBases": {
+      "type": "object",
+      "description": "Extension E1: replaces the base of List Entries as they are written; the value moves with it",
+      "required": ["list", "source", "baseField"],
+      "additionalProperties": false,
+      "properties": {
+        "when": { "$ref": "#/definitions/formula" },
+        "list": { "$ref": "#/definitions/id" },
+        "source": { "$ref": "#/definitions/dataRef" },
+        "baseField": { "$ref": "#/definitions/id" },
+        "valueField": { "$ref": "#/definitions/id" }
+      }
+    },
+    "finalize": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "groupFloors": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/definitions/groupFloor" }
+        },
+        "effects": { "type": "array", "items": { "$ref": "#/definitions/effect" } }
+      }
+    }
+  }
+}

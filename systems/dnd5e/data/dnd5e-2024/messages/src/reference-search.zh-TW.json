@@ -1,0 +1,26 @@
+{
+  "referenceSearch": {
+    "filters": "篩選條目",
+    "filter": {
+      "all": "全部",
+      "rules": "規則",
+      "spells": "法術",
+      "items": "物品",
+      "creatures": "怪物",
+      "options": "角色選項"
+    },
+    "filterByKind": "僅顯示：{kind}",
+    "glossary": "術語彙編",
+    "groupCount": "{kind}（{count, number}）",
+    "more": "顯示更多",
+    "moreKind": "顯示更多：{kind}",
+    "pin": "釘選",
+    "pinned": "已釘選",
+    "pinnedEmpty": "尚未釘選條目。",
+    "quickLinks": "快速連結",
+    "recent": "最近瀏覽",
+    "recentEmpty": "近期無瀏覽紀錄。",
+    "unpin": "取消釘選",
+    "viewInBook": "在書中檢視"
+  }
+}

@@ -1,0 +1,260 @@
+{
+  "referenceUi": {
+    "kind": {
+      "creature": "Creature",
+      "table": "Table",
+      "chapter": "Chapter"
+    },
+    "tag": {
+      "attackRoll": "{value, select, m {Melee Attack Roll:} r {Ranged Attack Roll:} other {Melee or Ranged Attack Roll:}}",
+      "spellAttack": "Bonus equals your spell attack modifier",
+      "saveFailNth": "{value, select, 1 {First Failure:} 2 {Second Failure:} other {Third Failure:}}",
+      "saveFailBy": "Failure by {value} or More:",
+      "saveSuccessOrFail": "Failure or Success:",
+      "hitOrMiss": "Hit or Miss:"
+    },
+    "overlay": {
+      "badge": "Original text (content pack)",
+      "source": {
+        "xphb": "Source: Player's Handbook (2024)",
+        "xmm": "Source: 2024 bestiary (XMM)",
+        "xdmg": "Source: 2024 GM's guide (XDMG)"
+      },
+      "showSrd": "Show SRD version",
+      "lore": "Lore",
+      "habitat": "Habitat",
+      "treasure": "Treasure"
+    },
+    "statBlock": {
+      "ac": "AC",
+      "initiative": "Initiative",
+      "hp": "HP",
+      "speed": "Speed",
+      "mod": "Mod",
+      "save": "Save",
+      "skills": "Skills",
+      "gear": "Gear",
+      "resistances": "Resistances",
+      "vulnerabilities": "Vulnerabilities",
+      "immunities": "Immunities",
+      "senses": "Senses",
+      "passive": "Passive Perception {value}",
+      "languages": "Languages",
+      "none": "None",
+      "cr": "CR",
+      "crLine": "{cr} (XP {xp}; PB {pb})",
+      "crLineLair": "{cr} (XP {xp}, or {xpLair} in lair; PB {pb})",
+      "crSummon": "None (XP 0; PB {pb})",
+      "pbYours": "equals your Proficiency Bonus",
+      "yourChoice": "{choice} (Your Choice)",
+      "feet": "{value} ft.",
+      "hover": "(hover)",
+      "errata": "SRD errata, p. {page}",
+      "section": {
+        "trait": "Traits",
+        "action": "Actions",
+        "bonus": "Bonus Actions",
+        "reaction": "Reactions",
+        "legendary": "Legendary Actions"
+      },
+      "size": {
+        "T": "Tiny",
+        "S": "Small",
+        "M": "Medium",
+        "L": "Large",
+        "H": "Huge",
+        "G": "Gargantuan"
+      },
+      "type": {
+        "aberration": "Aberration",
+        "beast": "Beast",
+        "celestial": "Celestial",
+        "construct": "Construct",
+        "dragon": "Dragon",
+        "elemental": "Elemental",
+        "fey": "Fey",
+        "fiend": "Fiend",
+        "giant": "Giant",
+        "humanoid": "Humanoid",
+        "monstrosity": "Monstrosity",
+        "ooze": "Ooze",
+        "plant": "Plant",
+        "undead": "Undead"
+      },
+      "swarm": "{size} Swarm of {swarmSize} {type}",
+      "swarmType": {
+        "beast": "Beasts",
+        "undead": "Undead"
+      },
+      "creatureTag": {
+        "angel": "Angel",
+        "chromatic": "Chromatic",
+        "cleric": "Cleric",
+        "demon": "Demon",
+        "devil": "Devil",
+        "dinosaur": "Dinosaur",
+        "druid": "Druid",
+        "genie": "Genie",
+        "goblinoid": "Goblinoid",
+        "lycanthrope": "Lycanthrope",
+        "metallic": "Metallic",
+        "titan": "Titan",
+        "wizard": "Wizard"
+      },
+      "alignment": {
+        "U": "Unaligned",
+        "N": "Neutral",
+        "LG": "Lawful Good",
+        "NG": "Neutral Good",
+        "CG": "Chaotic Good",
+        "LN": "Lawful Neutral",
+        "CN": "Chaotic Neutral",
+        "LE": "Lawful Evil",
+        "NE": "Neutral Evil",
+        "CE": "Chaotic Evil",
+        "A": "Any Alignment"
+      },
+      "speedMode": {
+        "burrow": "Burrow",
+        "climb": "Climb",
+        "fly": "Fly",
+        "swim": "Swim"
+      },
+      "sense": {
+        "blindsight": "Blindsight",
+        "darkvision": "Darkvision",
+        "tremorsense": "Tremorsense",
+        "truesight": "Truesight"
+      },
+      "damage": {
+        "acid": "Acid",
+        "bludgeoning": "Bludgeoning",
+        "cold": "Cold",
+        "fire": "Fire",
+        "force": "Force",
+        "lightning": "Lightning",
+        "necrotic": "Necrotic",
+        "piercing": "Piercing",
+        "poison": "Poison",
+        "psychic": "Psychic",
+        "radiant": "Radiant",
+        "slashing": "Slashing",
+        "thunder": "Thunder"
+      },
+      "subtitle": "{type}, {alignment}",
+      "sizedType": "{size} {type}",
+      "sep": ", ",
+      "modeSpeed": "{mode} {speed}",
+      "ability": {
+        "str": "Str",
+        "dex": "Dex",
+        "con": "Con",
+        "int": "Int",
+        "wis": "Wis",
+        "cha": "Cha"
+      }
+    },
+    "item": {
+      "category": {
+        "Armor": "Armor",
+        "Potion": "Potion",
+        "Ring": "Ring",
+        "Rod": "Rod",
+        "Scroll": "Scroll",
+        "Staff": "Staff",
+        "Wand": "Wand",
+        "Weapon": "Weapon",
+        "Wondrous Item": "Wondrous Item",
+        "Poison": "Poison"
+      },
+      "rarity": {
+        "common": "Common",
+        "uncommon": "Uncommon",
+        "rare": "Rare",
+        "very rare": "Very Rare",
+        "legendary": "Legendary",
+        "artifact": "Artifact",
+        "varies": "Rarity Varies",
+        "none": "Mundane"
+      },
+      "attunement": "Requires Attunement",
+      "attunementBy": "Requires Attunement {by}",
+      "variantOf": "Variant of",
+      "any": "Any {list}",
+      "except": "{list}, Except {item}",
+      "anyGroup": {
+        "simple-or-martial": "Simple or Martial",
+        "light-medium-or-heavy": "Light, Medium, or Heavy",
+        "medium-or-heavy": "Medium or Heavy",
+        "ammunition": "Ammunition",
+        "melee-weapon": "Melee Weapon"
+      },
+      "withDetail": "{category} ({detail})",
+      "line": "{type}, {rarity}",
+      "withAttunement": "{line} ({attunement})",
+      "by": {
+        "by-a-spellcaster": "by a spellcaster",
+        "by-a-sorcerer-warlock-or-wizard": "by a sorcerer, warlock, or wizard",
+        "by-a-bard-cleric-druid-sorcerer-warlock-or-wizard": "by a bard, cleric, druid, sorcerer, warlock, or wizard",
+        "by-a-druid-sorcerer-warlock-or-wizard": "by a druid, sorcerer, warlock, or wizard",
+        "by-a-wizard": "by a wizard",
+        "by-a-paladin": "by a paladin",
+        "by-a-cleric-druid-or-paladin": "by a cleric, druid, or paladin",
+        "by-a-bard-cleric-or-druid": "by a bard, cleric, or druid",
+        "by-a-druid": "by a druid",
+        "by-a-cleric-or-paladin": "by a cleric or paladin",
+        "by-a-dwarf-or-a-creature-attuned-to-a-item-belt-of-dwarvenkind-xdmg": "by a Dwarf or a Creature Attuned to a Belt of Dwarvenkind"
+      }
+    },
+    "monsters": {
+      "tab": "Monsters",
+      "search": "Search monsters",
+      "maxCr": "Max CR",
+      "anyCr": "Any CR",
+      "type": "Type",
+      "allTypes": "All types",
+      "size": "Size",
+      "allSizes": "All sizes",
+      "count": "{count} creatures",
+      "empty": "No creatures match",
+      "wildShape": "Browse beasts for Wild Shape"
+    },
+    "magicItems": {
+      "tab": "Magic Items",
+      "search": "Search magic items",
+      "category": "Category",
+      "allCategories": "All categories",
+      "rarity": "Rarity",
+      "allRarities": "All rarities",
+      "attunement": "Attunement",
+      "anyAttunement": "Any attunement",
+      "attunes": "Requires attunement",
+      "noAttunement": "No attunement",
+      "count": "{count} items",
+      "empty": "No magic items match"
+    },
+    "books": {
+      "tab": "Books",
+      "srd": "SRD 5.2.1",
+      "dmg": "DM’s Guide (2024)",
+      "phb": "Player's Handbook (2024)",
+      "contents": "Contents",
+      "filter": "Filter sections",
+      "empty": "No sections match",
+      "loading": "Loading…",
+      "open": "Open the book reader"
+    },
+    "refList": {
+      "filter": "Filter this list",
+      "count": "{count} entries"
+    },
+    "compendium": {
+      "featureLevel": "Level {level}"
+    },
+    "packFrom": "Pack: {name}",
+    "packNames": {
+      "xdmg-extras": "XDMG Extras",
+      "xphb-extras": "XPHB extras"
+    }
+  }
+}

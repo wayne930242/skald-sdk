@@ -1,0 +1,592 @@
+/*
+ * Sheet SDK styles: the Tailwind setup, the theme tokens, and the character sheet, renderer
+ * and print rules every sheet needs. A host imports this file first and adds its own rules
+ * after it. The host also names its fonts (--font-instrument-sans, --font-noto-sans-tc, …,
+ * read by @theme below) and points Tailwind's @source at every directory holding sheet code.
+ * Plugin and print-kit CSS travel with their components.
+ */
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "./genre-themes.css";
+
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+/* 觸控放大只給螢幕：列印媒體下 (pointer: coarse) 仍可能成立，但紙上不需要 44px 點擊區 */
+@custom-variant touch (@media screen and (pointer: coarse));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans:
+    var(--font-instrument-sans), var(--font-noto-sans-tc), system-ui,
+    sans-serif;
+  --font-display: var(--font-display);
+  --font-roll-num: var(--font-roll-num);
+  --font-serif: var(--font-noto-serif-tc), Georgia, serif;
+  --font-heading: var(--font-cormorant), var(--font-noto-serif-tc), Georgia, serif;
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-border: var(--warning-border);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-roll-critical: var(--roll-critical);
+  --color-roll-critical-foreground: var(--roll-critical-foreground);
+  --color-roll-extreme: var(--roll-extreme);
+  --color-roll-extreme-foreground: var(--roll-extreme-foreground);
+  --color-roll-hard: var(--roll-hard);
+  --color-roll-hard-foreground: var(--roll-hard-foreground);
+  --color-roll-regular: var(--roll-regular);
+  --color-roll-regular-foreground: var(--roll-regular-foreground);
+  --color-roll-fumble: var(--roll-fumble);
+  --color-roll-fumble-foreground: var(--roll-fumble-foreground);
+  --color-badge-fixed: var(--badge-fixed);
+  --color-badge-fixed-foreground: var(--badge-fixed-foreground);
+  --color-badge-fixed-bg: var(--badge-fixed-bg);
+  --color-badge-selected: var(--badge-selected);
+  --color-badge-selected-foreground: var(--badge-selected-foreground);
+  --color-badge-selected-bg: var(--badge-selected-bg);
+  --color-entity-gm: var(--entity-gm);
+  --color-entity-gm-foreground: var(--entity-gm-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  /* Tailwind 內建字級最小到 text-xs（12px），角色卡的密集表格與列印版需要更小。
+     這兩級是專案的下限，不要再用 text-[Npx] 另開新尺寸。 */
+  --text-2xs: 0.625rem; /* 10px */
+  --text-3xs: 0.5rem; /* 8px */
+  /* 外殼（Folio）用的字級：介於 Tailwind 內建級距之間的幾個固定值。 */
+  --text-badge: 0.65625rem; /* 10.5px 頂欄 BETA 標 */
+  --text-eyebrow: 0.78125rem; /* 12.5px 眉標 */
+  --text-caption: 0.8125rem; /* 13px 次要說明、計數 */
+  --text-ui: 0.9375rem; /* 15px 導覽、頁籤、選單項 */
+  --text-heading-sm: 1.375rem; /* 22px 空狀態標題 */
+  --text-wordmark: 1.75rem; /* 28px 字標 */
+  /* 裝飾性標題的寬字距。Tailwind 內建最寬只到 tracking-widest（0.1em），
+     不足以表達角色卡標題那種拉開的排版。先前散在各處寫成 0.15em 與 0.2em，
+     沒有依據，統一成一個值。 */
+  --tracking-display: 0.15em;
+  --radius-btn: var(--r-btn);
+  --radius-card: var(--r-card);
+  --shadow-card: var(--shadow-card);
+  --color-border-strong: var(--border-strong);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+/* ===========================================
+ * Skald Theme System
+ *
+ * 主題結構:
+ * - :root (外殼 Folio，淺色：暖紙)
+ * - .dark (外殼 Folio，深色)
+ * - .theme-* (主機另加的主題，覆寫同一組變數)
+ * - [data-genre] (類型主題，genre-themes.css)
+ * =========================================== */
+
+:root {
+  --radius: 0.625rem;
+
+  /* ===== 外殼 Folio（淺色）：暖紙、墨色主互動色、陶土色語意色 ===== */
+  /* 一個主互動色（--primary，墨色）＋一個語意色（--accent，陶土）。
+     先前銅與金兩個近似色並存，互動與語意分不清楚（稽核 U-08）。 */
+
+  /* Shell shape / type */
+  --r-btn: 999px;
+  --r-card: 16px;
+  --shadow-card:
+    0 1px 2px oklch(0.3 0.02 60 / 7%), 0 14px 34px -18px oklch(0.3 0.03 60 / 22%);
+  --font-display:
+    var(--font-instrument-serif), var(--font-noto-sans-tc), Georgia, serif;
+  /* 擲骰卡的大數字。類型主題只換 --font-display，這個不換：Marcellus 之類的
+     顯示字型把 1 畫成一豎，「11」會讀成「Il」。 */
+  --font-roll-num: var(--font-instrument-sans), var(--font-noto-sans-tc), system-ui, sans-serif;
+  --dur-fast: 140ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* Palette */
+  --background: oklch(0.975 0.008 80);
+  --foreground: oklch(0.22 0.015 60);
+  --card: oklch(0.992 0.004 80);
+  --card-foreground: oklch(0.22 0.015 60);
+  --popover: oklch(0.992 0.004 80);
+  --popover-foreground: oklch(0.22 0.015 60);
+  --primary: oklch(0.24 0.02 60);
+  --primary-foreground: oklch(0.985 0.005 80);
+  --secondary: oklch(0.93 0.012 80);
+  --secondary-foreground: oklch(0.26 0.02 60);
+  --muted: oklch(0.945 0.01 80);
+  --muted-foreground: oklch(0.46 0.02 60);
+  --accent: oklch(0.52 0.15 38);
+  --accent-foreground: oklch(0.99 0.004 80);
+  --destructive: oklch(0.50 0.18 25);
+  --border: oklch(0.89 0.012 80);
+  --border-strong: oklch(0.22 0.015 60);
+  --input: oklch(0.58 0.02 70);
+  --ring: oklch(0.24 0.02 60);
+  --chart-1: oklch(0.52 0.15 38);
+  --chart-2: oklch(0.5 0.13 150);
+  --chart-3: oklch(0.5 0.1 250);
+  --chart-4: oklch(0.55 0.12 85);
+  --chart-5: oklch(0.46 0.02 60);
+  --sidebar: oklch(0.985 0.005 80);
+  --sidebar-foreground: oklch(0.22 0.015 60);
+  --sidebar-primary: oklch(0.24 0.02 60);
+  --sidebar-primary-foreground: oklch(0.985 0.005 80);
+  --sidebar-accent: oklch(0.945 0.01 80);
+  --sidebar-accent-foreground: oklch(0.26 0.02 60);
+  --sidebar-border: oklch(0.89 0.012 80);
+  --sidebar-ring: oklch(0.24 0.02 60);
+
+  /* Semantic - Status */
+  --success: oklch(0.5 0.13 150);
+  --success-foreground: oklch(0.99 0 0);
+  --warning: oklch(0.55 0.18 75);
+  --warning-foreground: oklch(0.35 0.05 85);
+  --warning-bg: oklch(0.97 0.03 85);
+  --warning-border: oklch(0.88 0.08 85);
+  --info: oklch(0.55 0.12 250);
+  --info-foreground: oklch(0.99 0 0);
+
+  /* Semantic - Roll Results */
+  --roll-critical: oklch(0.75 0.15 85);
+  --roll-critical-foreground: oklch(0.25 0.02 85);
+  --roll-extreme: oklch(0.55 0.15 145);
+  --roll-extreme-foreground: oklch(0.99 0 0);
+  --roll-hard: oklch(0.55 0.12 250);
+  --roll-hard-foreground: oklch(0.99 0 0);
+  --roll-regular: oklch(0.60 0.12 160);
+  --roll-regular-foreground: oklch(0.99 0 0);
+  --roll-fumble: oklch(0.55 0.18 25);
+  --roll-fumble-foreground: oklch(0.99 0 0);
+
+  /* Semantic - Badges */
+  --badge-fixed: oklch(0.55 0.12 250);
+  --badge-fixed-foreground: oklch(0.25 0.05 250);
+  --badge-fixed-bg: oklch(0.95 0.02 250);
+  --badge-selected: oklch(0.55 0.15 145);
+  --badge-selected-foreground: oklch(0.25 0.05 145);
+  --badge-selected-bg: oklch(0.95 0.02 145);
+
+  /* Entity - GM：與語意色同一個陶土色（原本是第二個金色） */
+  --entity-gm: oklch(0.52 0.15 38);
+  --entity-gm-foreground: oklch(0.99 0.004 80);
+}
+
+/* ===== 外殼 Folio（深色） ===== */
+.dark {
+  --shadow-card:
+    0 1px 0 oklch(1 0 0 / 5%), 0 18px 38px -20px oklch(0 0 0 / 70%);
+
+  --background: oklch(0.19 0.01 60);
+  --foreground: oklch(0.95 0.01 80);
+  --card: oklch(0.23 0.012 60);
+  --card-foreground: oklch(0.95 0.01 80);
+  --popover: oklch(0.23 0.012 60);
+  --popover-foreground: oklch(0.95 0.01 80);
+  --primary: oklch(0.94 0.015 80);
+  --primary-foreground: oklch(0.2 0.01 60);
+  --secondary: oklch(0.3 0.012 60);
+  --secondary-foreground: oklch(0.94 0.01 80);
+  --muted: oklch(0.27 0.012 60);
+  --muted-foreground: oklch(0.73 0.02 75);
+  --accent: oklch(0.76 0.13 45);
+  --accent-foreground: oklch(0.2 0.02 50);
+  --destructive: oklch(0.7 0.17 25);
+  --border: oklch(0.33 0.015 60);
+  --border-strong: oklch(0.95 0.01 80);
+  --input: oklch(0.56 0.02 60);
+  --ring: oklch(0.76 0.13 45);
+  --chart-1: oklch(0.76 0.13 45);
+  --chart-2: oklch(0.76 0.14 150);
+  --chart-3: oklch(0.72 0.1 250);
+  --chart-4: oklch(0.8 0.12 85);
+  --chart-5: oklch(0.73 0.02 75);
+  --sidebar: oklch(0.21 0.012 60);
+  --sidebar-foreground: oklch(0.95 0.01 80);
+  --sidebar-primary: oklch(0.94 0.015 80);
+  --sidebar-primary-foreground: oklch(0.2 0.01 60);
+  --sidebar-accent: oklch(0.27 0.012 60);
+  --sidebar-accent-foreground: oklch(0.94 0.01 80);
+  --sidebar-border: oklch(0.33 0.015 60);
+  --sidebar-ring: oklch(0.76 0.13 45);
+
+  /* Semantic - Status (Dark) */
+  --success: oklch(0.76 0.14 150);
+  --success-foreground: oklch(0.18 0.02 145);
+  --warning: oklch(0.80 0.12 85);
+  --warning-foreground: oklch(0.90 0.05 85);
+  --warning-bg: oklch(0.25 0.04 85 / 0.5);
+  --warning-border: oklch(0.40 0.08 85);
+  --info: oklch(0.65 0.10 250);
+  --info-foreground: oklch(0.18 0.02 250);
+
+  /* Semantic - Roll Results (Dark) */
+  --roll-critical: oklch(0.80 0.12 85);
+  --roll-critical-foreground: oklch(0.20 0.02 85);
+  --roll-extreme: oklch(0.65 0.15 145);
+  --roll-extreme-foreground: oklch(0.18 0.02 145);
+  --roll-hard: oklch(0.65 0.10 250);
+  --roll-hard-foreground: oklch(0.18 0.02 250);
+  --roll-regular: oklch(0.70 0.12 160);
+  --roll-regular-foreground: oklch(0.18 0.02 160);
+  --roll-fumble: oklch(0.65 0.18 25);
+  --roll-fumble-foreground: oklch(0.18 0.02 25);
+
+  /* Semantic - Badges (Dark) */
+  --badge-fixed: oklch(0.65 0.10 250);
+  --badge-fixed-foreground: oklch(0.90 0.02 250);
+  --badge-fixed-bg: oklch(0.30 0.03 250);
+  --badge-selected: oklch(0.65 0.15 145);
+  --badge-selected-foreground: oklch(0.90 0.02 145);
+  --badge-selected-bg: oklch(0.30 0.03 145);
+
+  /* Entity - GM */
+  --entity-gm: oklch(0.76 0.13 45);
+  --entity-gm-foreground: oklch(0.2 0.02 50);
+}
+
+/* =========================================== */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  /* 鍵盤焦點永遠看得見：連結、按鈕沒有自己的 ring 時，用 --ring 畫外框（淺色是墨色，深色是陶土色）。 */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  /* Tailwind v4 的 preflight 把按鈕的游標改回預設箭頭；可按的東西一律顯示手指。工具類別（cursor-default 等）仍可覆寫。 */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+}
+
+/* 偏好減少動態：停掉 CSS 轉場與動畫（外殼的滑動指示、hover 位移、選單進出場）。 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * 選取／開啟狀態的唯一寫法。
+ *
+ * hover 是 muted 底色；選取在同一個底色上再加一圈 2px 的 primary 內框，兩者因此
+ * 一眼就分得開，內框對 muted 底色與背景在每個主題都超過 3:1（WCAG 1.4.11）；
+ * primary 不夠亮的主題另設 --selected-ring。
+ * 用 inset ring 而不是實心填色：列表列、含徽章與圖示的項目填滿 primary 之後
+ * 內部的 text-primary 會整個消失；ring 與 focus ring 也共用同一個 box-shadow 堆疊，
+ * 不會互相蓋掉。四邊一致，沒有單邊加粗。
+ */
+@utility state-selected {
+  @apply bg-muted inset-ring-2 inset-ring-[var(--selected-ring,var(--primary))];
+}
+
+/*
+ * 角色卡上的文字幾乎全部來自系統資料（技能說明、招式描述等），內容不受版面
+ * 控制。CSS 預設只在連字號與空白處斷行，斜線不是斷行點——avatar-legends 的
+ * "fatigue/condition/balance" 在 320px 上量到 157px，撐破 122px 的容器。
+ *
+ * 投稿系統上線後，任意長度的不可斷 token 一定會出現。與其要求每個 renderer
+ * 自己記得加 break-words，不如在這裡讓所有欄位預設安全。
+ *
+ * 用 break-word 而非 break-all：只在整個詞放不下時才從詞中間切，正常文字的
+ * 斷行行為完全不變。
+ */
+.skald-template .skald-field {
+  overflow-wrap: break-word;
+}
+
+/*
+ * Character Sheet Web Mode: true responsive layout without zoom scaling.
+ *
+ * 兩個根 class：`view-mode-web` 是舊路徑（pages，viewport 斷點）；
+ * `view-mode-web-view` 是 `template.views.web`（容器斷點，版面由 JS 顯式輸出）。
+ * 字級與文字下限是兩條路徑共用的；依 viewport 重排版面的規則（page、combat-stats、
+ * basic-info、portrait、data-grid-span）只屬於舊路徑，不能套到 web view 的節點上。
+ */
+.skald-template:is(.view-mode-web, .view-mode-web-view) {
+  font-size: clamp(15px, 0.45vw + 13px, 18px);
+  line-height: 1.5;
+  padding-inline: clamp(0.75rem, 1.8vw, 2rem);
+  padding-block: 1rem 2rem;
+}
+
+.skald-template.view-mode-web .skald-page {
+  margin-inline: auto;
+}
+
+.skald-template:is(.view-mode-web, .view-mode-web-view) .skald-section {
+  line-height: 1.45;
+}
+
+@media (min-width: 641px) {
+  .skald-template.view-mode-web .skald-section[data-section-id="combat-stats"] {
+    align-self: center;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.skald-template:is(.view-mode-web, .view-mode-web-view) .skald-field {
+  font-size: 1rem;
+}
+
+.skald-template:is(.view-mode-web, .view-mode-web-view) .skald-field input,
+.skald-template:is(.view-mode-web, .view-mode-web-view) .skald-field textarea,
+.skald-template:is(.view-mode-web, .view-mode-web-view) .skald-field [role="textbox"],
+.skald-template:is(.view-mode-web, .view-mode-web-view) .skald-field button[role="combobox"] {
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.skald-template:is(.view-mode-web, .view-mode-web-view) .skald-field .text-xs {
+  font-size: 0.8125rem;
+}
+
+.skald-template:is(.view-mode-web, .view-mode-web-view) .skald-field .text-sm {
+  font-size: 0.9375rem;
+}
+
+.skald-template:is(.view-mode-web, .view-mode-web-view)
+  :is(.text-\[8px\], .text-\[9px\], .text-\[10px\], .text-\[11px\]) {
+  line-height: 1.35;
+}
+
+.skald-template:is(.view-mode-web, .view-mode-web-view) .text-\[8px\] {
+  font-size: 0.75rem !important;
+}
+
+.skald-template:is(.view-mode-web, .view-mode-web-view) .text-\[9px\] {
+  font-size: 0.8125rem !important;
+}
+
+.skald-template:is(.view-mode-web, .view-mode-web-view) .text-\[10px\] {
+  font-size: 0.875rem !important;
+}
+
+.skald-template:is(.view-mode-web, .view-mode-web-view) .text-\[11px\] {
+  font-size: 0.9375rem !important;
+}
+
+@media (max-width: 640px) {
+  .skald-template:is(.view-mode-web, .view-mode-web-view) {
+    font-size: 15px;
+    padding-inline: 0.5rem;
+    padding-block: 0.75rem 1rem;
+  }
+
+  .skald-template.view-mode-web .skald-field[data-grid-span] {
+    flex: 1 1 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  .skald-template.view-mode-web .skald-page {
+    border-radius: 0.5rem;
+  }
+
+  .skald-template.view-mode-web
+    .skald-section[data-section-id="basic-info"]
+    > div.flex-col
+    > .skald-field[data-field-id="portrait"] {
+    order: -1;
+    margin-bottom: 0.5rem;
+  }
+
+  .skald-template.view-mode-web .skald-field[data-field-id="portrait"] {
+    width: 100% !important;
+    height: auto !important;
+    flex-shrink: 1 !important;
+  }
+}
+
+/*
+ * 列印預覽（modules/character/ui/print）：螢幕上是蓋在角色卡上的全螢幕層，
+ * 列印時只印它（見下方 @media print）。
+ */
+@layer components {
+  body.skald-print-open {
+    overflow: hidden;
+  }
+
+  #skald-print-root .skald-print-preview {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    overflow: auto;
+    background: var(--muted);
+  }
+
+  .skald-print-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--background);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .skald-print-pages {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 列印預覽開著時只印它：角色卡的網頁版面、導覽與彈出層都不屬於紙本 */
+  body:has(> #skald-print-root) > :not(#skald-print-root) {
+    display: none !important;
+  }
+
+  body.skald-print-open {
+    overflow: visible;
+  }
+
+  #skald-print-root .skald-print-preview {
+    position: static;
+    overflow: visible;
+    background: none;
+  }
+
+  .skald-print-pages {
+    padding: 0;
+  }
+
+  /*
+   * 手機上預覽 print 版面時，page-renderer 會在 .skald-page 掛 inline zoom
+   * 把 A4 縮到視窗寬度。實際列印必須是 1:1，否則會照著螢幕寬度印出縮小的頁面。
+   * 樣式表的 !important 優先於沒有 !important 的 inline style。
+   */
+  .skald-page {
+    zoom: 1 !important;
+  }
+
+  /*
+   * 有固定頁寬的 print 版面（A4、letter）以預覽寬度排版，再等比縮到紙面可印寬度，
+   * 列印結果才會跟「列印版面預覽」一致。若改用紙面寬度重排，文字換行會變多，
+   * 第一頁只剩 2% 餘裕，縮放 105%、邊界 15mm 或 Letter 紙就溢出成三頁。
+   * 縮放比例 = 可印寬度（外框的容器寬度）÷ 預覽寬度，所以換紙、改邊界或改縮放
+   * 都不會切到右緣。不支援型別運算的瀏覽器退回固定比例：A4、Letter 中較窄的
+   * 可印寬度 210mm − 2 × 10mm = 190mm。邊界固定為 10mm，對應這個基準。
+   */
+  @page {
+    margin: 10mm;
+  }
+
+  .skald-page-frame[data-print-size] {
+    container-type: inline-size;
+  }
+
+  .skald-page[data-print-size="A4"] {
+    --skald-print-zoom: calc(100cqw / 216mm);
+    width: 216mm !important;
+    min-width: 216mm !important;
+    zoom: 0.8796 !important; /* 190 / 216 */
+  }
+
+  .skald-page[data-print-size="letter"] {
+    --skald-print-zoom: calc(100cqw / 8.74in);
+    width: 8.74in !important;
+    min-width: 8.74in !important;
+    zoom: 0.8559 !important; /* 190mm / 8.74in */
+  }
+
+  /* 比例寫在自訂屬性裡，建置時的 CSS 壓縮才不會把它當成無效的 zoom 值刪掉 */
+  @supports (zoom: calc(100cqw / 1mm)) {
+    .skald-page[data-print-size] {
+      zoom: var(--skald-print-zoom) !important;
+    }
+  }
+
+  /*
+   * 浮在頁面上的選單、popover、tooltip（Radix popper）不屬於紙本。
+   * 選單開著按 Ctrl+P 時，快捷鍵會直接列印，選單不會先關上。
+   */
+  [data-radix-popper-content-wrapper] {
+    display: none !important;
+  }
+
+  /* Force light color-scheme for native controls (checkboxes, inputs) */
+  :root {
+    color-scheme: light !important;
+  }
+
+  /* Force light theme CSS variables when printing, regardless of current theme. */
+  .dark,
+  [class*="theme-"] {
+    --background: oklch(0.975 0.008 80) !important;
+    --foreground: oklch(0.22 0.015 60) !important;
+    --muted: oklch(0.945 0.01 80) !important;
+    --muted-foreground: oklch(0.46 0.02 60) !important;
+    --border: oklch(0.89 0.012 80) !important;
+    --input: oklch(0.58 0.02 70) !important;
+    --card: oklch(0.992 0.004 80) !important;
+    --card-foreground: oklch(0.22 0.015 60) !important;
+    --popover: oklch(0.992 0.004 80) !important;
+    --popover-foreground: oklch(0.22 0.015 60) !important;
+    --primary: oklch(0.24 0.02 60) !important;
+    --primary-foreground: oklch(0.985 0.005 80) !important;
+    --secondary: oklch(0.93 0.012 80) !important;
+    --secondary-foreground: oklch(0.26 0.02 60) !important;
+    --destructive: oklch(0.50 0.18 25) !important;
+    --accent: oklch(0.52 0.15 38) !important;
+    --accent-foreground: oklch(0.99 0 0) !important;
+    --ring: oklch(0.24 0.02 60) !important;
+  }
+}

@@ -1,0 +1,798 @@
+{
+  "renderer": {
+    "unknownFieldType": "Unknown field type: {type}",
+    "computedColumnMissingFormula": "Column \"{column}\" is computed but has no formula",
+    "refreshDerivedValue": "Refresh from template formula",
+    "removeItem": "Remove item",
+    "addNamedItem": "Add {label}",
+    "rollTile": "Roll {label} {value}",
+    "tileHalf": "Half value",
+    "tileFifth": "Fifth value",
+    "tileValueInput": "{label} value",
+    "resourceValue": "{label} current {current}, max {max}",
+    "resourceValueNoMax": "{label} current {current}",
+    "resourceDecrease": "{label} minus {step}",
+    "resourceIncrease": "{label} plus {step}",
+    "resourceMeterOpen": "{name}. Open stepper",
+    "resourcePrintCurrent": "Current",
+    "resourcePrintMax": "Max",
+    "resourcePrintStart": "Start",
+    "conditionsSuggest": "Suggested",
+    "conditionsSuggestTooltip": "Based on the character's current values, this condition may apply. It is never checked for you.",
+    "statListSearchLabel": "Search",
+    "statListSearchPlaceholder": "Search by name, e.g. “Spot”",
+    "statListFilters": "Filter",
+    "statListFilterPinned": "Pinned",
+    "statListFilterImproved": "Can improve",
+    "statListFilterAll": "All",
+    "statListColumnImprove": "Improve",
+    "statListColumnBase": "Base",
+    "statListColumnValue": "Value",
+    "statListColumnHalf": "Half of the current value",
+    "statListColumnFifth": "Fifth of the current value",
+    "statListImproved": "{name}: can improve",
+    "statListPin": "Pin {name}",
+    "statListUnpin": "Unpin {name}",
+    "statListRoll": "Roll {name}",
+    "rollField": "Roll {name}",
+    "editValue": "Edit {name}",
+    "rollMove": "Roll {move} ({stat})",
+    "rollDice": "Roll dice",
+    "statListValueInput": "{name} current value",
+    "statListSpecInput": "{parent} specialization name",
+    "statListNoRows": "Nothing to list yet.",
+    "statListNoPinned": "No pinned entries. Use the star next to a name to pin it.",
+    "statListNoImproved": "Nothing is marked to improve.",
+    "statListNoMatches": "No entry matches the search.",
+    "statListHint": "Click a name or the dice to roll. A ticked box marks it to improve at the end of the session.",
+    "statListSourceMissing": "Stat list “{field}” cannot list “{source}”: that field is missing or has no row source.",
+    "statListParentPrefix": "{parent}: ",
+    "statListSpecLabel": "{parent}: {spec}",
+    "statListSpecPlaceholder": "___",
+    "statListRollInvalid": "The roll of this row is misconfigured.",
+    "webTabsFallbackName": "Sections",
+    "tileEmptyValue": "—"
+  },
+  "dice": {
+    "droppedDie": "Dropped die: {face}",
+    "roll": "Roll",
+    "dice": "Dice",
+    "loadError": "Failed to load dice",
+    "notationInput": "Dice notation",
+    "target": "Target",
+    "bonusDice": "{count, plural, one {# bonus die} other {# bonus dice}}",
+    "penaltyDice": "{count, plural, one {# penalty die} other {# penalty dice}}",
+    "successLevel": {
+      "critical": "Critical",
+      "extreme": "Extreme",
+      "hard": "Hard",
+      "regular": "Regular",
+      "failure": "Failure",
+      "fumble": "Fumble",
+      "success-with-style": "Success with Style",
+      "success": "Success",
+      "tie": "Tie",
+      "strong": "Strong Hit",
+      "weak": "Weak Hit",
+      "miss": "Miss",
+      "bwb-extraordinary": "Extraordinary Hit (12+)",
+      "bwb-strong": "Strong Hit (10–11)",
+      "bwb-weak": "Weak Hit (7–9)",
+      "bwb-miss": "Miss (6 or less)"
+    },
+    "visibility": {
+      "label": "Roll visibility",
+      "all": "Everyone",
+      "gm": "Blind roll"
+    },
+    "half": "Half",
+    "fifth": "Fifth",
+    "noBonusPenalty": "Normal",
+    "rollSkill": "Roll Skill",
+    "decreaseDice": "Decrease bonus/penalty dice",
+    "increaseDice": "Increase bonus/penalty dice",
+    "rollControl": {
+      "tens": "Tens",
+      "units": "Units"
+    },
+    "rollOptions": {
+      "title": "{name} ({value})",
+      "bonusLabel": "Bonus/penalty dice",
+      "bonusGroup": "Bonus or penalty dice",
+      "roll": "Roll",
+      "cancel": "Cancel",
+      "hint": "Press and hold or right-click for difficulty and bonus or penalty dice.",
+      "formHint": "Press and hold or right-click to open this roll's options.",
+      "loadFailed": "The roll options did not load. Try again.",
+      "retry": "Retry",
+      "normal": "Normal",
+      "penaltyShort": "P{count}",
+      "bonusShort": "B{count}",
+      "normalLabel": "Normal roll, no bonus or penalty dice",
+      "regularLabel": "Regular difficulty: roll the full value or under",
+      "hardLabel": "Hard difficulty: roll half the value or under",
+      "extremeLabel": "Extreme difficulty: roll a fifth of the value or under",
+      "bonusCountLabel": "{count, plural, one {# bonus die} other {# bonus dice}}",
+      "penaltyCountLabel": "{count, plural, one {# penalty die} other {# penalty dice}}"
+    },
+    "custom": "Custom",
+    "customPlaceholder": "e.g. 2d6+3, 4d10...",
+    "quickShortcuts": {
+      "title": "Quick Shortcuts",
+      "editAll": "Edit Shortcuts",
+      "editPlaceholder": "One expression per line, for example:\n2d6\n4dF\n1d20+5",
+      "save": "Save",
+      "current": "Current Shortcuts",
+      "empty": "No custom shortcuts yet",
+      "importExport": "Import / Export",
+      "export": "Export",
+      "import": "Import",
+      "importPlaceholder": "Paste JSON (array or object with shortcuts field) or one expression per line",
+      "saved": "Quick shortcuts saved",
+      "imported": "Imported {count} shortcuts",
+      "invalidSkipped": "Skipped {count} invalid or duplicated entries",
+      "importEmpty": "No usable expression found in import payload",
+      "saveError": "Failed to save quick shortcuts",
+      "exportCopied": "Shortcut JSON copied",
+      "exportFailed": "Copy failed, please try again"
+    },
+    "selectDiceHint": "Click a die type to roll",
+    "rollDialog": {
+      "title": "Roll Check",
+      "reference": "Reference",
+      "options": "Modifiers",
+      "targetValue": "Target Value",
+      "cancel": "Cancel",
+      "roll": "Roll"
+    },
+    "syntaxHelp": {
+      "title": "Dice Notation Help",
+      "description": "Supports standard dice notation and advanced modifiers",
+      "sections": {
+        "basic": {
+          "title": "Basic Syntax",
+          "items": [
+            {
+              "syntax": "NdM",
+              "desc": "Roll N dice with M sides",
+              "example": "2d6, 1d20"
+            },
+            {
+              "syntax": "NdF",
+              "desc": "Roll N Fate/Fudge dice (-1, 0, +1)",
+              "example": "4dF"
+            },
+            {
+              "syntax": "+N / -N",
+              "desc": "Add or subtract modifier",
+              "example": "1d20+5"
+            },
+            {
+              "syntax": "×N or *N",
+              "desc": "Multiply result by N",
+              "example": "3d6×5"
+            },
+            {
+              "syntax": "Combine",
+              "desc": "Combine multiple dice groups",
+              "example": "2d6+1d8+3"
+            }
+          ]
+        },
+        "keepDrop": {
+          "title": "Keep/Drop",
+          "items": [
+            {
+              "syntax": "kN / khN",
+              "desc": "Keep highest N dice",
+              "example": "4d6kh3"
+            },
+            {
+              "syntax": "klN",
+              "desc": "Keep lowest N dice",
+              "example": "4d6kl1"
+            },
+            {
+              "syntax": "dhN",
+              "desc": "Drop highest N dice",
+              "example": "4d6dh1"
+            },
+            {
+              "syntax": "dN / dlN",
+              "desc": "Drop lowest N dice",
+              "example": "4d6dl1"
+            }
+          ]
+        },
+        "exploding": {
+          "title": "Exploding Dice",
+          "items": [
+            {
+              "syntax": "!",
+              "desc": "Roll additional die on max value",
+              "example": "1d6!"
+            },
+            {
+              "syntax": "!!",
+              "desc": "Add to same die on max value",
+              "example": "1d6!!"
+            },
+            {
+              "syntax": "!p",
+              "desc": "Explode but subtract 1 from extras",
+              "example": "1d6!p"
+            },
+            {
+              "syntax": "!>N",
+              "desc": "Custom explode threshold",
+              "example": "1d6!>5"
+            }
+          ]
+        },
+        "reference": {
+          "title": "Character References",
+          "items": [
+            {
+              "syntax": "{{#name[args]}}",
+              "desc": "Call a system roll macro with arguments (supports #name[args] shorthand)",
+              "example": "#coc[@str] or {{#coc[@str]}}"
+            },
+            {
+              "syntax": "{{@attr}}",
+              "desc": "Reference character attribute",
+              "example": "1d100+{{@dex}}"
+            }
+          ]
+        }
+      }
+    },
+    "validation": {
+      "empty": "Please enter a dice expression",
+      "invalidSyntax": "Invalid dice syntax",
+      "invalidChars": "Invalid characters: {chars}",
+      "startsWithSign": "Expression starts with a sign, treated as modifier",
+      "hasAttrRef": "Contains attribute references, requires character data",
+      "hasMacroRef": "Contains roll macro references, requires character data and system macros",
+      "tooManySides": "d{sides} has too many sides",
+      "tooManyDice": "{count}d{sides} has too many dice",
+      "keepDropExceedsCount": "Keep/drop count ({total}) cannot exceed dice count ({count})"
+    },
+    "rollResult": {
+      "titleDice": "Roll Result",
+      "titleCheck": "Skill Check",
+      "titleAttribute": "Attribute Roll",
+      "modifier": "Modifier",
+      "target": "Target",
+      "hardThreshold": "Hard (1/2)",
+      "extremeThreshold": "Extreme (1/5)",
+      "total": "Total",
+      "rerollSuggestion": "{count, plural, one {# attribute is} other {# attributes are}} below 50. Rerolling is suggested.",
+      "reroll": "Reroll",
+      "cancel": "Cancel",
+      "accept": "Accept"
+    },
+    "followUp": {
+      "pushed": "Pushed roll",
+      "luckSpent": "Spent {cost} Luck: {skill} {target} → {level}"
+    },
+    "ruleLabel": {
+      "normal": "Standard",
+      "bonus": "Bonus ×{count}",
+      "penalty": "Penalty ×{count}",
+      "compare": "Compare",
+      "roll": "Roll"
+    },
+    "difficulty": {
+      "label": "Difficulty",
+      "regular": "Regular",
+      "hard": "Hard",
+      "extreme": "Extreme",
+      "withTarget": "{level} ({target})"
+    }
+  },
+  "roll": {
+    "pushAlreadyDone": "This roll was already pushed somewhere else.",
+    "luckAlreadyDone": "This roll already has a follow-up.",
+    "error": {
+      "title": "Roll failed",
+      "invalidExpression": "Invalid expression",
+      "noOptions": "No options available to roll against"
+    },
+    "toast": {
+      "title": "{label} Roll",
+      "defaultTitle": "Roll Result",
+      "rolled": "Rolled {rolled}",
+      "rolledWithTarget": "Rolled {rolled} (target {target})",
+      "passed": "Passed",
+      "failed": "Failed",
+      "coc7Breakdown": "T[{tens}] U[{units}] -> {selectedTotal}",
+      "diceBreakdown": "[{rolls}]"
+    },
+    "successLevel": {
+      "critical": "Critical Success",
+      "extreme": "Extreme Success",
+      "hard": "Hard Success",
+      "regular": "Success",
+      "failure": "Failure",
+      "fumble": "Fumble",
+      "success-with-style": "Success with Style",
+      "success": "Success",
+      "tie": "Tie",
+      "strong": "Strong Hit",
+      "weak": "Weak Hit",
+      "miss": "Miss",
+      "bwb-extraordinary": "Extraordinary Hit (12+)",
+      "bwb-strong": "Strong Hit (10–11)",
+      "bwb-weak": "Weak Hit (7–9)",
+      "bwb-miss": "Miss (6 or less)"
+    },
+    "check": "Check",
+    "panel": {
+      "title": "Roll desk",
+      "close": "Close roll desk",
+      "audience": {
+        "label": "Send to",
+        "group": "Who sees your rolls in chat",
+        "all": "Everyone",
+        "gm": "Blind roll",
+        "gmHint": "Blind roll: only you and the GM can see it"
+      },
+      "result": {
+        "target": "{label} {target}",
+        "tens": "Tens",
+        "units": "Units",
+        "taken": "taken",
+        "regular": "Regular ≤{value}",
+        "hard": "Hard ≤{value}",
+        "extreme": "Extreme ≤{value}",
+        "bonus": "{count, plural, one {# bonus die} other {# bonus dice}}",
+        "penalty": "{count, plural, one {# penalty die} other {# penalty dice}}",
+        "dice": "Dice",
+        "sentAll": "Sent to chat · everyone can see it",
+        "sentGm": "Sent to chat · only you and the GM can see it",
+        "notSent": "Shown here only · not sent to chat",
+        "pushed": "Pushed roll",
+        "improveTicked": "Marked for improvement",
+        "improveUndone": "Improvement mark removed",
+        "improveBlindWithheld": "Blind rolls don't auto-mark improvement; mark it yourself when the session settles",
+        "improveUndo": "Undo",
+        "luckSpent": "Spent {count} Luck: {from} → {to}"
+      },
+      "history": {
+        "title": "Recent",
+        "inChat": "Also in chat",
+        "localOnly": "This page only"
+      },
+      "empty": "Roll something and the result stays here.",
+      "open": "Open roll desk",
+      "openWith": "Open roll desk, {summary}",
+      "announce": "{label}: {total}",
+      "announceLevel": "{label}: {total}, {level}",
+      "actions": {
+        "push": "Push the roll",
+        "pushHint": "Roll the same check again. If it fails, the consequences are worse. Once per roll.",
+        "pushedFinal": "Pushed: this roll can't be pushed again or helped with Luck.",
+        "luck": {
+          "title": "Spend Luck",
+          "have": "Luck {value}",
+          "option": "Spend {cost} Luck to make it {level}",
+          "optionLabel": "{level} −{cost}",
+          "tooLow": "Not enough Luck: {level} needs {cost}, you have {value}.",
+          "notWritable": "Only the character's owner can spend Luck.",
+          "failed": "The message was not sent, so the Luck was given back."
+        }
+      }
+    }
+  },
+  "common": {
+    "appName": "Skald",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "add": "Add",
+    "submit": "Submit",
+    "search": "Search",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "noResults": "No matching results",
+    "addSkill": "Add Skill",
+    "addSkillDescription": "Select a skill to add to the character sheet",
+    "aiTranslatedNotice": "This language is AI-translated and may contain errors",
+    "errorRetry": "Something went wrong. Please try again later."
+  },
+  "characterReferenceField": {
+    "namePlaceholder": "Enter character name...",
+    "selectPc": "Select a player character",
+    "selectNpc": "Select an NPC",
+    "selectAny": "Select any character",
+    "noMembers": "No members yet",
+    "openSheet": "Open character sheet",
+    "status": {
+      "notPlaying": "No longer playing",
+      "archived": "Archived",
+      "gone": "No longer at the table"
+    },
+    "remove": "Remove {name}",
+    "addMember": "Add a character from the table",
+    "noCandidates": "Every character at the table is already listed",
+    "addByName": "Add by name"
+  },
+  "characters": {
+    "derived": {
+      "updateFailed": "Failed to save derived value override",
+      "refreshFailed": "Failed to refresh derived value",
+      "overridden": "Overridden",
+      "auto": "Auto",
+      "autoValue": "Auto: {value}",
+      "fixed": "Auto (can't be overridden)",
+      "noRuntime": "Auto (this sheet can't override it)",
+      "input": "Override {name}",
+      "restore": "Restore auto for {name}",
+      "recalc": {
+        "title": "Recalculated",
+        "changed": "{name}: {before} → {after}",
+        "overridden": "{name} stays overridden at {value} (auto {before} → {after})",
+        "keptOutOfCap": "{name}: kept {kept} (cap {cap})",
+        "restore": "Restore auto"
+      }
+    },
+    "chrome": {
+      "back": "Back to my characters",
+      "modeGroup": "Sheet mode",
+      "modePlay": "Play",
+      "modeEdit": "Edit",
+      "untitled": "Unnamed character",
+      "portraitAlt": "Portrait",
+      "portraitView": "View {name}'s portrait",
+      "portraitUpload": "Upload portrait",
+      "portraitReplace": "Replace portrait",
+      "portraitRemove": "Remove portrait",
+      "portraitUploading": "Uploading…",
+      "portraitUploadFailed": "The portrait could not be uploaded. Try again.",
+      "portraitNotImage": "Choose an image file.",
+      "portraitDialogTitle": "Portrait",
+      "portraitEmpty": "No portrait yet",
+      "portraitUnnamed": "this character",
+      "advancedSettings": "Advanced settings",
+      "copyShareLink": "Copy share link",
+      "shareMenu": "Share options",
+      "syncLabel": "Sync status"
+    }
+  },
+  "tables": {
+    "session": {
+      "createNpc": {
+        "title": "Create NPC",
+        "description": "New NPCs are visible only to the GM and GM assistants until you show them to the table.",
+        "name": "Name",
+        "system": "Game system",
+        "chooseSystem": "Choose a game system",
+        "template": "Sheet template",
+        "loading": "Loading game systems and templates…",
+        "noTemplates": "No published sheet templates are available.",
+        "loadFailed": "Could not load sheet templates. Close the dialog and try again.",
+        "createFailed": "Could not create the NPC.",
+        "openFailed": "The NPC was created, but its sheet could not be opened. Refresh the table to find it.",
+        "visibilityFailed": "Could not change sheet visibility."
+      },
+      "inProgress": "Session in progress",
+      "noCharacter": "No character selected",
+      "selectCharacter": "Select a character to play",
+      "selectCharacterDesc": "Pick a character you play here, or bring a copy of one of your sheets. What happens at the table stays with the table's copy; your original sheet does not change.",
+      "noCharactersForSystem": "You have no {system} characters yet. Create one to use at this table.",
+      "viewExternalSheet": "View external sheet link",
+      "externalSheetLink": "External character sheet link",
+      "externalSheetLinkDesc": "No formal character card? Paste an external link (e.g. a Google Sheet) so others can view it",
+      "externalSheetLinkPlaceholder": "https://docs.google.com/...",
+      "externalSheetLinkSave": "Save link",
+      "externalSheetLinkClear": "Clear link",
+      "externalSheetLinkInvalid": "Enter a URL starting with http:// or https://",
+      "externalSheetLinkOpen": "Open external sheet",
+      "memberAvatar": "Table avatar",
+      "memberAvatarDesc": "No formal character card? Upload an avatar to use as your display image at this table",
+      "memberAvatarUpload": "Upload avatar",
+      "memberAvatarClear": "Clear avatar",
+      "startSession": "Start Session",
+      "characterCard": "Character: {name}",
+      "playModeComingSoon": "(Play mode character sheet coming soon)",
+      "backToTable": "Back to table",
+      "backToSession": "Back to Session",
+      "tableInfo": "Table Info",
+      "settings": "Settings",
+      "play": "Play",
+      "noCharactersInTable": "No characters in this table yet",
+      "addCharacters": "Add characters",
+      "backToHome": "Back to Home",
+      "settingsMenu": {
+        "genreTheme": "Genre themes",
+        "genreThemeGmOverride": "The GM chose a theme for this table; this switch has no effect here",
+        "gmGenre": "Table theme",
+        "genreAuto": "Auto (follow the game system)",
+        "genre": {
+          "neutral": "Neutral",
+          "hardboiled": "Hardboiled mystery",
+          "cozy": "Cozy mystery",
+          "eastern": "Eastern"
+        },
+        "diceAnimation": "Dice Animation",
+        "diceColor": "Dice Color",
+        "chatNotifications": "Chat Notifications",
+        "messageStacking": "Message Stacking",
+        "resetPanels": "Reset Panel Layout",
+        "copyInviteCode": "Copy Invite Code",
+        "leaveTable": "Leave Table",
+        "gmSettings": "GM Settings",
+        "enableChat": "Enable Chat",
+        "enableMedia": "Enable Media Player",
+        "discordIntegration": "Discord Integration",
+        "deleteTable": "Delete Table",
+        "deleteTableConfirmTitle": "Delete this table?",
+        "deleteTableConfirmDescription": "This cannot be undone. The table, its messages, character links, and notebooks will be permanently deleted for everyone.",
+        "deleteTableError": "Failed to delete table",
+        "comingSoon": "Coming Soon",
+        "inviteCodeCopied": "Invite code copied!",
+        "leaveTableError": "Failed to leave table",
+        "settings": "Session settings",
+        "messageStackingTutorial": {
+          "title": "How message stacking works",
+          "description": "Once enabled, Enter and the arrow keys behave differently in the chat input:",
+          "stepEnter": "Enter: saves what you typed as a pending draft and clears the input",
+          "stepDoubleEnter": "Press Enter again right away, on the now-empty input: sends that draft immediately",
+          "stepArrows": "Up, with the caret at the very start of the input: browse the draft queue — keep pressing Up/Down to move, Enter to load the highlighted draft back into the input",
+          "stepEscape": "Esc: stop browsing the queue and return to the input",
+          "close": "Got it"
+        },
+        "aiAssistant": "AI assistant (MCP)",
+        "characterEditPreset": "Who can edit table sheets",
+        "characterEditPresetHint": "Only this table's copies. Players' original sheets never change.",
+        "characterEditPresetOptions": {
+          "owner_and_gm": "Player and GM",
+          "owner_only": "Player only",
+          "all_members": "Everyone at the table"
+        },
+        "characterEditPresetDescriptions": {
+          "owner_and_gm": "Players edit their own copy; you can edit every copy.",
+          "owner_only": "Only the player who brought a sheet edits it; you can read it.",
+          "all_members": "Every approved player can edit any sheet in play here."
+        },
+        "characterEditPresetError": "Could not change who can edit table sheets",
+        "leaveTableConfirmTitle": "Leave this table?",
+        "leaveTableConfirmDescription": "Your character copies stay at this table. You can still open them and save them to your vault later from My Characters → Table copies.",
+        "deleteTableCopiesNote": "Character copies are not deleted: each player keeps theirs under My Characters → Table copies and can save it to their vault.",
+        "tableCopies": "Character copies at this table",
+        "tableSetup": "Table setup"
+      },
+      "editMode": "Edit",
+      "viewMode": "View",
+      "playMode": "Play",
+      "sheetMode": "Character sheet mode",
+      "fullEditor": "Full Editor",
+      "tableUnavailable": "This table is no longer available",
+      "syncFailed": "Failed to sync changes",
+      "characterTab": "Character",
+      "notesTab": "Notes",
+      "whiteboardTab": "Whiteboard",
+      "rightPanel": {
+        "topPanel": "Top panel",
+        "bottomPanel": "Bottom panel",
+        "expand": "Expand",
+        "collapse": "Collapse",
+        "hide": "Hide"
+      },
+      "tableRules": {
+        "title": "System rules",
+        "back": "Back to table",
+        "loading": "Loading system rules…",
+        "unavailable": "System rules could not be loaded. You can still use the table.",
+        "retry": "Retry"
+      },
+      "partyStrip": {
+        "title": "Party overview",
+        "summary": "{count, plural, one {# sheet} other {# sheets}} · Select a card to show its sheet below",
+        "unavailable": "Couldn't load the party summary. You can still switch sheets.",
+        "retry": "Retry",
+        "hidden": "Hidden from players"
+      },
+      "topBar": {
+        "breadcrumb": "Breadcrumb",
+        "tables": "Tables",
+        "onlyYou": "Only you online",
+        "online": "{count} online",
+        "chat": "Chat",
+        "chatUnread": "{count, plural, one {# unread message} other {# unread messages}}",
+        "chatUnreadMany": "More than 99 unread messages"
+      },
+      "chatHandle": {
+        "label": "Resize chat column",
+        "valueText": "{width} pixels wide",
+        "preview": "{width}px",
+        "hint": "←/→ to switch width, Enter to reset"
+      },
+      "sheetOwner": {
+        "label": "Whose sheet",
+        "readOnly": "Read-only · {name}'s sheet"
+      },
+      "party": {
+        "label": "Party",
+        "empty": "No teammates yet.",
+        "online": "Online",
+        "noCharacter": "No character",
+        "viewSheet": "View sheet (read-only)",
+        "externalSheet": "External sheet"
+      },
+      "nav": {
+        "label": "Table pages",
+        "myCard": "My card",
+        "party": "Party",
+        "chat": "Chat",
+        "pending": "{count, plural, one {# pending application} other {# pending applications}}",
+        "chatUnread": "{count, plural, one {# unread message} other {# unread messages}}",
+        "chatUnreadMany": "More than 99 unread messages",
+        "rules": "Rules"
+      },
+      "chatDrawer": {
+        "label": "Chat",
+        "title": "Chat",
+        "close": "Close chat"
+      },
+      "emptyTable": {
+        "title": "No players at this table yet",
+        "description": "Send the invite code or link to your players. Their applications show up here for you to approve.",
+        "codeLabel": "Invite code",
+        "copyLink": "Copy invite link",
+        "copyCode": "Copy code only",
+        "linkCopied": "Invite link copied",
+        "codeCopied": "Invite code copied",
+        "copyFailed": "Could not copy. Select the invite code by hand.",
+        "prepareHandbook": "Prepare the GM handbook first"
+      },
+      "noPlayerCharacters": {
+        "title": "No player characters yet",
+        "description": "Once players join and pick a character, they appear here.",
+        "goCrew": "Invite players in Crew"
+      },
+      "characterPicker": {
+        "description": "This table uses \"{system}\". Pick one of your sheets for that system: a copy of it joins the table and your original stays as it is. The GM and your party see the copy in the party list.",
+        "descriptionAnySystem": "Pick one of your sheets: a copy of it joins the table and your original stays as it is. The GM and your party see the copy in the party list.",
+        "listLabel": "Characters you can play",
+        "lastUpdated": "Last updated {date}",
+        "use": "Bring a copy into this table",
+        "create": "Create a character",
+        "hint": "You can chat and roll without a character, and pick one here any time later."
+      },
+      "pending": {
+        "details": "Application",
+        "table": "Table",
+        "gm": "GM",
+        "system": "System",
+        "appliedAt": "Applied",
+        "autoEnter": "This page enters the table by itself. No need to refresh.",
+        "back": "Back to tables",
+        "cancel": "Cancel application",
+        "cancelTitle": "Cancel your join request?",
+        "cancelDescription": "You will be removed from the approval list of \"{table}\". To join later you need to apply again with the invite code.",
+        "cancelConfirm": "Cancel application",
+        "cancelKeep": "Keep application",
+        "cancelled": "Join request cancelled",
+        "cancelFailed": "Could not cancel the application. Try again later."
+      },
+      "tableCopiesHeading": "Playing at this table",
+      "vaultSheetsHeading": "Bring a copy of one of your sheets",
+      "tableCopy": {
+        "label": "This table's copy",
+        "description": "Changes here stay at this table. The player's original sheet does not change.",
+        "openSource": "Open my original sheet",
+        "saveToVault": "Save to my vault…"
+      },
+      "unplayedCopiesHeading": "Your copies here, not in play",
+      "playAgain": "Play again",
+      "removeCopy": {
+        "title": "Take {name} out of play?",
+        "description": "The copy stays at this table with its progress, out of play. Bring the same sheet back to pick it up again, or save it to your vault first.",
+        "saveFirst": "Save to my vault first",
+        "confirm": "Take out of play"
+      },
+      "tableCopies": {
+        "title": "Character copies at this table",
+        "description": "Every copy at this table, including those players left behind. Archive the ones nobody plays, or hand your own copies (pregens, NPCs) to a player.",
+        "empty": "No character copies at this table yet.",
+        "you": "You",
+        "formerPlayer": "A former player",
+        "inPlay": "In play",
+        "notInPlay": "Not in play",
+        "archived": "Archived",
+        "archive": "Archive",
+        "unarchive": "Unarchive",
+        "archivedToast": "Copy archived",
+        "unarchivedToast": "Copy unarchived",
+        "handOffTo": "Hand to a player…",
+        "handOff": "Offer",
+        "offeredTo": "Offered to {name}, waiting for their answer",
+        "cancelOffer": "Withdraw",
+        "offeredToast": "Offer sent; the player is asked in the table",
+        "cancelledToast": "Offer withdrawn",
+        "handOffHint": "A handed-over copy becomes the player's once they accept. You can still edit it as this table's edit setting allows.",
+        "failed": "That did not work. Try again.",
+        "gmOnly": "GM only",
+        "hide": "Hide from players",
+        "show": "Show to players",
+        "hiddenToast": "Players no longer see this copy",
+        "shownToast": "Players can see this copy",
+        "visibilityHint": "GM-only copies are hidden from players: they cannot open or edit them. GM assistants still can. Characters you create in the table start GM-only."
+      },
+      "handoffOffer": {
+        "label": "Character offers",
+        "title": "The GM offers you “{name}”",
+        "body": "Accept to play it as your own character at this table. You can save it to your vault afterwards.",
+        "accept": "Accept",
+        "decline": "Decline",
+        "accepted": "The character is yours now",
+        "declined": "Offer declined",
+        "failed": "Could not answer the offer. Try again."
+      }
+    }
+  },
+  "sheetUi": {
+    "noSelectableSkills": "No selectable skills",
+    "searchSkills": "Search skills...",
+    "tabAvailableSkills": "Available Skills",
+    "tabSpecializationSkills": "Specialization Skills",
+    "tabCustom": "Custom",
+    "noMatchingSkills": "No matching skills found",
+    "noMatchingSpecializationSkills": "No matching specialization skills found",
+    "specializationOptionsCount": "{count} options",
+    "specializationBlankOption": "(Blank - fill in)",
+    "customSkillName": "Skill Name",
+    "customSkillNamePlaceholder": "Enter skill name",
+    "baseValue": "Base Value",
+    "addCustomSkill": "Add Custom Skill",
+    "assetItemPlaceholder": "Item...",
+    "assetValuePlaceholder": "Value",
+    "armorTypePlaceholder": "Armor type",
+    "armorValuePlaceholder": "Value",
+    "shieldTypePlaceholder": "Shield type",
+    "shieldValuePlaceholder": "Dmg/Armor",
+    "shieldDamagePlaceholder": "Dmg",
+    "shieldArmorPlaceholder": "Armor",
+    "noItems": "No items",
+    "fellowInvestigatorPlaceholder": "Investigator...",
+    "fellowPlayerPlaceholder": "Player...",
+    "fellowNotesPlaceholder": "Notes...",
+    "noFellowInvestigators": "No fellow investigators",
+    "markKeyConnection": "Mark as key connection",
+    "unmarkKeyConnection": "Unmark key connection",
+    "backstoryPlaceholder": "Enter content...",
+    "loadingSkills": "Loading skills...",
+    "selectImageFile": "Please select an image file",
+    "imageProcessingFailed": "Image processing failed",
+    "processing": "Processing...",
+    "removeImage": "Remove image",
+    "photo": "Photo",
+    "uploadUnavailable": "Image upload is not available here",
+    "stanceRollResults": "Stance Roll Results",
+    "clearPrefix": "Clear: ",
+    "positive": "Positive",
+    "negative": "Negative",
+    "physicalShort": "Physical",
+    "mentalShort": "Mental",
+    "pluginLoadFailed": "This sheet failed to load.",
+    "pluginFieldsLoadFailed": "This system's fields failed to load.",
+    "pluginLoadRetry": "Try again",
+    "zhFallbackNotice": "Some of this system's Traditional Chinese text is not included in this build; those parts show in English."
+  },
+  "errorPages": {
+    "error": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred. You can try again, or go back to the home page.",
+      "retry": "Try again",
+      "home": "Back to home",
+      "reference": "Error reference: {digest}"
+    }
+  }
+}

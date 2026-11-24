@@ -1,0 +1,1382 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "skald/schema/v1",
+  "title": "Skald Field Schema",
+  "description": "Schema for Skald character sheet field definitions",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "version",
+    "fields"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this schema"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name of the schema"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "author": {
+      "type": "string"
+    },
+    "system": {
+      "type": "string"
+    },
+    "era": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "optionModules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "source"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "fields": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/field"
+      }
+    },
+    "computed": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "formula"
+        ],
+        "properties": {
+          "formula": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "validations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "rule",
+          "message"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "rule": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "error",
+              "warning",
+              "info"
+            ]
+          }
+        }
+      }
+    },
+    "editorConfig": {
+      "type": "object",
+      "properties": {
+        "toolbar": {
+          "$ref": "#/definitions/toolbar"
+        },
+        "settingsPanel": {
+          "$ref": "#/definitions/settingsPanel"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "field": {
+      "type": "object",
+      "required": [
+        "id",
+        "type"
+      ],
+      "properties": {
+        "action": {
+          "type": "object",
+          "description": "FieldAction"
+        },
+        "actions": {
+          "type": "array",
+          "description": "string[]",
+          "items": {
+            "type": "string"
+          }
+        },
+        "advancesPath": {
+          "type": "string"
+        },
+        "allowAdd": {
+          "type": "boolean"
+        },
+        "allowCustom": {
+          "type": "boolean"
+        },
+        "allowCustomSkills": {
+          "type": "boolean"
+        },
+        "allowEditLabel": {
+          "type": "boolean"
+        },
+        "allowMultiple": {
+          "type": "boolean",
+          "description": "Allow multiple character selections (for character-reference)"
+        },
+        "allowRemove": {
+          "type": "boolean"
+        },
+        "allowUpload": {
+          "type": "boolean"
+        },
+        "allowUrl": {
+          "type": "boolean"
+        },
+        "aspectRatio": {
+          "type": "string"
+        },
+        "assetsLabel": {
+          "type": "string"
+        },
+        "baseBoxes": {
+          "type": "number"
+        },
+        "baseRefresh": {
+          "type": "number"
+        },
+        "baseValue": {
+          "description": "數值或公式字串",
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "bonusThresholds": {
+          "type": "array",
+          "description": "FateStressThreshold[]",
+          "items": {
+            "type": "object"
+          }
+        },
+        "boxes": {
+          "type": "number"
+        },
+        "cashLabel": {
+          "type": "string"
+        },
+        "categories": {
+          "type": "array",
+          "description": "SkillCategoryDef[]",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "label"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "category": {
+          "type": "string"
+        },
+        "centerPath": {
+          "type": "string",
+          "description": "Data path for center position"
+        },
+        "characterType": {
+          "type": "string",
+          "enum": [
+            "pc",
+            "npc",
+            "both"
+          ]
+        },
+        "columns": {
+          "description": "number of grid columns (conditions), or the shown number columns (stat-list)",
+          "oneOf": [
+            { "type": "number" },
+            {
+              "type": "array",
+              "items": { "type": "string", "enum": ["improve", "base", "value", "half", "fifth"] }
+            }
+          ]
+        },
+        "current": {
+          "type": "string",
+          "description": "resource: data path of the current value, default <id>.current"
+        },
+        "currentValue": {
+          "type": "string"
+        },
+        "customClass": {
+          "type": "string",
+          "pattern": "^skald-user-[a-z0-9-]+$"
+        },
+        "cycleStates": {
+          "type": "boolean",
+          "description": "Allow cycling through multiple states on click"
+        },
+        "defaultAspects": {
+          "type": "array",
+          "description": "預設面向",
+          "items": {
+            "type": "object"
+          }
+        },
+        "defaultBaseValue": {
+          "type": "number"
+        },
+        "defaultSkills": {
+          "description": "FateDefaultSkill[] | string[]",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "defaultValue": {},
+        "description": {
+          "type": "string"
+        },
+        "detailPath": {
+          "type": "string"
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "vertical",
+            "horizontal"
+          ]
+        },
+        "display": {
+          "type": "string",
+          "description": "stat-list: rows (default) or tiles",
+          "enum": ["rows", "tiles"]
+        },
+        "groupBy": {
+          "type": "string",
+          "description": "stat-list: category (the source's groups, default) or none",
+          "enum": ["category", "none"]
+        },
+        "include": {
+          "type": "array",
+          "description": "stat-list: show only these row ids",
+          "items": { "type": "string" }
+        },
+        "rowRoll": {
+          "description": "stat-list: roll for each row; @row.value, @row.base, @row.half, @row.fifth and @row.level become numbers before the roll",
+          "oneOf": [{ "type": "string" }, { "type": "object" }]
+        },
+        "searchable": {
+          "type": "boolean",
+          "description": "stat-list: show the search bar (default true)"
+        },
+        "displayFormat": {
+          "type": "string",
+          "enum": [
+            "simple",
+            "detailed"
+          ]
+        },
+        "displayStyle": {
+          "type": "string",
+          "description": "各欄位型別各自宣告一組子集",
+          "enum": [
+            "list",
+            "chips",
+            "grid",
+            "cards",
+            "compact",
+            "full",
+            "default",
+            "quote",
+            "muted"
+          ]
+        },
+        "displayVariant": {
+          "type": "string",
+          "enum": [
+            "underline",
+            "box",
+            "minimal",
+            "plain"
+          ]
+        },
+        "editableLabels": {
+          "type": "boolean"
+        },
+        "emptyMessage": {
+          "type": "string"
+        },
+        "fallbackKey": {
+          "type": "string"
+        },
+        "follow": {
+          "type": "string",
+          "enum": ["max", "start"],
+          "description": "resource / coc-tracked-resource: the current value follows this value (max or start) when it changes and has not been edited by hand (see lib/sheets/follow-resource.ts)"
+        },
+        "fifthFormula": {
+          "type": "string"
+        },
+        "filters": {
+          "type": "array",
+          "description": "stat-list: filter chips (pinned = 常用, improvable = 可成長, all = 全部)",
+          "items": { "type": "string", "enum": ["pinned", "improvable", "all"] }
+        },
+        "flow": {
+          "description": "stat-list: column-count flow, { columns } or { base, md?, lg? } of those",
+          "oneOf": [
+            {
+              "type": "object",
+              "required": ["columns"],
+              "properties": { "columns": { "type": "integer", "minimum": 1 } },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": ["base"],
+              "properties": {
+                "base": { "type": "object", "required": ["columns"], "properties": { "columns": { "type": "integer", "minimum": 1 } } },
+                "md": { "type": "object", "required": ["columns"], "properties": { "columns": { "type": "integer", "minimum": 1 } } },
+                "lg": { "type": "object", "required": ["columns"], "properties": { "columns": { "type": "integer", "minimum": 1 } } }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "filter": {
+          "type": "string"
+        },
+        "filterByTraining": {
+          "type": "boolean"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "decimal",
+            "integer",
+            "percentage",
+            "text"
+          ]
+        },
+        "formula": {
+          "type": "string"
+        },
+        "freeStunts": {
+          "type": "number"
+        },
+        "gridPosition": {
+          "type": "object",
+          "description": "GridPosition",
+          "properties": {
+            "column": {
+              "type": "number"
+            },
+            "columnSpan": {
+              "type": "number"
+            },
+            "row": {
+              "type": "number"
+            },
+            "rowSpan": {
+              "type": "number"
+            }
+          }
+        },
+        "groupByType": {
+          "type": "boolean"
+        },
+        "groupLabels": {
+          "type": "object",
+          "description": "分組鍵對應的 i18n key",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "halfFormula": {
+          "type": "string"
+        },
+        "hidden": {
+          "type": "boolean",
+          "description": "完全不渲染（供巨集/公式中繼值使用），與 layout.hidden、visibleWhen 不同"
+        },
+        "i18nKeyPattern": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "idPrefix": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "includeGroup": {
+          "type": "boolean"
+        },
+        "includeUniversal": {
+          "type": "boolean"
+        },
+        "isSpecialization": {
+          "type": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "description": "ChecklistItem[] (checklist), or ConditionItem[] (conditions)",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "label"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "suggest": {
+                "type": "string",
+                "description": "conditions: boolean formula; when true and the item is unchecked a dashed hint is shown (never auto-checks)"
+              }
+            }
+          }
+        },
+        "label": {
+          "type": "string"
+        },
+        "labelPath": {
+          "type": "string"
+        },
+        "labelPosition": {
+          "type": "string",
+          "enum": [
+            "top",
+            "left",
+            "inline",
+            "hidden"
+          ]
+        },
+        "rowTemplate": {
+          "$ref": "#/definitions/listRowTemplate"
+        },
+        "ladderI18nPrefix": {
+          "type": "string"
+        },
+        "layout": {
+          "type": "object",
+          "description": "Partial<LayoutBase>"
+        },
+        "level": {
+          "type": "integer",
+          "enum": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        "linkedSkillId": {
+          "type": "string"
+        },
+        "linkedSkills": {
+          "type": "array",
+          "description": "FateLinkedSkill[]",
+          "items": {
+            "type": "object"
+          }
+        },
+        "listLayout": {
+          "type": "object",
+          "description": "清單版面設定"
+        },
+        "macro": {
+          "type": "object",
+          "description": "RollConfig — macro-trigger-button 觸發的巨集/擲骰表達式"
+        },
+        "max": {
+          "description": "number (number field), or ResourceValueSource (resource field)",
+          "oneOf": [
+            { "type": "number" },
+            { "type": "string" },
+            {
+              "type": "object",
+              "required": ["from"],
+              "properties": { "from": { "type": "string" } },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "maxChecked": {
+          "type": "integer",
+          "description": "Maximum items that can be checked (optional)"
+        },
+        "maxItems": {
+          "type": "integer"
+        },
+        "maxLength": {
+          "type": "number"
+        },
+        "maxLevel": {
+          "type": "number"
+        },
+        "maxPosition": {
+          "type": "integer",
+          "description": "Maximum position on balance track (default: +4)"
+        },
+        "maxSelected": {
+          "type": "integer",
+          "description": "Maximum number of selections allowed"
+        },
+        "maxStunts": {
+          "type": "number"
+        },
+        "maxValue": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "min": {
+          "type": "number"
+        },
+        "minLevel": {
+          "type": "number"
+        },
+        "minPosition": {
+          "type": "integer",
+          "description": "Minimum position on balance track (default: -4)"
+        },
+        "minSelected": {
+          "type": "integer",
+          "description": "Minimum number of selections required"
+        },
+        "moveSource": {
+          "type": "string",
+          "enum": [
+            "playbook",
+            "custom",
+            "basic",
+            "balance",
+            "other-playbooks"
+          ]
+        },
+        "moves": {
+          "type": "array",
+          "description": "MoveDefinition[]",
+          "items": {
+            "type": "object"
+          }
+        },
+        "multiline": {
+          "type": "boolean"
+        },
+        "multiple": {
+          "type": "boolean"
+        },
+        "noFormulaPlaceholder": {
+          "type": "string"
+        },
+        "nullPlaceholder": {
+          "type": "string"
+        },
+        "onChange": {
+          "type": "string"
+        },
+        "optionModule": {
+          "type": "string"
+        },
+        "optionSource": {
+          "type": "object",
+          "description": "macro-trigger-button：讀取目標 select 欄位的選項數量傳入巨集",
+          "required": [
+            "fieldId",
+            "argParam"
+          ],
+          "properties": {
+            "fieldId": {
+              "type": "string"
+            },
+            "argParam": {
+              "type": "string"
+            }
+          }
+        },
+        "offLabel": {
+          "type": "string"
+        },
+        "onLabel": {
+          "type": "string"
+        },
+        "options": {
+          "description": "SelectOption[] | MultiSelectOption[] | GrowthAdvanceOption[] | string（optionSources 參照）",
+          "anyOf": [
+            {
+              "type": "array",
+              "description": "SelectOption[]",
+              "items": {
+                "type": "object",
+                "required": [
+                  "value",
+                  "label"
+                ],
+                "properties": {
+                  "value": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "applyData": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            {
+              "type": "array",
+              "description": "MultiSelectOption[] | GrowthAdvanceOption[]",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "label"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "maxCount": {
+                    "type": "number"
+                  }
+                }
+              }
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "placeholder": {
+          "type": "string"
+        },
+        "positionPath": {
+          "type": "string",
+          "description": "Data path for balance position"
+        },
+        "print": {
+          "description": "ResourcePrintConfig (resource) or StatListPrintConfig (stat-list) — print look",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "variant": { "type": "string", "enum": ["ticks", "boxes"] }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "flow": {
+                  "type": "object",
+                  "required": ["columns"],
+                  "properties": { "columns": { "type": "integer", "minimum": 1 } },
+                  "additionalProperties": false
+                },
+                "columns": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["name", "improve", "base", "value", "half", "fifth"]
+                  }
+                },
+                "blankRowsPerColumn": { "type": "integer", "minimum": 0 }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "printWidth": {
+          "type": "string"
+        },
+        "principle1": {
+          "type": "object",
+          "description": "BalanceTrackPrinciple",
+          "required": [
+            "id",
+            "label"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        },
+        "principle2": {
+          "type": "object",
+          "description": "BalanceTrackPrinciple",
+          "required": [
+            "id",
+            "label"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        },
+        "pyramidConfig": {
+          "type": "object",
+          "description": "各層級的數量約束"
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "refreshField": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "roll": {
+          "description": "RollConfig，或 true / \"self\" 簡寫",
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "rows": {
+          "type": "integer"
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "table"
+          ],
+          "description": "character-reference: pick the characters of the sheet's table (requires allowMultiple; value is [{ id, characterId, name }])"
+        },
+        "selectable": {
+          "type": "boolean"
+        },
+        "selectedPath": {
+          "type": "string"
+        },
+        "selectionUi": {
+          "type": "string",
+          "enum": [
+            "inline",
+            "dialog"
+          ]
+        },
+        "showBase": {
+          "type": "boolean"
+        },
+        "showCenter": {
+          "type": "boolean",
+          "description": "Show center marker on balance track"
+        },
+        "showFifth": {
+          "type": "boolean"
+        },
+        "showHalf": {
+          "type": "boolean"
+        },
+        "showImproved": {
+          "type": "boolean"
+        },
+        "showTrackBoxes": {
+          "type": "boolean"
+        },
+        "showType": {
+          "type": "string",
+          "enum": [
+            "positive",
+            "negative",
+            "both"
+          ]
+        },
+        "skillI18nPrefix": {
+          "type": "string"
+        },
+        "skillPyramidField": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "sourceField": {
+          "type": "string"
+        },
+        "sourceShape": {
+          "type": "string",
+          "enum": [
+            "flat",
+            "grouped"
+          ]
+        },
+        "specializationModule": {
+          "type": "string"
+        },
+        "spendingLabel": {
+          "type": "string"
+        },
+        "start": {
+          "description": "ResourceValueSource — fixed number, or { from: derived field id }",
+          "oneOf": [
+            { "type": "number" },
+            {
+              "type": "object",
+              "required": ["from"],
+              "properties": { "from": { "type": "string" } },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "startValue": {
+          "type": "string"
+        },
+        "states": {
+          "type": "array",
+          "description": "Available states (default: [\"unchecked\", \"checked\"])",
+          "items": {
+            "type": "string",
+            "enum": [
+              "unchecked",
+              "checked",
+              "completed",
+              "crossed"
+            ]
+          }
+        },
+        "statusMarkers": {
+          "type": "array",
+          "description": "StatusMarkerConfig[]",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "label"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "trigger": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "step": {
+          "type": "number"
+        },
+        "storage": {
+          "type": "string",
+          "enum": [
+            "array",
+            "map"
+          ]
+        },
+        "stuntsField": {
+          "type": "string"
+        },
+        "style": {
+          "type": "string",
+          "enum": [
+            "solid",
+            "dashed",
+            "dotted",
+            "decorative"
+          ]
+        },
+        "suggestions": {
+          "type": "array",
+          "description": "string[]",
+          "items": {
+            "type": "string"
+          }
+        },
+        "text": {
+          "type": "string"
+        },
+        "textAlign": {
+          "type": "string",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ]
+        },
+        "thickness": {
+          "type": "string",
+          "enum": [
+            "thin",
+            "medium",
+            "thick"
+          ]
+        },
+        "tooltip": {
+          "type": "string"
+        },
+        "tooltipPath": {
+          "type": "string"
+        },
+        "tooltipPrefix": {
+          "type": "string"
+        },
+        "trackBoxCount": {
+          "description": "數值或公式字串",
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "track": {
+          "type": "object",
+          "description": "ResourceTrackConfig — printed tick marks of a resource field",
+          "properties": {
+            "boxes": { "type": "integer", "minimum": 1 },
+            "circleCurrent": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        },
+        "trackBoxSize": {
+          "type": "string",
+          "enum": [
+            "xs",
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "trackDirection": {
+          "type": "string",
+          "enum": [
+            "row",
+            "column"
+          ]
+        },
+        "trackUsage": {
+          "type": "boolean"
+        },
+        "trainingSourceField": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "text",
+            "number",
+            "computed",
+            "select",
+            "toggle",
+            "coc-tracked-resource",
+            "resource",
+            "conditions",
+            "stat-list",
+            "attribute",
+            "coc-skill",
+            "coc-skill-list",
+            "coc-weapon-list",
+            "image",
+            "divider",
+            "heading",
+            "backstory-list",
+            "coc-fellow-investigators",
+            "coc-assets-list",
+            "coc-assets-info",
+            "coc-armor",
+            "coc-talent-display",
+            "balance-track",
+            "checklist",
+            "multi-select",
+            "character-reference",
+            "moves-list",
+            "growth-question",
+            "dynamic-text",
+            "growth-advances",
+            "combat-reference",
+            "status-effects-reference",
+            "checkbox-track",
+            "conditions-reference",
+            "moves-reference",
+            "techniques-list",
+            "fate-skill-pyramid",
+            "fate-stunt-list",
+            "fate-stress-track",
+            "fate-aspect-list",
+            "fate-refresh",
+            "fate-reset-button",
+            "macro-trigger-button",
+            "list",
+            "toggleable-reference",
+            "object"
+          ]
+        },
+        "unlockedByAdvance": {
+          "type": "string"
+        },
+        "usagePath": {
+          "type": "string"
+        },
+        "valuePath": {
+          "type": "string"
+        },
+        "variant": {
+          "type": "string",
+          "enum": [
+            "underline",
+            "plain",
+            "default",
+            "decorated",
+            "underlined",
+            "inline",
+            "body"
+          ]
+        },
+        "visibleWhen": {
+          "type": "string"
+        },
+        "weaponDataSource": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": { "const": "list" }
+            }
+          },
+          "then": {
+            "required": ["rowTemplate"]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": { "not": { "const": "stat-list" } }
+            }
+          },
+          "then": {
+            "properties": {
+              "columns": { "type": "number" }
+            }
+          }
+        }
+      ]
+    },
+    "listRowTemplate": {
+      "type": "object",
+      "required": ["children", "layout"],
+      "properties": {
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/listRowField" }
+        },
+        "layout": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "listRowField": {
+      "allOf": [
+        { "$ref": "#/definitions/field" },
+        {
+          "properties": {
+            "type": {
+              "not": {
+                "enum": [
+                  "list",
+                  "page",
+                  "section",
+                  "container",
+                  "object"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "toolbar": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "type",
+              "id"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "button",
+                  "display",
+                  "separator"
+                ]
+              },
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "panelId": {
+                "type": "string"
+              },
+              "handler": {
+                "type": "string"
+              },
+              "template": {
+                "type": "string"
+              },
+              "variant": {
+                "type": "string"
+              },
+              "visibleWhen": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "settingsPanel": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "width": {
+          "type": "string"
+        },
+        "defaultOpen": {
+          "type": "boolean"
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              },
+              "defaultOpen": {
+                "type": "boolean"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/settingItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "settingItem": {
+      "type": "object",
+      "required": [
+        "type",
+        "id"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "select",
+            "text",
+            "checkbox",
+            "button",
+            "display",
+            "group"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "placeholder": {
+          "type": "string"
+        },
+        "options": {},
+        "bindTo": {
+          "type": "string"
+        },
+        "onChange": {
+          "type": "string"
+        },
+        "dependsOn": {
+          "type": "string"
+        },
+        "visibleWhen": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "handler": {
+          "type": "string"
+        },
+        "variant": {
+          "type": "string"
+        },
+        "template": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/settingItem"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,284 @@
+{
+  "$schema": "../schemas/template.schema.json",
+  "id": "fate-condensed-standard",
+  "name": "命運濃縮版標準版",
+  "version": "2.0.0",
+  "schemaId": "fate-condensed-character",
+  "schemaVersion": "2.0.0",
+  "description": "Fate Condensed standard character sheet template",
+  "author": "Skald",
+  "header": {
+    "portrait": "portrait"
+  },
+  "pages": [
+    {
+      "id": "page1",
+      "title": "角色卡",
+      "size": "A4",
+      "orientation": "portrait",
+      "margin": "sm",
+      "layout": {
+        "type": "stack",
+        "direction": "column",
+        "gap": "md"
+      },
+      "children": [
+        {
+          "id": "header-row",
+          "type": "section",
+          "title": "{{i18n:system.name}}",
+          "titleStyle": {
+            "size": "2xl",
+            "align": "center",
+            "weight": "bold"
+          },
+          "layout": {
+            "type": "stack",
+            "direction": "row",
+            "gap": "md",
+            "align": "start"
+          },
+          "children": [
+            {
+              "id": "header-info",
+              "type": "section",
+              "sectionLayout": {
+                "width": "fill"
+              },
+              "layout": {
+                "type": "stack",
+                "direction": "column",
+                "gap": "xs"
+              },
+              "children": [
+                {
+                  "id": "name-player-row",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "row",
+                    "gap": "md"
+                  },
+                  "children": [
+                    {
+                      "type": "field-ref",
+                      "fieldId": "name",
+                      "label": "{{i18n:field.name}}"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "player",
+                      "label": "{{i18n:field.player}}"
+                    }
+                  ]
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "description",
+                  "label": "{{i18n:field.description}}"
+                }
+              ]
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "portrait",
+              "layout": {
+                "width": "120px",
+                "height": "120px"
+              }
+            }
+          ]
+        },
+        {
+          "id": "main-content",
+          "type": "section",
+          "layout": {
+            "type": "stack",
+            "direction": "row",
+            "gap": "lg"
+          },
+          "children": [
+            {
+              "id": "left-column",
+              "type": "section",
+              "sectionLayout": {
+                "width": "fill"
+              },
+              "layout": {
+                "type": "stack",
+                "direction": "column",
+                "gap": "lg"
+              },
+              "children": [
+                {
+                  "id": "aspects-section",
+                  "type": "section",
+                  "title": "{{i18n:section.aspects}}",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "column",
+                    "gap": "xs"
+                  },
+                  "children": [
+                    {
+                      "type": "field-ref",
+                      "fieldId": "aspects"
+                    }
+                  ]
+                },
+                {
+                  "id": "stunts-section",
+                  "type": "section",
+                  "title": "{{i18n:section.stunts}}",
+                  "sectionLayout": {
+                    "minHeight": "200px"
+                  },
+                  "layout": {
+                    "type": "stack",
+                    "direction": "column",
+                    "gap": "xs"
+                  },
+                  "children": [
+                    {
+                      "type": "field-ref",
+                      "fieldId": "stunts"
+                    }
+                  ]
+                },
+                {
+                  "id": "refresh-section",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "row",
+                    "gap": "md",
+                    "align": "center"
+                  },
+                  "children": [
+                    {
+                      "type": "field-ref",
+                      "fieldId": "refresh"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "right-column",
+              "type": "section",
+              "sectionLayout": {
+                "width": "fill"
+              },
+              "layout": {
+                "type": "stack",
+                "direction": "column",
+                "gap": "lg"
+              },
+              "children": [
+                {
+                  "id": "skills-section",
+                  "type": "section",
+                  "title": "{{i18n:section.skills}}",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "column",
+                    "gap": "xs"
+                  },
+                  "children": [
+                    {
+                      "type": "field-ref",
+                      "fieldId": "skills"
+                    }
+                  ]
+                },
+                {
+                  "id": "vitality-section",
+                  "type": "section",
+                  "title": "{{i18n:section.vitality}}",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "column",
+                    "gap": "sm"
+                  },
+                  "children": [
+                    {
+                      "id": "stress-subsection",
+                      "type": "section",
+                      "title": "{{i18n:section.stress}}",
+                      "titleVariant": "small",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "column",
+                        "gap": "xs"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "physicalStress"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "mentalStress"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "consequences-subsection",
+                      "type": "section",
+                      "title": "{{i18n:section.consequences}}",
+                      "titleVariant": "small",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "column",
+                        "gap": "xs"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "mildConsequence"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "moderateConsequence"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "severeConsequence"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "extraMildConsequence",
+                          "visibleWhen": "{{extraMildConsequence}}"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "extras-section",
+                  "type": "section",
+                  "titleVariant": "hidden",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "column",
+                    "gap": "xs"
+                  },
+                  "children": [
+                    {
+                      "type": "field-ref",
+                      "fieldId": "extras"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "notes"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

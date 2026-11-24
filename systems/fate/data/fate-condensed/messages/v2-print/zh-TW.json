@@ -1,0 +1,49 @@
+{
+  "fatePrint": {
+    "title": "命運濃縮版",
+    "name": "姓名",
+    "player": "玩家",
+    "description": "描述",
+    "portrait": "角色肖像",
+    "portraitLoading": "正在載入角色肖像…",
+    "portraitFailed": "無法載入角色肖像，列印時將省略。",
+    "overflow": "有些內容未能印出，全文請見角色卡。",
+    "continued": "續頁",
+    "tailContinued": "→ 絕技、額外項目與筆記見續頁",
+    "invokeLabel": "免費援引",
+    "aspects": "形象",
+    "aspect": {
+      "highConcept": "高概念",
+      "trouble": "麻煩",
+      "relationship": "關係",
+      "free": "自由形象",
+      "situation": "情境形象",
+      "boost": "推助"
+    },
+    "aspectLabel": "{kind}（{label}）",
+    "secret": "秘密",
+    "freeInvokes": "免費援引：{count} 次",
+    "skills": "技能梯度",
+    "rung": "{rank} {label}",
+    "ladder": {
+      "8": "傳奇", "7": "史詩", "6": "驚人", "5": "卓越", "4": "傑出", "3": "良好", "2": "尚可", "1": "普通", "0": "平庸", "-1": "差勁", "-2": "糟糕", "-3": "悲劇", "-4": "駭人"
+    },
+    "fatePoints": "命運點",
+    "refresh": "重振",
+    "stress": "壓力",
+    "consequences": "後果",
+    "conditions": "狀態",
+    "injury": "{name}（{value}）",
+    "blocked": { "extremeUsed": "已使用", "legacyUnassigned": "需先指定舊版後果的軌別" },
+    "legacyExtraMild": "未指定軌別的額外輕微後果",
+    "stunts": "絕技",
+    "stuntBudget": "絕技：{count} 項（{free} 項免費），消耗重振：{cost} 點",
+    "blankStuntBudget": "絕技：<gap></gap> 項（<gap></gap> 項免費），消耗重振：<gap></gap> 點",
+    "blankRefreshBudget": "基礎重振：<gap></gap>，額外取得：<gap></gap>",
+    "refreshBudget": "基礎重振：{base}，額外取得：{earned}",
+    "refreshOverride": "指定重振：{override}",
+    "oncePerSession": "每場次限用一次",
+    "extras": "額外項目",
+    "notes": "筆記"
+  }
+}

@@ -1,0 +1,505 @@
+{
+  "notice": {
+    "en": "Fate Condensed"
+  },
+  "credits": {
+    "en": "Credits"
+  },
+  "intro": {
+    "en": "Introduction",
+    "zh-TW": "入門導引"
+  },
+  "intro.tools": {
+    "en": "Introduction / What Do I Need to Play?",
+    "zh-TW": "入門導引 / 我需要什麼來玩？"
+  },
+  "intro.changes": {
+    "en": "Introduction / What Do I Need to Play? / For Veterans: Changes From Fate Core",
+    "zh-TW": "入門導引 / 我需要什麼來玩？ / 給老手：從命運核心版改了什麼"
+  },
+  "character": {
+    "en": "Getting Started",
+    "zh-TW": "開始"
+  },
+  "character.setting": {
+    "en": "Getting Started / Define Your Setting",
+    "zh-TW": "開始 / 定義你們的設定"
+  },
+  "character.creation": {
+    "en": "Getting Started / Create Your Characters",
+    "zh-TW": "開始 / 創造你的角色"
+  },
+  "character.identity": {
+    "en": "Getting Started / Create Your Characters / Who Are You?",
+    "zh-TW": "開始 / 創造你的角色 / 你是誰？"
+  },
+  "character.aspects": {
+    "en": "Getting Started / Create Your Characters / Aspects",
+    "zh-TW": "開始 / 創造你的角色 / 形象"
+  },
+  "character.aspects.high-concept": {
+    "en": "Getting Started / Create Your Characters / Aspects / High Concept",
+    "zh-TW": "開始 / 創造你的角色 / 形象 / 高概念"
+  },
+  "character.aspects.trouble": {
+    "en": "Getting Started / Create Your Characters / Aspects / Trouble",
+    "zh-TW": "開始 / 創造你的角色 / 形象 / 麻煩"
+  },
+  "character.aspects.relationship": {
+    "en": "Getting Started / Create Your Characters / Aspects / Relationship",
+    "zh-TW": "開始 / 創造你的角色 / 形象 / 關係"
+  },
+  "character.aspects.free": {
+    "en": "Getting Started / Create Your Characters / Aspects / Free Aspects",
+    "zh-TW": "開始 / 創造你的角色 / 形象 / 自由形象"
+  },
+  "character.skills": {
+    "en": "Getting Started / Create Your Characters / Skills",
+    "zh-TW": "開始 / 創造你的角色 / 技能"
+  },
+  "character.skills.ladder": {
+    "en": "Getting Started / Create Your Characters / Skills / The Adjective Ladder",
+    "zh-TW": "開始 / 創造你的角色 / 技能 / 形容詞梯度"
+  },
+  "character.skills.list": {
+    "en": "Getting Started / Create Your Characters / Skills / Skill List",
+    "zh-TW": "開始 / 創造你的角色 / 技能 / 技能表"
+  },
+  "character.skills.alternative": {
+    "en": "Getting Started / Create Your Characters / Skills / Alternative Skill Lists",
+    "zh-TW": "開始 / 創造你的角色 / 技能 / 替換技能表"
+  },
+  "character.refresh": {
+    "en": "Getting Started / Create Your Characters / Refresh",
+    "zh-TW": "開始 / 創造你的角色 / 重振"
+  },
+  "character.stunts": {
+    "en": "Getting Started / Create Your Characters / Stunts",
+    "zh-TW": "開始 / 創造你的角色 / 絕技"
+  },
+  "character.stunts.writing": {
+    "en": "Getting Started / Create Your Characters / Stunts / Writing Stunts",
+    "zh-TW": "開始 / 創造你的角色 / 絕技 / 撰寫絕技"
+  },
+  "character.stress-and-consequences": {
+    "en": "Getting Started / Create Your Characters / Stress and Consequences",
+    "zh-TW": "開始 / 創造你的角色 / 壓力與後果"
+  },
+  "character.stress-variant": {
+    "en": "Getting Started / Create Your Characters / Stress and Consequences / Hang on, that’s not what I remember!",
+    "zh-TW": "開始 / 創造你的角色 / 壓力與後果 / 等咧，這和我記得的不同！"
+  },
+  "character.finishing": {
+    "en": "Getting Started / Create Your Characters / Finishing Touches",
+    "zh-TW": "開始 / 創造你的角色 / 潤色"
+  },
+  "rolls": {
+    "en": "Taking Action, Rolling the Dice",
+    "zh-TW": "行動，擲骰"
+  },
+  "rolls.difficulty": {
+    "en": "Taking Action, Rolling the Dice / Difficulty and Opposition",
+    "zh-TW": "行動，擲骰 / 難度與對抗"
+  },
+  "rolls.modify": {
+    "en": "Taking Action, Rolling the Dice / Modifying the Dice",
+    "zh-TW": "行動，擲骰 / 調整骰子"
+  },
+  "rolls.invoke": {
+    "en": "Taking Action, Rolling the Dice / Modifying the Dice / Invoking Aspects",
+    "zh-TW": "行動，擲骰 / 調整骰子 / 援引形象"
+  },
+  "rolls.stunts": {
+    "en": "Taking Action, Rolling the Dice / Modifying the Dice / Using Stunts",
+    "zh-TW": "行動，擲骰 / 調整骰子 / 使用絕技"
+  },
+  "rolls.outcomes": {
+    "en": "Taking Action, Rolling the Dice / Outcomes",
+    "zh-TW": "行動，擲骰 / 結果"
+  },
+  "rolls.outcomes.failure": {
+    "en": "Taking Action, Rolling the Dice / Outcomes / Failure",
+    "zh-TW": "行動，擲骰 / 結果 / 失敗"
+  },
+  "rolls.failure.simple": {
+    "en": "Taking Action, Rolling the Dice / Outcomes / Failure / Simple Failure",
+    "zh-TW": "行動，擲骰 / 結果 / 失敗 / 簡單失敗"
+  },
+  "rolls.failure.major-cost": {
+    "en": "Taking Action, Rolling the Dice / Outcomes / Failure / Success at a major cost",
+    "zh-TW": "行動，擲骰 / 結果 / 失敗 / 大代價成功"
+  },
+  "rolls.failure.hit": {
+    "en": "Taking Action, Rolling the Dice / Outcomes / Failure / Take a Hit",
+    "zh-TW": "行動，擲骰 / 結果 / 失敗 / 受到打擊"
+  },
+  "rolls.outcomes.tie": {
+    "en": "Taking Action, Rolling the Dice / Outcomes / Tie",
+    "zh-TW": "行動，擲骰 / 結果 / 平手"
+  },
+  "rolls.tie.minor-cost": {
+    "en": "Taking Action, Rolling the Dice / Outcomes / Tie / Success at a minor cost",
+    "zh-TW": "行動，擲骰 / 結果 / 平手 / 小代價成功"
+  },
+  "rolls.tie.partial": {
+    "en": "Taking Action, Rolling the Dice / Outcomes / Tie / Partial Success",
+    "zh-TW": "行動，擲骰 / 結果 / 平手 / 部分成功"
+  },
+  "rolls.outcomes.success": {
+    "en": "Taking Action, Rolling the Dice / Outcomes / Success",
+    "zh-TW": "行動，擲骰 / 結果 / 成功"
+  },
+  "rolls.success.fiction-first": {
+    "en": "Taking Action, Rolling the Dice / Outcomes / Success / Applying “Fiction First” to Success",
+    "zh-TW": "行動，擲骰 / 結果 / 成功 / 以「敘事優先」看待成功"
+  },
+  "rolls.outcomes.success-with-style": {
+    "en": "Taking Action, Rolling the Dice / Outcomes / Success with Style",
+    "zh-TW": "行動，擲骰 / 結果 / 絕妙成功"
+  },
+  "rolls.actions": {
+    "en": "Taking Action, Rolling the Dice / Actions",
+    "zh-TW": "行動，擲骰 / 行動"
+  },
+  "rolls.actions.overcome": {
+    "en": "Taking Action, Rolling the Dice / Actions / Overcome",
+    "zh-TW": "行動，擲骰 / 行動 / 克服"
+  },
+  "rolls.actions.create-advantage": {
+    "en": "Taking Action, Rolling the Dice / Actions / Create an Advantage",
+    "zh-TW": "行動，擲骰 / 行動 / 創造優勢"
+  },
+  "rolls.actions.attack": {
+    "en": "Taking Action, Rolling the Dice / Actions / Attack",
+    "zh-TW": "行動，擲骰 / 行動 / 攻擊"
+  },
+  "rolls.actions.defend": {
+    "en": "Taking Action, Rolling the Dice / Actions / Defend",
+    "zh-TW": "行動，擲骰 / 行動 / 防禦"
+  },
+  "rolls.actions.attack-defend-skills": {
+    "en": "Taking Action, Rolling the Dice / Actions / Defend / Which skills can be used to attack and defend?",
+    "zh-TW": "行動，擲骰 / 行動 / 防禦 / 什麼技能用於攻擊與防禦？"
+  },
+  "aspects": {
+    "en": "Aspects and Fate Points",
+    "zh-TW": "形象與命運點"
+  },
+  "aspects.true": {
+    "en": "Aspects and Fate Points / Aspects Are Always True",
+    "zh-TW": "形象與命運點 / 形象總是真實"
+  },
+  "aspects.kinds": {
+    "en": "Aspects and Fate Points / What Kinds of Aspects Are There?",
+    "zh-TW": "形象與命運點 / 有哪些形象？"
+  },
+  "aspects.character": {
+    "en": "Aspects and Fate Points / What Kinds of Aspects Are There? / Character Aspects",
+    "zh-TW": "形象與命運點 / 有哪些形象？ / 角色形象"
+  },
+  "aspects.situation": {
+    "en": "Aspects and Fate Points / What Kinds of Aspects Are There? / Situation Aspects",
+    "zh-TW": "形象與命運點 / 有哪些形象？ / 情境形象"
+  },
+  "aspects.consequences": {
+    "en": "Aspects and Fate Points / What Kinds of Aspects Are There? / Consequences",
+    "zh-TW": "形象與命運點 / 有哪些形象？ / 後果"
+  },
+  "aspects.boost": {
+    "en": "Aspects and Fate Points / What Kinds of Aspects Are There? / Boosts",
+    "zh-TW": "形象與命運點 / 有哪些形象？ / 推助"
+  },
+  "aspects.usage": {
+    "en": "Aspects and Fate Points / What Can I Do with Aspects?",
+    "zh-TW": "形象與命運點 / 我能以形象做什麼？"
+  },
+  "aspects.earning-fate-points": {
+    "en": "Aspects and Fate Points / What Can I Do with Aspects? / Earning Fate Points",
+    "zh-TW": "形象與命運點 / 我能以形象做什麼？ / 賺命運點"
+  },
+  "aspects.invoke": {
+    "en": "Aspects and Fate Points / What Can I Do with Aspects? / Invokes",
+    "zh-TW": "形象與命運點 / 我能以形象做什麼？ / 援引"
+  },
+  "aspects.invoke.ellipsis": {
+    "en": "Aspects and Fate Points / What Can I Do with Aspects? / Invokes / The Ellipsis Trick",
+    "zh-TW": "形象與命運點 / 我能以形象做什麼？ / 援引 / 刪節技巧"
+  },
+  "aspects.invoke.hostile": {
+    "en": "Aspects and Fate Points / What Can I Do with Aspects? / Invokes / Hostile Invocations",
+    "zh-TW": "形象與命運點 / 我能以形象做什麼？ / 援引 / 敵對援引"
+  },
+  "aspects.invoke.story-details": {
+    "en": "Aspects and Fate Points / What Can I Do with Aspects? / Invokes / Invoking to Declare Story Details",
+    "zh-TW": "形象與命運點 / 我能以形象做什麼？ / 援引 / 援引以宣告故事細節"
+  },
+  "aspects.compel": {
+    "en": "Aspects and Fate Points / What Can I Do with Aspects? / Compels",
+    "zh-TW": "形象與命運點 / 我能以形象做什麼？ / 強迫"
+  },
+  "aspects.compel.complications": {
+    "en": "Aspects and Fate Points / What Can I Do with Aspects? / Compels / Compels Are Complications, Not Stymies",
+    "zh-TW": "形象與命運點 / 我能以形象做什麼？ / 強迫 / 強迫是麻煩，而非阻礙"
+  },
+  "aspects.compel.events-decisions": {
+    "en": "Aspects and Fate Points / What Can I Do with Aspects? / Compels / Events and Decisions",
+    "zh-TW": "形象與命運點 / 我能以形象做什麼？ / 強迫 / 事件與決策"
+  },
+  "aspects.compel.hostile": {
+    "en": "Aspects and Fate Points / What Can I Do with Aspects? / Compels / Hostile Invocations or Compels?",
+    "zh-TW": "形象與命運點 / 我能以形象做什麼？ / 強迫 / 是敵對援引還是強迫？"
+  },
+  "aspects.change": {
+    "en": "Aspects and Fate Points / How Can I Add and Remove Aspects?",
+    "zh-TW": "形象與命運點 / 我可以如何添加、移除形象？"
+  },
+  "aspects.other": {
+    "en": "Aspects and Fate Points / Other Kinds of Aspects",
+    "zh-TW": "形象與命運點 / 其他類型形象"
+  },
+  "scenes": {
+    "en": "Challenges, Conflicts, and Contests",
+    "zh-TW": "挑戰、衝突與競爭"
+  },
+  "scenes.setup": {
+    "en": "Challenges, Conflicts, and Contests / Setting Up Scenes",
+    "zh-TW": "挑戰、衝突與競爭 / 設置場景"
+  },
+  "scenes.zones": {
+    "en": "Challenges, Conflicts, and Contests / Setting Up Scenes / Zones",
+    "zh-TW": "挑戰、衝突與競爭 / 設置場景 / 區域"
+  },
+  "scenes.situation": {
+    "en": "Challenges, Conflicts, and Contests / Setting Up Scenes / Situation Aspects",
+    "zh-TW": "挑戰、衝突與競爭 / 設置場景 / 情境形象"
+  },
+  "scenes.free-invokes": {
+    "en": "Challenges, Conflicts, and Contests / Setting Up Scenes / Situation Aspects / Free Invokes on the scene’s aspects?",
+    "zh-TW": "挑戰、衝突與競爭 / 設置場景 / 情境形象 / 免費援引場景中形象？"
+  },
+  "scenes.zone-aspects": {
+    "en": "Challenges, Conflicts, and Contests / Setting Up Scenes / Situation Aspects / Zone Aspects",
+    "zh-TW": "挑戰、衝突與競爭 / 設置場景 / 情境形象 / 區域形象"
+  },
+  "scenes.turn-order": {
+    "en": "Challenges, Conflicts, and Contests / Setting Up Scenes / Turn Order",
+    "zh-TW": "挑戰、衝突與競爭 / 設置場景 / 回合次序"
+  },
+  "scenes.teamwork": {
+    "en": "Challenges, Conflicts, and Contests / Teamwork",
+    "zh-TW": "挑戰、衝突與競爭 / 團隊合作"
+  },
+  "scenes.challenges": {
+    "en": "Challenges, Conflicts, and Contests / Challenges",
+    "zh-TW": "挑戰、衝突與競爭 / 挑戰"
+  },
+  "scenes.contests": {
+    "en": "Challenges, Conflicts, and Contests / Contests",
+    "zh-TW": "挑戰、衝突與競爭 / 競爭"
+  },
+  "scenes.contests.advantages": {
+    "en": "Challenges, Conflicts, and Contests / Contests / Creating Advantages in a Contest",
+    "zh-TW": "挑戰、衝突與競爭 / 競爭 / 競爭中製造優勢"
+  },
+  "conflict": {
+    "en": "Challenges, Conflicts, and Contests / Conflicts",
+    "zh-TW": "挑戰、衝突與競爭 / 衝突"
+  },
+  "conflict.harm": {
+    "en": "Challenges, Conflicts, and Contests / Conflicts / Taking Harm",
+    "zh-TW": "挑戰、衝突與競爭 / 衝突 / 受傷"
+  },
+  "conflict.stress": {
+    "en": "Challenges, Conflicts, and Contests / Conflicts / Taking Harm / Stress",
+    "zh-TW": "挑戰、衝突與競爭 / 衝突 / 受傷 / 壓力"
+  },
+  "conflict.consequences": {
+    "en": "Challenges, Conflicts, and Contests / Conflicts / Taking Harm / Consequences",
+    "zh-TW": "挑戰、衝突與競爭 / 衝突 / 受傷 / 後果"
+  },
+  "conflict.taken-out": {
+    "en": "Challenges, Conflicts, and Contests / Conflicts / Taking Harm / Getting Taken Out",
+    "zh-TW": "挑戰、衝突與競爭 / 衝突 / 受傷 / 剔除"
+  },
+  "conflict.concede": {
+    "en": "Challenges, Conflicts, and Contests / Conflicts / Taking Harm / Conceding",
+    "zh-TW": "挑戰、衝突與競爭 / 衝突 / 受傷 / 讓步"
+  },
+  "conflict.end": {
+    "en": "Challenges, Conflicts, and Contests / Conflicts / Ending a Conflict",
+    "zh-TW": "挑戰、衝突與競爭 / 衝突 / 結束衝突"
+  },
+  "conflict.recovery": {
+    "en": "Challenges, Conflicts, and Contests / Conflicts / Recovering from Conflicts",
+    "zh-TW": "挑戰、衝突與競爭 / 衝突 / 從衝突中恢復"
+  },
+  "advancement": {
+    "en": "Advancement",
+    "zh-TW": "成長"
+  },
+  "advancement.milestone": {
+    "en": "Advancement / Minor Milestones",
+    "zh-TW": "成長 / 里程碑"
+  },
+  "advancement.breakthrough": {
+    "en": "Advancement / Major Milestones",
+    "zh-TW": "成長 / 突破點"
+  },
+  "advancement.skill-ratings": {
+    "en": "Advancement / Major Milestones / Improving Skill Ratings",
+    "zh-TW": "成長 / 突破點 / 提高技能等級"
+  },
+  "advancement.sessions": {
+    "en": "Advancement / Sessions and Arcs",
+    "zh-TW": "成長 / 聚會與弧線"
+  },
+  "gm": {
+    "en": "Being the Game Master",
+    "zh-TW": "成為遊戲主持人"
+  },
+  "gm.difficulty": {
+    "en": "Being the Game Master / Setting Difficulty and Opposition",
+    "zh-TW": "成為遊戲主持人 / 設置難度與對抗"
+  },
+  "gm.npcs": {
+    "en": "Being the Game Master / NPCs",
+    "zh-TW": "成為遊戲主持人 / NPC"
+  },
+  "gm.major": {
+    "en": "Being the Game Master / NPCs / Major NPCs",
+    "zh-TW": "成為遊戲主持人 / NPC / 主要 NPC"
+  },
+  "gm.minor": {
+    "en": "Being the Game Master / NPCs / Minor NPCs",
+    "zh-TW": "成為遊戲主持人 / NPC / 次要 NPC"
+  },
+  "gm.monsters": {
+    "en": "Being the Game Master / NPCs / Monsters, Big Bads, and Other Threats",
+    "zh-TW": "成為遊戲主持人 / NPC / 怪物、大魔王與其他威脅"
+  },
+  "gm.points": {
+    "en": "Being the Game Master / Your Fate Points",
+    "zh-TW": "成為遊戲主持人 / 你的命運點"
+  },
+  "gm.safety": {
+    "en": "Being the Game Master / Safety Tools",
+    "zh-TW": "成為遊戲主持人 / 安全工具"
+  },
+  "optional": {
+    "en": "Optional Rules",
+    "zh-TW": "可選規則"
+  },
+  "optional.conditions": {
+    "en": "Optional Rules / Conditions",
+    "zh-TW": "可選規則 / 條件"
+  },
+  "optional.conditions.separate": {
+    "en": "Optional Rules / Conditions / Moving Conditions Further Apart",
+    "zh-TW": "可選規則 / 條件 / 將條件再分開"
+  },
+  "optional.conditions.versions": {
+    "en": "Optional Rules / Conditions / Other Versions of Conditions",
+    "zh-TW": "可選規則 / 條件 / 其他版本的狀態"
+  },
+  "optional.skills": {
+    "en": "Optional Rules / Changing the Skill List",
+    "zh-TW": "可選規則 / 變更技能列表"
+  },
+  "optional.creation": {
+    "en": "Optional Rules / Character Creation As You Play",
+    "zh-TW": "可選規則 / 邊玩邊創造角色"
+  },
+  "optional.countdowns": {
+    "en": "Optional Rules / Countdowns",
+    "zh-TW": "可選規則 / 倒數"
+  },
+  "optional.extreme": {
+    "en": "Optional Rules / Extreme Consequences",
+    "zh-TW": "可選規則 / 極端後果"
+  },
+  "optional.faster-contests": {
+    "en": "Optional Rules / Faster Contests",
+    "zh-TW": "可選規則 / 加速競賽"
+  },
+  "optional.full-defense": {
+    "en": "Optional Rules / Full Defense",
+    "zh-TW": "可選規則 / 全力防禦"
+  },
+  "optional.obstacles": {
+    "en": "Optional Rules / Obstacles",
+    "zh-TW": "可選規則 / 障礙物"
+  },
+  "optional.hazards": {
+    "en": "Optional Rules / Obstacles / Hazards",
+    "zh-TW": "可選規則 / 障礙物 / 危害"
+  },
+  "optional.blocks": {
+    "en": "Optional Rules / Obstacles / Blocks",
+    "zh-TW": "可選規則 / 障礙物 / 妨礙"
+  },
+  "optional.distractions": {
+    "en": "Optional Rules / Obstacles / Distractions",
+    "zh-TW": "可選規則 / 障礙物 / 分心"
+  },
+  "optional.scale": {
+    "en": "Optional Rules / Scale",
+    "zh-TW": "可選規則 / 規模"
+  },
+  "optional.scale.aspects": {
+    "en": "Optional Rules / Scale / Aspects and Scale",
+    "zh-TW": "可選規則 / 規模 / 形象與規模"
+  },
+  "optional.scale.advantage": {
+    "en": "Optional Rules / Scale / Aspects and Scale / Does Scale Apply When Supernaturally Creating an Advantage?",
+    "zh-TW": "可選規則 / 規模 / 形象與規模 / 當超自然創造優勢時要應用規模嗎？"
+  },
+  "optional.time": {
+    "en": "Optional Rules / Time Shifts",
+    "zh-TW": "可選規則 / 時間檔次"
+  },
+  "optional.big-bads": {
+    "en": "Optional Rules / Ways to Break the Rules for Big Bads",
+    "zh-TW": "可選規則 / 給大魔王的打破規則法"
+  },
+  "optional.immunity": {
+    "en": "Optional Rules / Ways to Break the Rules for Big Bads / Challenge or Contest Immunity",
+    "zh-TW": "可選規則 / 給大魔王的打破規則法 / 挑戰和競爭免疫"
+  },
+  "optional.minion-armor": {
+    "en": "Optional Rules / Ways to Break the Rules for Big Bads / Expendable Minion Armor",
+    "zh-TW": "可選規則 / 給大魔王的打破規則法 / 消耗性雜魚護甲"
+  },
+  "optional.reveal": {
+    "en": "Optional Rules / Ways to Break the Rules for Big Bads / Reveal True Form",
+    "zh-TW": "可選規則 / 給大魔王的打破規則法 / 揭露真身"
+  },
+  "optional.scale-up": {
+    "en": "Optional Rules / Ways to Break the Rules for Big Bads / Scale Things Up",
+    "zh-TW": "可選規則 / 給大魔王的打破規則法 / 提升事物規模"
+  },
+  "optional.solo": {
+    "en": "Optional Rules / Ways to Break the Rules for Big Bads / Solo Bonus",
+    "zh-TW": "可選規則 / 給大魔王的打破規則法 / 單幹獎勵"
+  },
+  "optional.threat-map": {
+    "en": "Optional Rules / Ways to Break the Rules for Big Bads / The Threat is a Map (or a Hive of Characters)",
+    "zh-TW": "可選規則 / 給大魔王的打破規則法 / 地圖乃威脅（或角色巢穴）"
+  },
+  "optional.multiple-targets": {
+    "en": "Optional Rules / Ways to Handle Multiple Targets",
+    "zh-TW": "可選規則 / 處理多目標的方法"
+  },
+  "optional.gear": {
+    "en": "Optional Rules / Weapon and Armor Ratings",
+    "zh-TW": "可選規則 / 武器與護甲等級"
+  },
+  "edition": {
+    "en": "What Version Is This?"
+  },
+  "edition.history": {
+    "en": "What Version Is This? / What Came Before"
+  },
+  "edition.license": {
+    "en": "What Version Is This? / Licensing"
+  }
+}

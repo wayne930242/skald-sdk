@@ -1,0 +1,17 @@
+{
+  "fateRules": {
+    "title": "規則參照",
+    "book": "命運濃縮版",
+    "contents": "目錄",
+    "search": "搜尋規則…",
+    "empty": "沒有符合的章節",
+    "en": "English",
+    "zh-TW": "中文",
+    "credits": "來源與授權",
+    "changes": "本版重新編排內文，並將書中可辨識的頁碼改連至對應章節。",
+    "license": "CC BY 3.0",
+    "translation": "Wei Hung 的繁體中文譯本",
+    "source": "英文 SRD",
+    "fallback": "本節僅有英文版，以下顯示入門導引。"
+  }
+}

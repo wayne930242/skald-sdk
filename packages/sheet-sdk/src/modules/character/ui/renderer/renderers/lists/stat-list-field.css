@@ -1,0 +1,501 @@
+/* modules/character/ui/renderer/renderers/lists/stat-list-field.css
+ *
+ * `stat-list`。顏色走 --sheet-*（web view 提供），沒有時退回 Folio token；
+ * 勾選框、星號、搜尋框都自己畫，深色主題下才吃得到主題色。
+ * 欄數由 JS 依容器斷點算好，用 --stat-cols 交給 column-count，這裡沒有 @media 版面規則。
+ */
+
+.skald-stat-list {
+  display: grid;
+  min-width: 0;
+  gap: 0.75rem;
+  color: var(--sheet-fg, var(--foreground));
+}
+
+.skald-stat-list-error {
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--destructive);
+  border: 1px dashed var(--destructive);
+  border-radius: var(--sheet-radius-sm, 0.5rem);
+}
+
+/* ---- 工具列：標題、搜尋、篩選 chip ---- */
+
+.skald-stat-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.skald-stat-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.skald-stat-search {
+  position: relative;
+  display: flex;
+  flex: 1 1 14rem;
+  min-width: 0;
+  max-width: 28rem;
+  align-items: center;
+}
+
+.skald-stat-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  width: 1rem;
+  height: 1rem;
+  color: var(--sheet-muted-fg, var(--muted-foreground));
+  pointer-events: none;
+}
+
+.skald-stat-search-input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0 2.5rem 0 2.25rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  color: inherit;
+  background: var(--sheet-surface, var(--card));
+  border: 1px solid var(--sheet-border, var(--border));
+  border-radius: var(--sheet-radius-sm, 0.75rem);
+}
+
+.skald-stat-search-input:focus-visible {
+  outline: 2px solid var(--sheet-ring, var(--ring));
+  outline-offset: 1px;
+}
+
+.skald-stat-search-key {
+  position: absolute;
+  right: 0.625rem;
+  padding: 0 0.375rem;
+  font-family: inherit;
+  font-size: 0.75rem;
+  color: var(--sheet-muted-fg, var(--muted-foreground));
+  border: 1px solid var(--sheet-border, var(--border));
+  border-radius: 0.375rem;
+  pointer-events: none;
+}
+
+.skald-stat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.skald-stat-chip {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0 0.875rem;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: inherit;
+  background: var(--sheet-surface, var(--card));
+  border: 1px solid var(--sheet-border, var(--border));
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.skald-stat-chip:focus-visible {
+  outline: 2px solid var(--sheet-ring, var(--ring));
+  outline-offset: 2px;
+}
+
+.skald-stat-chip[aria-pressed="true"] {
+  /* 選中的 chip 用前景色當底、頁面底色當字，淺色／深色主題下都有對比 */
+  color: var(--background);
+  background: var(--sheet-fg, var(--foreground));
+  border-color: var(--sheet-fg, var(--foreground));
+}
+
+.skald-stat-chip-count {
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+/* ---- 內容：column-count 流排 ---- */
+
+.skald-stat-body {
+  column-count: var(--stat-cols, 1);
+  column-gap: 2rem;
+  column-rule: 1px solid var(--sheet-border, var(--border));
+}
+
+.skald-stat-group {
+  min-width: 0;
+  margin: 0 0 0.75rem;
+  /* 整個分組留在同一欄；比一欄還高的分組才會被迫斷開 */
+  break-inside: avoid;
+}
+
+.skald-stat-group-header,
+.skald-stat-row {
+  display: grid;
+  grid-template-columns: var(--stat-grid);
+  align-items: center;
+  column-gap: 0.25rem;
+}
+
+.skald-stat-group-header {
+  min-height: 1.75rem;
+  /* 標題不會孤立在欄底 */
+  break-after: avoid;
+  border-bottom: 1px solid var(--sheet-border, var(--border));
+}
+
+.skald-stat-group-title {
+  min-width: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--sheet-muted-fg, var(--muted-foreground));
+}
+
+.skald-stat-column-label {
+  font-size: 0.75rem;
+  text-align: center;
+  color: var(--sheet-muted-fg, var(--muted-foreground));
+}
+
+.skald-stat-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skald-stat-row {
+  min-height: 2.75rem;
+  break-inside: avoid;
+  border-bottom: 1px solid color-mix(in srgb, var(--sheet-border, var(--border)) 60%, transparent);
+}
+
+.skald-stat-name {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.skald-stat-name-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 0.9375rem;
+}
+
+.skald-stat-name-button {
+  padding: 0.5rem 0.25rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  color: inherit;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
+
+.skald-stat-name-button:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--sheet-accent, var(--primary));
+  text-underline-offset: 3px;
+}
+
+.skald-stat-name-button:focus-visible,
+.skald-stat-pin:focus-visible,
+.skald-stat-check:focus-visible,
+.skald-stat-roll:focus-visible {
+  outline: 2px solid var(--sheet-ring, var(--ring));
+  outline-offset: 1px;
+}
+
+.skald-stat-spec,
+.skald-stat-spec-text {
+  min-width: 2rem;
+  flex: 1;
+  padding: 0.25rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px dashed var(--sheet-border-strong, var(--border));
+}
+
+.skald-stat-spec:focus-visible {
+  outline: 2px solid var(--sheet-ring, var(--ring));
+  outline-offset: 1px;
+}
+
+/* 星號：已釘選一直看得到；其餘 hover／聚焦才出現，觸控裝置淡淡地常駐 */
+.skald-stat-pin {
+  display: inline-flex;
+  width: 1.75rem;
+  height: 2rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--sheet-muted-fg, var(--muted-foreground));
+  background: transparent;
+  border: 0;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  opacity: 0;
+}
+
+.skald-stat-row:hover .skald-stat-pin,
+.skald-stat-row:focus-within .skald-stat-pin,
+.skald-stat-pin[aria-pressed="true"] {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .skald-stat-pin {
+    opacity: 0.45;
+  }
+
+  .skald-stat-pin[aria-pressed="true"] {
+    opacity: 1;
+  }
+}
+
+.skald-stat-pin:disabled {
+  cursor: default;
+}
+
+.skald-stat-pin-icon {
+  width: 0.9375rem;
+  height: 0.9375rem;
+}
+
+.skald-stat-pin[aria-pressed="true"] {
+  color: var(--sheet-accent, var(--primary));
+}
+
+.skald-stat-pin[aria-pressed="true"] .skald-stat-pin-icon {
+  fill: currentColor;
+}
+
+/* 成長勾 */
+.skald-stat-check {
+  display: inline-flex;
+  width: 1.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.skald-stat-check:disabled {
+  cursor: default;
+}
+
+.skald-stat-check-box {
+  display: inline-flex;
+  width: 1.125rem;
+  height: 1.125rem;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  background: var(--sheet-surface, transparent);
+  border: 2px solid var(--sheet-border-strong, var(--border));
+  border-radius: 0.3125rem;
+  transition:
+    background-color 120ms,
+    border-color 120ms;
+}
+
+.skald-stat-check:hover:not(:disabled) .skald-stat-check-box {
+  border-color: var(--sheet-accent, var(--primary));
+}
+
+.skald-stat-check[aria-checked="true"] .skald-stat-check-box {
+  color: var(--background);
+  background: var(--sheet-accent, var(--primary));
+  border-color: var(--sheet-accent, var(--primary));
+}
+
+.skald-stat-check-tick {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+/* 數字欄 */
+.skald-stat-cell {
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--sheet-muted-fg, var(--muted-foreground));
+  font-variant-numeric: tabular-nums;
+}
+
+.skald-stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--sheet-fg, var(--foreground));
+}
+
+/* 現值輸入：看起來是粗體數字，hover／聚焦才露出輸入框 */
+.skald-stat-value-input {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.25rem;
+  padding: 0;
+  font-family: inherit;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.skald-stat-value-input::-webkit-outer-spin-button,
+.skald-stat-value-input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.skald-stat-value-input:hover {
+  border-color: var(--sheet-border, var(--border));
+}
+
+.skald-stat-value-input:focus-visible {
+  outline: 2px solid var(--sheet-ring, var(--ring));
+  outline-offset: 0;
+}
+
+/* 骰子鈕常駐（U-22） */
+.skald-stat-roll-cell {
+  display: flex;
+  justify-content: center;
+}
+
+.skald-stat-roll {
+  display: inline-flex;
+  width: 2.25rem;
+  height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--sheet-fg, var(--foreground));
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.skald-stat-roll:hover {
+  background: var(--sheet-surface-sunken, var(--muted));
+  border-color: var(--sheet-border, var(--border));
+}
+
+.skald-stat-roll-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.skald-stat-row[data-roll-invalid="true"] .skald-stat-name-text {
+  text-decoration: wavy underline var(--destructive);
+}
+
+.skald-stat-empty,
+.skald-stat-hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--sheet-muted-fg, var(--muted-foreground));
+}
+
+.skald-stat-empty {
+  padding: 1rem 0;
+  text-align: center;
+}
+
+/* ---- 磚 ---- */
+
+.skald-stat-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6.5rem, 9rem));
+  gap: 0.5rem;
+}
+
+/* ---- 列印：顯式分欄，每欄底部留空白列 ---- */
+
+.skald-stat-print {
+  display: grid;
+  grid-template-columns: repeat(var(--stat-print-cols, 4), minmax(0, 1fr));
+  gap: 0 0.5rem;
+  font-size: 7pt;
+  color: #000;
+}
+
+.skald-stat-print-column {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.skald-stat-print-header {
+  padding: 1px 2px;
+  font-size: 6.5pt;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  background: rgb(0 0 0 / 6%);
+  border-bottom: 0.4pt solid #000;
+}
+
+.skald-stat-print-line {
+  display: grid;
+  grid-template-columns: var(--stat-print-grid);
+  align-items: end;
+  min-height: 4.1mm;
+  column-gap: 1px;
+  border-bottom: 0.25pt solid #000;
+}
+
+.skald-stat-print-box {
+  display: inline-flex;
+  width: 2.2mm;
+  height: 2.2mm;
+  align-items: center;
+  justify-content: center;
+  font-size: 6pt;
+  line-height: 1;
+  border: 0.4pt solid #000;
+}
+
+.skald-stat-print-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.skald-stat-print-cell {
+  text-align: center;
+}
+
+.skald-stat-print-cell[data-column="value"] {
+  font-weight: 700;
+}
+
+@media print {
+  .skald-stat-roll-cell,
+  .skald-stat-pin,
+  .skald-stat-search,
+  .skald-stat-chips {
+    display: none !important;
+  }
+}

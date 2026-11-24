@@ -1,0 +1,23 @@
+{
+  "$schema": "../schemas/aliases.schema.json",
+  "attributes": {
+    "str": "str",
+    "STR": "str",
+    "力量": "str",
+    "dex": "dex",
+    "DEX": "dex",
+    "敏捷": "dex",
+    "con": "con",
+    "CON": "con",
+    "體質": "con",
+    "int": "int",
+    "INT": "int",
+    "智力": "int",
+    "wis": "wis",
+    "WIS": "wis",
+    "睿知": "wis",
+    "cha": "cha",
+    "CHA": "cha",
+    "魅力": "cha"
+  }
+}

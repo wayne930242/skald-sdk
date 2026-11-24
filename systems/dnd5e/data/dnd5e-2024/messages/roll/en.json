@@ -1,0 +1,16 @@
+{
+  "mode": "Advantage or disadvantage",
+  "disadvantage": "Disadvantage",
+  "normal": "Normal",
+  "advantage": "Advantage",
+  "exhaustion": "Exhaustion {value} already counted",
+  "modifier": "Modifier",
+  "decrease": "Minus 1",
+  "increase": "Plus 1",
+  "extraDice": "Extra dice",
+  "none": "None",
+  "hint": "Press and hold or right-click for advantage, a modifier or extra dice.",
+  "critical": "Critical Hit",
+  "criticalHint": "A Critical Hit rolls twice as many damage dice; modifiers are not doubled.",
+  "damageHint": "Press and hold or right-click for a Critical Hit or a modifier."
+}

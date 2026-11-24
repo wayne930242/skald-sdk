@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "skald/lookup-tables/v1",
+  "title": "Skald Lookup Tables",
+  "description": "Schema for user-defined lookup tables",
+  "type": "object",
+  "required": ["tables"],
+  "properties": {
+    "tables": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          { "$ref": "#/definitions/thresholdTable" },
+          { "$ref": "#/definitions/formulaTable" },
+          { "$ref": "#/definitions/rangeTable" }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "thresholdTable": {
+      "type": "object",
+      "required": ["type", "entries"],
+      "properties": {
+        "type": { "const": "threshold" },
+        "description": { "type": "string" },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["threshold", "value"],
+            "properties": {
+              "threshold": { "type": "number" },
+              "value": { "oneOf": [{ "type": "string" }, { "type": "number" }] }
+            }
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "formulaTable": {
+      "type": "object",
+      "required": ["type", "formula"],
+      "properties": {
+        "type": { "const": "formula" },
+        "description": { "type": "string" },
+        "formula": { "type": "string", "pattern": "^\\{\\{.*\\}\\}$" }
+      }
+    },
+    "rangeTable": {
+      "type": "object",
+      "required": ["type", "entries"],
+      "properties": {
+        "type": { "const": "range" },
+        "description": { "type": "string" },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["min", "max", "value"],
+            "properties": {
+              "min": { "type": "number" },
+              "max": { "type": "number" },
+              "value": { "oneOf": [{ "type": "string" }, { "type": "number" }] },
+              "label": { "type": "string" }
+            }
+          },
+          "minItems": 1
+        }
+      }
+    }
+  }
+}

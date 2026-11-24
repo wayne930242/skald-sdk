@@ -1,0 +1,2592 @@
+{
+  "$schema": "../schemas/schema.schema.json",
+  "id": "dnd5e-2024-character",
+  "name": "D&D 5e (2024) Character",
+  "version": "1.0.0",
+  "description": "Dungeons & Dragons 5th Edition (2024 rules, SRD 5.2.1) character sheet",
+  "author": "Skald",
+  "system": "dnd5e-2024",
+  "language": "en",
+  "tags": [
+    "dnd",
+    "5e",
+    "2024",
+    "srd"
+  ],
+  "fields": {
+    "name": {
+      "id": "name",
+      "type": "text",
+      "label": "{{i18n:field.name}}",
+      "required": true,
+      "placeholder": "{{i18n:field.namePlaceholder}}"
+    },
+    "player": {
+      "id": "player",
+      "type": "text",
+      "label": "{{i18n:field.player}}"
+    },
+    "className": {
+      "id": "className",
+      "type": "text",
+      "label": "{{i18n:field.className}}"
+    },
+    "classId": {
+      "id": "classId",
+      "type": "text",
+      "label": "{{i18n:field.classId}}",
+      "hidden": true
+    },
+    "subclass": {
+      "id": "subclass",
+      "type": "text",
+      "label": "{{i18n:field.subclass}}"
+    },
+    "level": {
+      "id": "level",
+      "type": "number",
+      "label": "{{i18n:field.level}}",
+      "min": 1,
+      "max": 20,
+      "defaultValue": 1,
+      "format": "integer"
+    },
+    "xp": {
+      "id": "xp",
+      "type": "number",
+      "label": "{{i18n:field.xp}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "background": {
+      "id": "background",
+      "type": "text",
+      "label": "{{i18n:field.background}}"
+    },
+    "backgroundId": {
+      "id": "backgroundId",
+      "type": "text",
+      "label": "{{i18n:field.backgroundId}}",
+      "hidden": true
+    },
+    "species": {
+      "id": "species",
+      "type": "text",
+      "label": "{{i18n:field.species}}"
+    },
+    "speciesId": {
+      "id": "speciesId",
+      "type": "text",
+      "label": "{{i18n:field.speciesId}}",
+      "hidden": true
+    },
+    "lineage": {
+      "id": "lineage",
+      "type": "text",
+      "label": "{{i18n:field.lineage}}"
+    },
+    "size": {
+      "id": "size",
+      "type": "select",
+      "label": "{{i18n:field.size}}",
+      "options": [
+        {
+          "value": "tiny",
+          "label": "{{i18n:option.size.tiny}}"
+        },
+        {
+          "value": "small",
+          "label": "{{i18n:option.size.small}}"
+        },
+        {
+          "value": "medium",
+          "label": "{{i18n:option.size.medium}}"
+        },
+        {
+          "value": "large",
+          "label": "{{i18n:option.size.large}}"
+        }
+      ]
+    },
+    "alignment": {
+      "id": "alignment",
+      "type": "select",
+      "label": "{{i18n:field.alignment}}",
+      "options": [
+        {
+          "value": "lawfulGood",
+          "label": "{{i18n:option.alignment.lawfulGood}}"
+        },
+        {
+          "value": "neutralGood",
+          "label": "{{i18n:option.alignment.neutralGood}}"
+        },
+        {
+          "value": "chaoticGood",
+          "label": "{{i18n:option.alignment.chaoticGood}}"
+        },
+        {
+          "value": "lawfulNeutral",
+          "label": "{{i18n:option.alignment.lawfulNeutral}}"
+        },
+        {
+          "value": "neutral",
+          "label": "{{i18n:option.alignment.neutral}}"
+        },
+        {
+          "value": "chaoticNeutral",
+          "label": "{{i18n:option.alignment.chaoticNeutral}}"
+        },
+        {
+          "value": "lawfulEvil",
+          "label": "{{i18n:option.alignment.lawfulEvil}}"
+        },
+        {
+          "value": "neutralEvil",
+          "label": "{{i18n:option.alignment.neutralEvil}}"
+        },
+        {
+          "value": "chaoticEvil",
+          "label": "{{i18n:option.alignment.chaoticEvil}}"
+        },
+        {
+          "value": "unaligned",
+          "label": "{{i18n:option.alignment.unaligned}}"
+        }
+      ]
+    },
+    "str": {
+      "id": "str",
+      "type": "number",
+      "label": "{{i18n:ability.str}}",
+      "min": 1,
+      "max": 30,
+      "defaultValue": 10,
+      "format": "integer"
+    },
+    "dex": {
+      "id": "dex",
+      "type": "number",
+      "label": "{{i18n:ability.dex}}",
+      "min": 1,
+      "max": 30,
+      "defaultValue": 10,
+      "format": "integer"
+    },
+    "con": {
+      "id": "con",
+      "type": "number",
+      "label": "{{i18n:ability.con}}",
+      "min": 1,
+      "max": 30,
+      "defaultValue": 10,
+      "format": "integer"
+    },
+    "int": {
+      "id": "int",
+      "type": "number",
+      "label": "{{i18n:ability.int}}",
+      "min": 1,
+      "max": 30,
+      "defaultValue": 10,
+      "format": "integer"
+    },
+    "wis": {
+      "id": "wis",
+      "type": "number",
+      "label": "{{i18n:ability.wis}}",
+      "min": 1,
+      "max": 30,
+      "defaultValue": 10,
+      "format": "integer"
+    },
+    "cha": {
+      "id": "cha",
+      "type": "number",
+      "label": "{{i18n:ability.cha}}",
+      "min": 1,
+      "max": 30,
+      "defaultValue": 10,
+      "format": "integer"
+    },
+    "strMod": {
+      "id": "strMod",
+      "type": "computed",
+      "label": "{{i18n:field.mod.str}}",
+      "formula": "=FLOOR(([str]-10)/2)",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@strMod-@d20Penalty]}}"
+      }
+    },
+    "dexMod": {
+      "id": "dexMod",
+      "type": "computed",
+      "label": "{{i18n:field.mod.dex}}",
+      "formula": "=FLOOR(([dex]-10)/2)",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@dexMod-@d20Penalty]}}"
+      }
+    },
+    "conMod": {
+      "id": "conMod",
+      "type": "computed",
+      "label": "{{i18n:field.mod.con}}",
+      "formula": "=FLOOR(([con]-10)/2)",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@conMod-@d20Penalty]}}"
+      }
+    },
+    "intMod": {
+      "id": "intMod",
+      "type": "computed",
+      "label": "{{i18n:field.mod.int}}",
+      "formula": "=FLOOR(([int]-10)/2)",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@intMod-@d20Penalty]}}"
+      }
+    },
+    "wisMod": {
+      "id": "wisMod",
+      "type": "computed",
+      "label": "{{i18n:field.mod.wis}}",
+      "formula": "=FLOOR(([wis]-10)/2)",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@wisMod-@d20Penalty]}}"
+      }
+    },
+    "chaMod": {
+      "id": "chaMod",
+      "type": "computed",
+      "label": "{{i18n:field.mod.cha}}",
+      "formula": "=FLOOR(([cha]-10)/2)",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@chaMod-@d20Penalty]}}"
+      }
+    },
+    "profBonus": {
+      "id": "profBonus",
+      "type": "computed",
+      "label": "{{i18n:field.profBonus}}",
+      "formula": "=2+FLOOR(([level]-1)/4)",
+      "format": "integer"
+    },
+    "strSaveProf": {
+      "id": "strSaveProf",
+      "type": "toggle",
+      "icon": "Star",
+      "label": "{{i18n:field.saveProf.str}}",
+      "defaultValue": false
+    },
+    "strSave": {
+      "id": "strSave",
+      "type": "computed",
+      "label": "{{i18n:field.save.str}}",
+      "formula": "=[strMod]+IF([strSaveProf],[profBonus],0)",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@strSave-@d20Penalty]}}"
+      }
+    },
+    "dexSaveProf": {
+      "id": "dexSaveProf",
+      "type": "toggle",
+      "icon": "Star",
+      "label": "{{i18n:field.saveProf.dex}}",
+      "defaultValue": false
+    },
+    "dexSave": {
+      "id": "dexSave",
+      "type": "computed",
+      "label": "{{i18n:field.save.dex}}",
+      "formula": "=[dexMod]+IF([dexSaveProf],[profBonus],0)",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@dexSave-@d20Penalty]}}"
+      }
+    },
+    "conSaveProf": {
+      "id": "conSaveProf",
+      "type": "toggle",
+      "icon": "Star",
+      "label": "{{i18n:field.saveProf.con}}",
+      "defaultValue": false
+    },
+    "conSave": {
+      "id": "conSave",
+      "type": "computed",
+      "label": "{{i18n:field.save.con}}",
+      "formula": "=[conMod]+IF([conSaveProf],[profBonus],0)",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@conSave-@d20Penalty]}}"
+      }
+    },
+    "intSaveProf": {
+      "id": "intSaveProf",
+      "type": "toggle",
+      "icon": "Star",
+      "label": "{{i18n:field.saveProf.int}}",
+      "defaultValue": false
+    },
+    "intSave": {
+      "id": "intSave",
+      "type": "computed",
+      "label": "{{i18n:field.save.int}}",
+      "formula": "=[intMod]+IF([intSaveProf],[profBonus],0)",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@intSave-@d20Penalty]}}"
+      }
+    },
+    "wisSaveProf": {
+      "id": "wisSaveProf",
+      "type": "toggle",
+      "icon": "Star",
+      "label": "{{i18n:field.saveProf.wis}}",
+      "defaultValue": false
+    },
+    "wisSave": {
+      "id": "wisSave",
+      "type": "computed",
+      "label": "{{i18n:field.save.wis}}",
+      "formula": "=[wisMod]+IF([wisSaveProf],[profBonus],0)",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@wisSave-@d20Penalty]}}"
+      }
+    },
+    "chaSaveProf": {
+      "id": "chaSaveProf",
+      "type": "toggle",
+      "icon": "Star",
+      "label": "{{i18n:field.saveProf.cha}}",
+      "defaultValue": false
+    },
+    "chaSave": {
+      "id": "chaSave",
+      "type": "computed",
+      "label": "{{i18n:field.save.cha}}",
+      "formula": "=[chaMod]+IF([chaSaveProf],[profBonus],0)",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@chaSave-@d20Penalty]}}"
+      }
+    },
+    "jackOfAllTrades": {
+      "id": "jackOfAllTrades",
+      "type": "toggle",
+      "icon": "Star",
+      "label": "{{i18n:field.jackOfAllTrades}}",
+      "defaultValue": false
+    },
+    "orderLoreBonus": {
+      "id": "orderLoreBonus",
+      "type": "select",
+      "label": "{{i18n:field.orderLoreBonus}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.orderLore.none}}"
+        },
+        {
+          "value": "thaumaturge",
+          "label": "{{i18n:option.orderLore.thaumaturge}}"
+        },
+        {
+          "value": "magician",
+          "label": "{{i18n:option.orderLore.magician}}"
+        }
+      ],
+      "defaultValue": "none"
+    },
+    "acrobaticsProf": {
+      "id": "acrobaticsProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.acrobatics}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "acrobatics": {
+      "id": "acrobatics",
+      "type": "computed",
+      "label": "{{i18n:skill.acrobatics}}",
+      "formula": "=[dexMod]+IF([acrobaticsProf]=\"expertise\",2*[profBonus],IF([acrobaticsProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@acrobatics-@d20Penalty]}}"
+      }
+    },
+    "animalHandlingProf": {
+      "id": "animalHandlingProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.animalHandling}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "animalHandling": {
+      "id": "animalHandling",
+      "type": "computed",
+      "label": "{{i18n:skill.animalHandling}}",
+      "formula": "=[wisMod]+IF([animalHandlingProf]=\"expertise\",2*[profBonus],IF([animalHandlingProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@animalHandling-@d20Penalty]}}"
+      }
+    },
+    "arcanaProf": {
+      "id": "arcanaProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.arcana}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "arcana": {
+      "id": "arcana",
+      "type": "computed",
+      "label": "{{i18n:skill.arcana}}",
+      "formula": "=[intMod]+IF([arcanaProf]=\"expertise\",2*[profBonus],IF([arcanaProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))+IF(OR([orderLoreBonus]=\"thaumaturge\",[orderLoreBonus]=\"magician\"),MAX(1,[wisMod]),0)",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@arcana-@d20Penalty]}}"
+      }
+    },
+    "athleticsProf": {
+      "id": "athleticsProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.athletics}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "athletics": {
+      "id": "athletics",
+      "type": "computed",
+      "label": "{{i18n:skill.athletics}}",
+      "formula": "=[strMod]+IF([athleticsProf]=\"expertise\",2*[profBonus],IF([athleticsProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@athletics-@d20Penalty]}}"
+      }
+    },
+    "deceptionProf": {
+      "id": "deceptionProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.deception}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "deception": {
+      "id": "deception",
+      "type": "computed",
+      "label": "{{i18n:skill.deception}}",
+      "formula": "=[chaMod]+IF([deceptionProf]=\"expertise\",2*[profBonus],IF([deceptionProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@deception-@d20Penalty]}}"
+      }
+    },
+    "historyProf": {
+      "id": "historyProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.history}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "history": {
+      "id": "history",
+      "type": "computed",
+      "label": "{{i18n:skill.history}}",
+      "formula": "=[intMod]+IF([historyProf]=\"expertise\",2*[profBonus],IF([historyProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@history-@d20Penalty]}}"
+      }
+    },
+    "insightProf": {
+      "id": "insightProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.insight}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "insight": {
+      "id": "insight",
+      "type": "computed",
+      "label": "{{i18n:skill.insight}}",
+      "formula": "=[wisMod]+IF([insightProf]=\"expertise\",2*[profBonus],IF([insightProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@insight-@d20Penalty]}}"
+      }
+    },
+    "intimidationProf": {
+      "id": "intimidationProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.intimidation}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "intimidation": {
+      "id": "intimidation",
+      "type": "computed",
+      "label": "{{i18n:skill.intimidation}}",
+      "formula": "=[chaMod]+IF([intimidationProf]=\"expertise\",2*[profBonus],IF([intimidationProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@intimidation-@d20Penalty]}}"
+      }
+    },
+    "investigationProf": {
+      "id": "investigationProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.investigation}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "investigation": {
+      "id": "investigation",
+      "type": "computed",
+      "label": "{{i18n:skill.investigation}}",
+      "formula": "=[intMod]+IF([investigationProf]=\"expertise\",2*[profBonus],IF([investigationProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@investigation-@d20Penalty]}}"
+      }
+    },
+    "medicineProf": {
+      "id": "medicineProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.medicine}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "medicine": {
+      "id": "medicine",
+      "type": "computed",
+      "label": "{{i18n:skill.medicine}}",
+      "formula": "=[wisMod]+IF([medicineProf]=\"expertise\",2*[profBonus],IF([medicineProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@medicine-@d20Penalty]}}"
+      }
+    },
+    "natureProf": {
+      "id": "natureProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.nature}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "nature": {
+      "id": "nature",
+      "type": "computed",
+      "label": "{{i18n:skill.nature}}",
+      "formula": "=[intMod]+IF([natureProf]=\"expertise\",2*[profBonus],IF([natureProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))+IF([orderLoreBonus]=\"magician\",MAX(1,[wisMod]),0)",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@nature-@d20Penalty]}}"
+      }
+    },
+    "perceptionProf": {
+      "id": "perceptionProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.perception}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "perception": {
+      "id": "perception",
+      "type": "computed",
+      "label": "{{i18n:skill.perception}}",
+      "formula": "=[wisMod]+IF([perceptionProf]=\"expertise\",2*[profBonus],IF([perceptionProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@perception-@d20Penalty]}}"
+      }
+    },
+    "performanceProf": {
+      "id": "performanceProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.performance}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "performance": {
+      "id": "performance",
+      "type": "computed",
+      "label": "{{i18n:skill.performance}}",
+      "formula": "=[chaMod]+IF([performanceProf]=\"expertise\",2*[profBonus],IF([performanceProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@performance-@d20Penalty]}}"
+      }
+    },
+    "persuasionProf": {
+      "id": "persuasionProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.persuasion}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "persuasion": {
+      "id": "persuasion",
+      "type": "computed",
+      "label": "{{i18n:skill.persuasion}}",
+      "formula": "=[chaMod]+IF([persuasionProf]=\"expertise\",2*[profBonus],IF([persuasionProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@persuasion-@d20Penalty]}}"
+      }
+    },
+    "religionProf": {
+      "id": "religionProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.religion}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "religion": {
+      "id": "religion",
+      "type": "computed",
+      "label": "{{i18n:skill.religion}}",
+      "formula": "=[intMod]+IF([religionProf]=\"expertise\",2*[profBonus],IF([religionProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))+IF([orderLoreBonus]=\"thaumaturge\",MAX(1,[wisMod]),0)",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@religion-@d20Penalty]}}"
+      }
+    },
+    "sleightOfHandProf": {
+      "id": "sleightOfHandProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.sleightOfHand}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "sleightOfHand": {
+      "id": "sleightOfHand",
+      "type": "computed",
+      "label": "{{i18n:skill.sleightOfHand}}",
+      "formula": "=[dexMod]+IF([sleightOfHandProf]=\"expertise\",2*[profBonus],IF([sleightOfHandProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@sleightOfHand-@d20Penalty]}}"
+      }
+    },
+    "stealthProf": {
+      "id": "stealthProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.stealth}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "stealth": {
+      "id": "stealth",
+      "type": "computed",
+      "label": "{{i18n:skill.stealth}}",
+      "formula": "=[dexMod]+IF([stealthProf]=\"expertise\",2*[profBonus],IF([stealthProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@stealth-@d20Penalty]}}"
+      }
+    },
+    "survivalProf": {
+      "id": "survivalProf",
+      "type": "select",
+      "label": "{{i18n:field.skillProf.survival}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.prof.none}}"
+        },
+        {
+          "value": "proficient",
+          "label": "{{i18n:option.prof.proficient}}"
+        },
+        {
+          "value": "expertise",
+          "label": "{{i18n:option.prof.expertise}}"
+        }
+      ]
+    },
+    "survival": {
+      "id": "survival",
+      "type": "computed",
+      "label": "{{i18n:skill.survival}}",
+      "formula": "=[wisMod]+IF([survivalProf]=\"expertise\",2*[profBonus],IF([survivalProf]=\"proficient\",[profBonus],IF([jackOfAllTrades],FLOOR([profBonus]/2),0)))",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@survival-@d20Penalty]}}"
+      }
+    },
+    "passivePerception": {
+      "id": "passivePerception",
+      "type": "computed",
+      "label": "{{i18n:field.passivePerception}}",
+      "formula": "=10+[perception]",
+      "format": "integer"
+    },
+    "initiativeProf": {
+      "id": "initiativeProf",
+      "type": "toggle",
+      "icon": "Star",
+      "label": "{{i18n:field.initiativeProf}}",
+      "defaultValue": false
+    },
+    "initiativeMisc": {
+      "id": "initiativeMisc",
+      "type": "number",
+      "label": "{{i18n:field.initiativeMisc}}",
+      "format": "integer"
+    },
+    "initiative": {
+      "id": "initiative",
+      "type": "computed",
+      "label": "{{i18n:field.initiative}}",
+      "formula": "=[dexMod]+IF([initiativeProf],[profBonus],0)+[initiativeMisc]",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@initiative-@d20Penalty]}}"
+      }
+    },
+    "rangedAttackBonus": {
+      "id": "rangedAttackBonus",
+      "type": "number",
+      "label": "{{i18n:field.rangedAttackBonus}}",
+      "defaultValue": 0,
+      "format": "integer"
+    },
+    "speed": {
+      "id": "speed",
+      "type": "number",
+      "label": "{{i18n:field.speed}}",
+      "min": 0,
+      "defaultValue": 30,
+      "format": "integer"
+    },
+    "currentSpeed": {
+      "id": "currentSpeed",
+      "type": "computed",
+      "label": "{{i18n:field.currentSpeed}}",
+      "formula": "=MAX(0,[speed]-IF([armorStrReq]>[str],10,0)-5*MIN(6,MAX(0,[exhaustion])))",
+      "format": "integer"
+    },
+    "darkvision": {
+      "id": "darkvision",
+      "type": "number",
+      "label": "{{i18n:field.darkvision}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "heroicInspiration": {
+      "id": "heroicInspiration",
+      "type": "toggle",
+      "icon": "Sparkles",
+      "label": "{{i18n:field.heroicInspiration}}",
+      "defaultValue": false
+    },
+    "armorType": {
+      "id": "armorType",
+      "type": "select",
+      "label": "{{i18n:field.armorType}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.armorType.none}}"
+        },
+        {
+          "value": "light",
+          "label": "{{i18n:option.armorType.light}}"
+        },
+        {
+          "value": "medium",
+          "label": "{{i18n:option.armorType.medium}}"
+        },
+        {
+          "value": "heavy",
+          "label": "{{i18n:option.armorType.heavy}}"
+        }
+      ]
+    },
+    "armorBase": {
+      "id": "armorBase",
+      "type": "number",
+      "label": "{{i18n:field.armorBase}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "shield": {
+      "id": "shield",
+      "type": "toggle",
+      "icon": "Shield",
+      "label": "{{i18n:field.shield}}",
+      "defaultValue": false
+    },
+    "shieldBonus": {
+      "id": "shieldBonus",
+      "type": "number",
+      "label": "{{i18n:field.shield}}",
+      "hidden": true,
+      "defaultValue": 0,
+      "format": "integer"
+    },
+    "armorStrReq": {
+      "id": "armorStrReq",
+      "type": "number",
+      "label": "{{i18n:ability.str}}",
+      "hidden": true,
+      "defaultValue": 0,
+      "format": "integer"
+    },
+    "armorStealth": {
+      "id": "armorStealth",
+      "type": "toggle",
+      "label": "{{i18n:skill.stealth}}",
+      "hidden": true,
+      "defaultValue": false,
+      "icon": "Shield"
+    },
+    "unarmoredDefense": {
+      "id": "unarmoredDefense",
+      "type": "select",
+      "label": "{{i18n:field.unarmoredDefense}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.unarmored.none}}"
+        },
+        {
+          "value": "barbarian",
+          "label": "{{i18n:option.unarmored.barbarian}}"
+        },
+        {
+          "value": "monk",
+          "label": "{{i18n:option.unarmored.monk}}"
+        }
+      ]
+    },
+    "acMisc": {
+      "id": "acMisc",
+      "type": "number",
+      "label": "{{i18n:field.acMisc}}",
+      "format": "integer"
+    },
+    "ac": {
+      "id": "ac",
+      "type": "computed",
+      "label": "{{i18n:field.ac}}",
+      "formula": "=IF([armorType]=\"none\",10+[dexMod]+IF([unarmoredDefense]=\"barbarian\",[conMod],IF([unarmoredDefense]=\"monk\",[wisMod],0)),[armorBase]+IF([armorType]=\"light\",[dexMod],IF([armorType]=\"medium\",MIN([dexMod],2),0)))+IF([shield],2+[shieldBonus],0)+[acMisc]",
+      "format": "integer"
+    },
+    "hitDieFaces": {
+      "id": "hitDieFaces",
+      "type": "number",
+      "label": "{{i18n:field.hitDieFaces}}",
+      "min": 6,
+      "max": 12,
+      "step": 2,
+      "defaultValue": 8,
+      "format": "integer"
+    },
+    "hpPerLevelBonus": {
+      "id": "hpPerLevelBonus",
+      "type": "number",
+      "label": "{{i18n:field.hpPerLevelBonus}}",
+      "format": "integer"
+    },
+    "hpMaxMisc": {
+      "id": "hpMaxMisc",
+      "type": "number",
+      "label": "{{i18n:field.hpMaxMisc}}",
+      "format": "integer"
+    },
+    "hpMax": {
+      "id": "hpMax",
+      "type": "computed",
+      "label": "{{i18n:field.hpMax}}",
+      "formula": "=[hitDieFaces]+[conMod]+([level]-1)*(FLOOR([hitDieFaces]/2)+1+[conMod])+[level]*[hpPerLevelBonus]+[hpMaxMisc]",
+      "format": "integer"
+    },
+    "hp": {
+      "id": "hp",
+      "type": "resource",
+      "label": "{{i18n:field.hp}}",
+      "max": {
+        "from": "hpMax"
+      },
+      "follow": "max"
+    },
+    "hpTemp": {
+      "id": "hpTemp",
+      "type": "number",
+      "label": "{{i18n:field.hpTemp}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "hitDiceSpent": {
+      "id": "hitDiceSpent",
+      "type": "number",
+      "label": "{{i18n:field.hitDiceSpent}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "hitDiceMax": {
+      "id": "hitDiceMax",
+      "type": "computed",
+      "label": "{{i18n:field.hitDiceMax}}",
+      "formula": "=[level]",
+      "format": "integer"
+    },
+    "deathSuccesses": {
+      "id": "deathSuccesses",
+      "type": "checkbox-track",
+      "label": "{{i18n:field.deathSuccesses}}",
+      "boxes": 3
+    },
+    "deathFailures": {
+      "id": "deathFailures",
+      "type": "checkbox-track",
+      "label": "{{i18n:field.deathFailures}}",
+      "boxes": 3
+    },
+    "conditions": {
+      "id": "conditions",
+      "type": "multi-select",
+      "label": "{{i18n:field.conditions}}",
+      "options": [
+        {
+          "id": "blinded",
+          "label": "{{i18n:ref.condition.blinded}}"
+        },
+        {
+          "id": "charmed",
+          "label": "{{i18n:ref.condition.charmed}}"
+        },
+        {
+          "id": "deafened",
+          "label": "{{i18n:ref.condition.deafened}}"
+        },
+        {
+          "id": "exhaustion",
+          "label": "{{i18n:ref.condition.exhaustion}}"
+        },
+        {
+          "id": "frightened",
+          "label": "{{i18n:ref.condition.frightened}}"
+        },
+        {
+          "id": "grappled",
+          "label": "{{i18n:ref.condition.grappled}}"
+        },
+        {
+          "id": "incapacitated",
+          "label": "{{i18n:ref.condition.incapacitated}}"
+        },
+        {
+          "id": "invisible",
+          "label": "{{i18n:ref.condition.invisible}}"
+        },
+        {
+          "id": "paralyzed",
+          "label": "{{i18n:ref.condition.paralyzed}}"
+        },
+        {
+          "id": "petrified",
+          "label": "{{i18n:ref.condition.petrified}}"
+        },
+        {
+          "id": "poisoned",
+          "label": "{{i18n:ref.condition.poisoned}}"
+        },
+        {
+          "id": "prone",
+          "label": "{{i18n:ref.condition.prone}}"
+        },
+        {
+          "id": "restrained",
+          "label": "{{i18n:ref.condition.restrained}}"
+        },
+        {
+          "id": "stunned",
+          "label": "{{i18n:ref.condition.stunned}}"
+        },
+        {
+          "id": "unconscious",
+          "label": "{{i18n:ref.condition.unconscious}}"
+        }
+      ],
+      "displayStyle": "chips",
+      "defaultValue": []
+    },
+    "exhaustion": {
+      "id": "exhaustion",
+      "type": "number",
+      "label": "{{i18n:field.exhaustion}}",
+      "min": 0,
+      "max": 6,
+      "defaultValue": 0,
+      "format": "integer"
+    },
+    "d20Penalty": {
+      "id": "d20Penalty",
+      "type": "computed",
+      "label": "{{i18n:field.d20Penalty}}",
+      "formula": "=2*MIN(6,MAX(0,[exhaustion]))",
+      "format": "integer"
+    },
+    "concentration": {
+      "id": "concentration",
+      "type": "text",
+      "label": "{{i18n:field.concentration}}",
+      "defaultValue": ""
+    },
+    "armorLight": {
+      "id": "armorLight",
+      "type": "toggle",
+      "icon": "Star",
+      "label": "{{i18n:field.armorLight}}",
+      "defaultValue": false
+    },
+    "armorMedium": {
+      "id": "armorMedium",
+      "type": "toggle",
+      "icon": "Star",
+      "label": "{{i18n:field.armorMedium}}",
+      "defaultValue": false
+    },
+    "armorHeavy": {
+      "id": "armorHeavy",
+      "type": "toggle",
+      "icon": "Star",
+      "label": "{{i18n:field.armorHeavy}}",
+      "defaultValue": false
+    },
+    "armorShields": {
+      "id": "armorShields",
+      "type": "toggle",
+      "icon": "Star",
+      "label": "{{i18n:field.armorShields}}",
+      "defaultValue": false
+    },
+    "weaponProficiencies": {
+      "id": "weaponProficiencies",
+      "type": "text",
+      "label": "{{i18n:field.weaponProficiencies}}",
+      "multiline": true,
+      "rows": 2
+    },
+    "toolProficiencies": {
+      "id": "toolProficiencies",
+      "type": "list",
+      "label": "{{i18n:field.toolProficiencies}}",
+      "idPrefix": "tool",
+      "emptyMessage": "{{i18n:field.emptyList}}",
+      "rowTemplate": {
+        "children": [
+          {
+            "id": "name",
+            "type": "text",
+            "label": "{{i18n:field.row.name}}",
+            "defaultValue": "",
+            "layout": {
+              "width": "fill"
+            },
+            "action": {
+              "handler": "openReference",
+              "icon": "BookOpen",
+              "tooltip": "{{i18n:reference.open}}"
+            }
+          },
+          {
+            "id": "ref",
+            "type": "text",
+            "label": "{{i18n:field.row.ref}}",
+            "hidden": true,
+            "defaultValue": ""
+          },
+          {
+            "id": "origin",
+            "type": "select",
+            "label": "{{i18n:field.row.origin}}",
+            "hidden": true,
+            "options": [
+              {
+                "value": "srd",
+                "label": "{{i18n:option.origin.srd}}"
+              },
+              {
+                "value": "pack",
+                "label": "{{i18n:option.origin.pack}}"
+              },
+              {
+                "value": "custom",
+                "label": "{{i18n:option.origin.custom}}"
+              }
+            ],
+            "defaultValue": "custom"
+          },
+          {
+            "id": "text",
+            "type": "text",
+            "label": "{{i18n:field.row.text}}",
+            "multiline": true,
+            "rows": 1,
+            "defaultValue": "",
+            "layout": {
+              "width": "100%"
+            }
+          },
+          {
+            "id": "playerText",
+            "type": "text",
+            "label": "{{i18n:field.row.text}}",
+            "multiline": true,
+            "hidden": true,
+            "defaultValue": ""
+          }
+        ],
+        "layout": {
+          "type": "stack",
+          "direction": "row",
+          "wrap": true,
+          "gap": "xs",
+          "align": "center"
+        }
+      }
+    },
+    "weaponMasteries": {
+      "id": "weaponMasteries",
+      "type": "list",
+      "label": "{{i18n:field.weaponMasteries}}",
+      "idPrefix": "mastery",
+      "emptyMessage": "{{i18n:field.emptyList}}",
+      "rowTemplate": {
+        "children": [
+          {
+            "id": "name",
+            "type": "text",
+            "label": "{{i18n:field.row.name}}",
+            "defaultValue": "",
+            "layout": {
+              "width": "fill"
+            },
+            "action": {
+              "handler": "openReference",
+              "icon": "BookOpen",
+              "tooltip": "{{i18n:reference.open}}"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "mastery",
+            "type": "text",
+            "label": "{{i18n:field.row.mastery}}",
+            "defaultValue": "",
+            "layout": {
+              "width": "8rem"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "ref",
+            "type": "text",
+            "label": "{{i18n:field.row.ref}}",
+            "hidden": true,
+            "defaultValue": ""
+          },
+          {
+            "id": "origin",
+            "type": "select",
+            "label": "{{i18n:field.row.origin}}",
+            "hidden": true,
+            "options": [
+              {
+                "value": "srd",
+                "label": "{{i18n:option.origin.srd}}"
+              },
+              {
+                "value": "pack",
+                "label": "{{i18n:option.origin.pack}}"
+              },
+              {
+                "value": "custom",
+                "label": "{{i18n:option.origin.custom}}"
+              }
+            ],
+            "defaultValue": "custom"
+          },
+          {
+            "id": "text",
+            "type": "text",
+            "label": "{{i18n:field.row.text}}",
+            "multiline": true,
+            "rows": 1,
+            "defaultValue": "",
+            "layout": {
+              "width": "100%"
+            }
+          }
+        ],
+        "layout": {
+          "type": "stack",
+          "direction": "row",
+          "wrap": true,
+          "gap": "xs",
+          "align": "center"
+        }
+      }
+    },
+    "languages": {
+      "id": "languages",
+      "type": "list",
+      "label": "{{i18n:field.languages}}",
+      "idPrefix": "lang",
+      "emptyMessage": "{{i18n:field.emptyList}}",
+      "rowTemplate": {
+        "children": [
+          {
+            "id": "name",
+            "type": "text",
+            "label": "{{i18n:field.row.name}}",
+            "defaultValue": "",
+            "layout": {
+              "width": "fill"
+            },
+            "action": {
+              "handler": "openReference",
+              "icon": "BookOpen",
+              "tooltip": "{{i18n:reference.open}}"
+            }
+          },
+          {
+            "id": "ref",
+            "type": "text",
+            "label": "{{i18n:field.row.ref}}",
+            "hidden": true,
+            "defaultValue": ""
+          },
+          {
+            "id": "origin",
+            "type": "select",
+            "label": "{{i18n:field.row.origin}}",
+            "hidden": true,
+            "options": [
+              {
+                "value": "srd",
+                "label": "{{i18n:option.origin.srd}}"
+              },
+              {
+                "value": "pack",
+                "label": "{{i18n:option.origin.pack}}"
+              },
+              {
+                "value": "custom",
+                "label": "{{i18n:option.origin.custom}}"
+              }
+            ],
+            "defaultValue": "custom"
+          },
+          {
+            "id": "text",
+            "type": "text",
+            "label": "{{i18n:field.row.text}}",
+            "multiline": true,
+            "rows": 1,
+            "defaultValue": "",
+            "layout": {
+              "width": "100%"
+            }
+          }
+        ],
+        "layout": {
+          "type": "stack",
+          "direction": "row",
+          "wrap": true,
+          "gap": "xs",
+          "align": "center"
+        }
+      }
+    },
+    "features": {
+      "id": "features",
+      "type": "list",
+      "label": "{{i18n:field.features}}",
+      "idPrefix": "feature",
+      "emptyMessage": "{{i18n:field.emptyList}}",
+      "rowTemplate": {
+        "children": [
+          {
+            "id": "level",
+            "type": "number",
+            "label": "{{i18n:field.row.level}}",
+            "min": 1,
+            "max": 20,
+            "format": "integer",
+            "layout": {
+              "width": "4rem"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "name",
+            "type": "text",
+            "label": "{{i18n:field.row.name}}",
+            "defaultValue": "",
+            "layout": {
+              "width": "fill"
+            },
+            "action": {
+              "handler": "openReference",
+              "icon": "BookOpen",
+              "tooltip": "{{i18n:reference.open}}"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "ref",
+            "type": "text",
+            "label": "{{i18n:field.row.ref}}",
+            "hidden": true,
+            "defaultValue": ""
+          },
+          {
+            "id": "origin",
+            "type": "select",
+            "label": "{{i18n:field.row.origin}}",
+            "hidden": true,
+            "options": [
+              {
+                "value": "srd",
+                "label": "{{i18n:option.origin.srd}}"
+              },
+              {
+                "value": "pack",
+                "label": "{{i18n:option.origin.pack}}"
+              },
+              {
+                "value": "custom",
+                "label": "{{i18n:option.origin.custom}}"
+              }
+            ],
+            "defaultValue": "custom"
+          },
+          {
+            "id": "text",
+            "type": "text",
+            "label": "{{i18n:field.row.text}}",
+            "multiline": true,
+            "rows": 1,
+            "defaultValue": "",
+            "layout": {
+              "width": "100%"
+            }
+          },
+          {
+            "id": "playerText",
+            "type": "text",
+            "label": "{{i18n:field.row.text}}",
+            "multiline": true,
+            "hidden": true,
+            "defaultValue": ""
+          }
+        ],
+        "layout": {
+          "type": "stack",
+          "direction": "row",
+          "wrap": true,
+          "gap": "xs",
+          "align": "center"
+        }
+      }
+    },
+    "speciesTraits": {
+      "id": "speciesTraits",
+      "type": "list",
+      "label": "{{i18n:field.speciesTraits}}",
+      "idPrefix": "trait",
+      "emptyMessage": "{{i18n:field.emptyList}}",
+      "rowTemplate": {
+        "children": [
+          {
+            "id": "name",
+            "type": "text",
+            "label": "{{i18n:field.row.name}}",
+            "defaultValue": "",
+            "layout": {
+              "width": "fill"
+            },
+            "action": {
+              "handler": "openReference",
+              "icon": "BookOpen",
+              "tooltip": "{{i18n:reference.open}}"
+            }
+          },
+          {
+            "id": "ref",
+            "type": "text",
+            "label": "{{i18n:field.row.ref}}",
+            "hidden": true,
+            "defaultValue": ""
+          },
+          {
+            "id": "origin",
+            "type": "select",
+            "label": "{{i18n:field.row.origin}}",
+            "hidden": true,
+            "options": [
+              {
+                "value": "srd",
+                "label": "{{i18n:option.origin.srd}}"
+              },
+              {
+                "value": "pack",
+                "label": "{{i18n:option.origin.pack}}"
+              },
+              {
+                "value": "custom",
+                "label": "{{i18n:option.origin.custom}}"
+              }
+            ],
+            "defaultValue": "custom"
+          },
+          {
+            "id": "text",
+            "type": "text",
+            "label": "{{i18n:field.row.text}}",
+            "multiline": true,
+            "rows": 1,
+            "defaultValue": "",
+            "layout": {
+              "width": "100%"
+            }
+          },
+          {
+            "id": "playerText",
+            "type": "text",
+            "label": "{{i18n:field.row.text}}",
+            "multiline": true,
+            "hidden": true,
+            "defaultValue": ""
+          }
+        ],
+        "layout": {
+          "type": "stack",
+          "direction": "row",
+          "wrap": true,
+          "gap": "xs",
+          "align": "center"
+        }
+      }
+    },
+    "feats": {
+      "id": "feats",
+      "type": "list",
+      "label": "{{i18n:field.feats}}",
+      "idPrefix": "feat",
+      "emptyMessage": "{{i18n:field.emptyList}}",
+      "rowTemplate": {
+        "children": [
+          {
+            "id": "name",
+            "type": "text",
+            "label": "{{i18n:field.row.name}}",
+            "defaultValue": "",
+            "layout": {
+              "width": "fill"
+            },
+            "action": {
+              "handler": "openReference",
+              "icon": "BookOpen",
+              "tooltip": "{{i18n:reference.open}}"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "category",
+            "type": "select",
+            "label": "{{i18n:field.row.category}}",
+            "options": [
+              {
+                "value": "origin",
+                "label": "{{i18n:option.featCategory.origin}}"
+              },
+              {
+                "value": "general",
+                "label": "{{i18n:option.featCategory.general}}"
+              },
+              {
+                "value": "fightingStyle",
+                "label": "{{i18n:option.featCategory.fightingStyle}}"
+              },
+              {
+                "value": "epicBoon",
+                "label": "{{i18n:option.featCategory.epicBoon}}"
+              }
+            ]
+          },
+          {
+            "id": "ref",
+            "type": "text",
+            "label": "{{i18n:field.row.ref}}",
+            "hidden": true,
+            "defaultValue": ""
+          },
+          {
+            "id": "origin",
+            "type": "select",
+            "label": "{{i18n:field.row.origin}}",
+            "hidden": true,
+            "options": [
+              {
+                "value": "srd",
+                "label": "{{i18n:option.origin.srd}}"
+              },
+              {
+                "value": "pack",
+                "label": "{{i18n:option.origin.pack}}"
+              },
+              {
+                "value": "custom",
+                "label": "{{i18n:option.origin.custom}}"
+              }
+            ],
+            "defaultValue": "custom"
+          },
+          {
+            "id": "text",
+            "type": "text",
+            "label": "{{i18n:field.row.text}}",
+            "multiline": true,
+            "rows": 1,
+            "defaultValue": "",
+            "layout": {
+              "width": "100%"
+            }
+          },
+          {
+            "id": "playerText",
+            "type": "text",
+            "label": "{{i18n:field.row.text}}",
+            "multiline": true,
+            "hidden": true,
+            "defaultValue": ""
+          }
+        ],
+        "layout": {
+          "type": "stack",
+          "direction": "row",
+          "wrap": true,
+          "gap": "xs",
+          "align": "center"
+        }
+      }
+    },
+    "weapons": {
+      "id": "weapons",
+      "type": "list",
+      "label": "{{i18n:field.weapons}}",
+      "idPrefix": "weapon",
+      "emptyMessage": "{{i18n:field.emptyList}}",
+      "rowTemplate": {
+        "layout": {
+          "type": "stack",
+          "direction": "row",
+          "wrap": true,
+          "gap": "xs",
+          "align": "center"
+        },
+        "children": [
+          {
+            "id": "name",
+            "type": "text",
+            "label": "{{i18n:field.row.name}}",
+            "defaultValue": "",
+            "layout": {
+              "width": "100%"
+            },
+            "action": {
+              "handler": "openReference",
+              "icon": "BookOpen",
+              "tooltip": "{{i18n:reference.open}}"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "ability",
+            "type": "select",
+            "label": "{{i18n:field.row.ability}}",
+            "options": [
+              {
+                "value": "str",
+                "label": "{{i18n:option.weaponAbility.str}}"
+              },
+              {
+                "value": "dex",
+                "label": "{{i18n:option.weaponAbility.dex}}"
+              },
+              {
+                "value": "spell",
+                "label": "{{i18n:option.weaponAbility.spell}}"
+              }
+            ],
+            "defaultValue": "str"
+          },
+          {
+            "id": "proficient",
+            "type": "toggle",
+            "icon": "Star",
+            "label": "{{i18n:field.row.proficient}}",
+            "defaultValue": true
+          },
+          {
+            "id": "magic",
+            "type": "number",
+            "label": "{{i18n:field.row.magic}}",
+            "defaultValue": 0,
+            "format": "integer",
+            "labelPosition": "top",
+            "layout": {
+              "width": "4.5rem"
+            }
+          },
+          {
+            "id": "ranged",
+            "type": "toggle",
+            "icon": "Bookmark",
+            "label": "{{i18n:field.row.ranged}}",
+            "defaultValue": false
+          },
+          {
+            "id": "attack",
+            "type": "computed",
+            "label": "{{i18n:field.row.attack}}",
+            "format": "integer",
+            "formula": "=IF([@ability]=\"str\",[Character.strMod],IF([@ability]=\"dex\",[Character.dexMod],[Character.spellMod]))+IF([@proficient],[Character.profBonus],0)+[@magic]+IF([@ranged],[Character.rangedAttackBonus],0)",
+            "roll": {
+              "expression": "{{#d20[@attack-@d20Penalty]}}"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "damageDice",
+            "type": "text",
+            "label": "{{i18n:field.row.damageDice}}",
+            "defaultValue": "",
+            "labelPosition": "top",
+            "layout": {
+              "width": "6rem"
+            }
+          },
+          {
+            "id": "damageMod",
+            "type": "computed",
+            "label": "{{i18n:field.row.damageMod}}",
+            "format": "integer",
+            "formula": "=IF([@ability]=\"str\",[Character.strMod],IF([@ability]=\"dex\",[Character.dexMod],[Character.spellMod]))+[@magic]",
+            "roll": {
+              "expression": "{{@damageDice}}+{{@damageMod}}",
+              "system": "dnd5e"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "damageType",
+            "type": "text",
+            "label": "{{i18n:field.row.damageType}}",
+            "defaultValue": "",
+            "labelPosition": "top",
+            "layout": {
+              "width": "8rem"
+            }
+          },
+          {
+            "id": "mastery",
+            "type": "text",
+            "label": "{{i18n:field.row.mastery}}",
+            "defaultValue": "",
+            "labelPosition": "top",
+            "layout": {
+              "width": "8rem"
+            }
+          },
+          {
+            "id": "notes",
+            "type": "text",
+            "label": "{{i18n:field.row.notes}}",
+            "defaultValue": "",
+            "layout": {
+              "width": "100%"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "playerText",
+            "type": "text",
+            "label": "{{i18n:field.row.text}}",
+            "multiline": true,
+            "hidden": true,
+            "defaultValue": ""
+          },
+          {
+            "id": "itemId",
+            "type": "text",
+            "label": "{{i18n:field.row.ref}}",
+            "hidden": true,
+            "defaultValue": ""
+          },
+          {
+            "id": "ref",
+            "type": "text",
+            "label": "{{i18n:field.row.ref}}",
+            "hidden": true,
+            "defaultValue": ""
+          },
+          {
+            "id": "origin",
+            "type": "select",
+            "label": "{{i18n:field.row.origin}}",
+            "hidden": true,
+            "options": [
+              {
+                "value": "srd",
+                "label": "{{i18n:option.origin.srd}}"
+              },
+              {
+                "value": "pack",
+                "label": "{{i18n:option.origin.pack}}"
+              },
+              {
+                "value": "custom",
+                "label": "{{i18n:option.origin.custom}}"
+              }
+            ],
+            "defaultValue": "custom"
+          }
+        ]
+      }
+    },
+    "spells": {
+      "id": "spells",
+      "type": "list",
+      "label": "{{i18n:field.spells}}",
+      "idPrefix": "spell",
+      "emptyMessage": "{{i18n:field.emptyList}}",
+      "rowTemplate": {
+        "layout": {
+          "type": "stack",
+          "direction": "row",
+          "wrap": true,
+          "gap": "xs",
+          "align": "center"
+        },
+        "children": [
+          {
+            "id": "level",
+            "type": "number",
+            "label": "{{i18n:field.row.spellLevel}}",
+            "min": 0,
+            "max": 9,
+            "defaultValue": 0,
+            "format": "integer",
+            "layout": {
+              "width": "3.5rem"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "prepared",
+            "type": "toggle",
+            "icon": "Bookmark",
+            "label": "{{i18n:field.row.prepared}}",
+            "defaultValue": false
+          },
+          {
+            "id": "name",
+            "type": "text",
+            "label": "{{i18n:field.row.name}}",
+            "defaultValue": "",
+            "layout": {
+              "width": "fill"
+            },
+            "action": {
+              "handler": "openReference",
+              "icon": "BookOpen",
+              "tooltip": "{{i18n:reference.open}}"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "castingTime",
+            "type": "text",
+            "label": "{{i18n:field.row.castingTime}}",
+            "defaultValue": "",
+            "layout": {
+              "width": "6rem"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "range",
+            "type": "text",
+            "label": "{{i18n:field.row.range}}",
+            "defaultValue": "",
+            "layout": {
+              "width": "6rem"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "concentration",
+            "type": "toggle",
+            "icon": "Bookmark",
+            "label": "{{i18n:field.row.concentration}}",
+            "defaultValue": false
+          },
+          {
+            "id": "ritual",
+            "type": "toggle",
+            "icon": "Bookmark",
+            "label": "{{i18n:field.row.ritual}}",
+            "defaultValue": false
+          },
+          {
+            "id": "material",
+            "type": "toggle",
+            "icon": "Bookmark",
+            "label": "{{i18n:field.row.material}}",
+            "defaultValue": false
+          },
+          {
+            "id": "source",
+            "type": "select",
+            "label": "{{i18n:field.row.source}}",
+            "options": [
+              {
+                "value": "class",
+                "label": "{{i18n:option.spellSource.class}}"
+              },
+              {
+                "value": "magic-initiate",
+                "label": "{{i18n:option.spellSource.magic-initiate}}"
+              },
+              {
+                "value": "species",
+                "label": "{{i18n:option.spellSource.species}}"
+              },
+              {
+                "value": "other",
+                "label": "{{i18n:option.spellSource.other}}"
+              }
+            ],
+            "defaultValue": "class"
+          },
+          {
+            "id": "notes",
+            "type": "text",
+            "label": "{{i18n:field.row.notes}}",
+            "defaultValue": "",
+            "layout": {
+              "width": "fill"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "ref",
+            "type": "text",
+            "label": "{{i18n:field.row.ref}}",
+            "hidden": true,
+            "defaultValue": ""
+          },
+          {
+            "id": "origin",
+            "type": "select",
+            "label": "{{i18n:field.row.origin}}",
+            "hidden": true,
+            "options": [
+              {
+                "value": "srd",
+                "label": "{{i18n:option.origin.srd}}"
+              },
+              {
+                "value": "pack",
+                "label": "{{i18n:option.origin.pack}}"
+              },
+              {
+                "value": "custom",
+                "label": "{{i18n:option.origin.custom}}"
+              }
+            ],
+            "defaultValue": "custom"
+          },
+          {
+            "id": "text",
+            "type": "text",
+            "label": "{{i18n:field.row.text}}",
+            "multiline": true,
+            "rows": 1,
+            "defaultValue": "",
+            "layout": {
+              "width": "100%"
+            }
+          },
+          {
+            "id": "playerText",
+            "type": "text",
+            "label": "{{i18n:field.row.text}}",
+            "multiline": true,
+            "hidden": true,
+            "defaultValue": ""
+          }
+        ]
+      }
+    },
+    "equipment": {
+      "id": "equipment",
+      "type": "list",
+      "label": "{{i18n:field.equipment}}",
+      "idPrefix": "equipment",
+      "emptyMessage": "{{i18n:field.emptyList}}",
+      "rowTemplate": {
+        "layout": {
+          "type": "stack",
+          "direction": "row",
+          "wrap": true,
+          "gap": "xs",
+          "align": "center"
+        },
+        "children": [
+          {
+            "id": "qty",
+            "type": "number",
+            "label": "{{i18n:field.row.qty}}",
+            "min": 0,
+            "defaultValue": 1,
+            "format": "integer",
+            "layout": {
+              "width": "4rem"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "name",
+            "type": "text",
+            "label": "{{i18n:field.row.name}}",
+            "defaultValue": "",
+            "layout": {
+              "width": "fill"
+            },
+            "action": {
+              "handler": "openReference",
+              "icon": "BookOpen",
+              "tooltip": "{{i18n:reference.open}}"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "equipped",
+            "type": "toggle",
+            "icon": "Backpack",
+            "label": "{{i18n:field.row.equipped}}",
+            "defaultValue": false
+          },
+          {
+            "id": "bonus",
+            "type": "number",
+            "label": "{{i18n:field.row.magic}}",
+            "hidden": true,
+            "defaultValue": 0,
+            "format": "integer"
+          },
+          {
+            "id": "rarity",
+            "type": "text",
+            "label": "{{i18n:field.row.category}}",
+            "hidden": true,
+            "defaultValue": ""
+          },
+          {
+            "id": "attunement",
+            "type": "toggle",
+            "label": "{{i18n:section.attunement}}",
+            "hidden": true,
+            "defaultValue": false,
+            "icon": "Sparkles"
+          },
+          {
+            "id": "weight",
+            "type": "number",
+            "label": "{{i18n:field.equipment}}",
+            "hidden": true,
+            "min": 0
+          },
+          {
+            "id": "notes",
+            "type": "text",
+            "label": "{{i18n:field.row.notes}}",
+            "hidden": true,
+            "defaultValue": ""
+          },
+          {
+            "id": "ref",
+            "type": "text",
+            "label": "{{i18n:field.row.ref}}",
+            "hidden": true,
+            "defaultValue": ""
+          },
+          {
+            "id": "origin",
+            "type": "select",
+            "label": "{{i18n:field.row.origin}}",
+            "hidden": true,
+            "options": [
+              {
+                "value": "srd",
+                "label": "{{i18n:option.origin.srd}}"
+              },
+              {
+                "value": "pack",
+                "label": "{{i18n:option.origin.pack}}"
+              },
+              {
+                "value": "custom",
+                "label": "{{i18n:option.origin.custom}}"
+              }
+            ],
+            "defaultValue": "custom"
+          },
+          {
+            "id": "text",
+            "type": "text",
+            "label": "{{i18n:field.row.text}}",
+            "multiline": true,
+            "rows": 1,
+            "defaultValue": "",
+            "layout": {
+              "width": "100%"
+            }
+          },
+          {
+            "id": "playerText",
+            "type": "text",
+            "label": "{{i18n:field.row.text}}",
+            "multiline": true,
+            "hidden": true,
+            "defaultValue": ""
+          }
+        ]
+      }
+    },
+    "spellAbility": {
+      "id": "spellAbility",
+      "type": "select",
+      "label": "{{i18n:field.spellAbility}}",
+      "options": [
+        {
+          "value": "none",
+          "label": "{{i18n:option.spellAbility.none}}"
+        },
+        {
+          "value": "int",
+          "label": "{{i18n:option.spellAbility.int}}"
+        },
+        {
+          "value": "wis",
+          "label": "{{i18n:option.spellAbility.wis}}"
+        },
+        {
+          "value": "cha",
+          "label": "{{i18n:option.spellAbility.cha}}"
+        }
+      ]
+    },
+    "spellMod": {
+      "id": "spellMod",
+      "type": "computed",
+      "label": "{{i18n:field.spellMod}}",
+      "formula": "=IF([spellAbility]=\"int\",[intMod],IF([spellAbility]=\"wis\",[wisMod],IF([spellAbility]=\"cha\",[chaMod],0)))",
+      "format": "integer"
+    },
+    "spellSaveDc": {
+      "id": "spellSaveDc",
+      "type": "computed",
+      "label": "{{i18n:field.spellSaveDc}}",
+      "formula": "=8+[spellMod]+[profBonus]",
+      "format": "integer"
+    },
+    "spellAttack": {
+      "id": "spellAttack",
+      "type": "computed",
+      "label": "{{i18n:field.spellAttack}}",
+      "formula": "=[spellMod]+[profBonus]",
+      "format": "integer",
+      "roll": {
+        "expression": "{{#d20[@spellAttack-@d20Penalty]}}"
+      }
+    },
+    "slot1Total": {
+      "id": "slot1Total",
+      "type": "number",
+      "label": "{{i18n:field.slotTotal}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot1Used": {
+      "id": "slot1Used",
+      "type": "number",
+      "label": "{{i18n:field.slotUsed}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot2Total": {
+      "id": "slot2Total",
+      "type": "number",
+      "label": "{{i18n:field.slotTotal}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot2Used": {
+      "id": "slot2Used",
+      "type": "number",
+      "label": "{{i18n:field.slotUsed}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot3Total": {
+      "id": "slot3Total",
+      "type": "number",
+      "label": "{{i18n:field.slotTotal}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot3Used": {
+      "id": "slot3Used",
+      "type": "number",
+      "label": "{{i18n:field.slotUsed}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot4Total": {
+      "id": "slot4Total",
+      "type": "number",
+      "label": "{{i18n:field.slotTotal}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot4Used": {
+      "id": "slot4Used",
+      "type": "number",
+      "label": "{{i18n:field.slotUsed}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot5Total": {
+      "id": "slot5Total",
+      "type": "number",
+      "label": "{{i18n:field.slotTotal}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot5Used": {
+      "id": "slot5Used",
+      "type": "number",
+      "label": "{{i18n:field.slotUsed}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot6Total": {
+      "id": "slot6Total",
+      "type": "number",
+      "label": "{{i18n:field.slotTotal}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot6Used": {
+      "id": "slot6Used",
+      "type": "number",
+      "label": "{{i18n:field.slotUsed}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot7Total": {
+      "id": "slot7Total",
+      "type": "number",
+      "label": "{{i18n:field.slotTotal}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot7Used": {
+      "id": "slot7Used",
+      "type": "number",
+      "label": "{{i18n:field.slotUsed}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot8Total": {
+      "id": "slot8Total",
+      "type": "number",
+      "label": "{{i18n:field.slotTotal}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot8Used": {
+      "id": "slot8Used",
+      "type": "number",
+      "label": "{{i18n:field.slotUsed}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot9Total": {
+      "id": "slot9Total",
+      "type": "number",
+      "label": "{{i18n:field.slotTotal}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "slot9Used": {
+      "id": "slot9Used",
+      "type": "number",
+      "label": "{{i18n:field.slotUsed}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "pactSlots": {
+      "id": "pactSlots",
+      "type": "number",
+      "label": "{{i18n:field.pactSlots}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "pactSlotLevel": {
+      "id": "pactSlotLevel",
+      "type": "number",
+      "label": "{{i18n:field.pactSlotLevel}}",
+      "min": 0,
+      "max": 5,
+      "format": "integer"
+    },
+    "pactUsed": {
+      "id": "pactUsed",
+      "type": "number",
+      "label": "{{i18n:field.pactUsed}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "portrait": {
+      "id": "portrait",
+      "type": "image",
+      "label": "{{i18n:field.portrait}}",
+      "aspectRatio": "1:1",
+      "placeholder": "{{i18n:field.portrait}}",
+      "allowUpload": true
+    },
+    "appearance": {
+      "id": "appearance",
+      "type": "text",
+      "label": "{{i18n:field.appearance}}",
+      "multiline": true,
+      "rows": 3
+    },
+    "backstory": {
+      "id": "backstory",
+      "type": "text",
+      "label": "{{i18n:field.backstory}}",
+      "multiline": true,
+      "rows": 6
+    },
+    "attunement1": {
+      "id": "attunement1",
+      "type": "text",
+      "label": "{{i18n:field.attunement}}"
+    },
+    "attunement2": {
+      "id": "attunement2",
+      "type": "text",
+      "label": "{{i18n:field.attunement}}"
+    },
+    "attunement3": {
+      "id": "attunement3",
+      "type": "text",
+      "label": "{{i18n:field.attunement}}"
+    },
+    "cp": {
+      "id": "cp",
+      "type": "number",
+      "label": "{{i18n:field.cp}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "sp": {
+      "id": "sp",
+      "type": "number",
+      "label": "{{i18n:field.sp}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "ep": {
+      "id": "ep",
+      "type": "number",
+      "label": "{{i18n:field.ep}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "gp": {
+      "id": "gp",
+      "type": "number",
+      "label": "{{i18n:field.gp}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "pp": {
+      "id": "pp",
+      "type": "number",
+      "label": "{{i18n:field.pp}}",
+      "min": 0,
+      "format": "integer"
+    },
+    "startingShop": {
+      "id": "startingShop",
+      "type": "toggle",
+      "label": "{{i18n:field.equipment}}",
+      "hidden": true,
+      "defaultValue": false,
+      "icon": "Backpack"
+    },
+    "notes": {
+      "id": "notes",
+      "type": "text",
+      "label": "{{i18n:field.notes}}",
+      "multiline": true,
+      "rows": 4
+    }
+  },
+  "editorConfig": {
+    "toolbar": {
+      "items": [
+        {
+          "type": "button",
+          "id": "openReferenceBrowser",
+          "label": "{{i18n:toolbar.reference}}",
+          "icon": "BookOpen",
+          "action": "custom",
+          "handler": "openReferenceBrowser"
+        },
+        {
+          "type": "button",
+          "id": "openCompendium",
+          "label": "{{i18n:toolbar.compendium}}",
+          "icon": "ScrollText",
+          "action": "custom",
+          "handler": "openCompendium"
+        }
+      ]
+    }
+  }
+}

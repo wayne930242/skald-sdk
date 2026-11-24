@@ -1,0 +1,134 @@
+/* modules/character/ui/renderer/renderers/interactive/conditions-field.css
+ *
+ * `conditions` 欄位。顏色走 --sheet-*（web view 提供），沒有時退回 Folio token，
+ * 深色主題下勾選框跟著主題色，不用原生核取方塊。
+ */
+
+.skald-conditions {
+  display: grid;
+  min-width: 0;
+  gap: 0.375rem;
+  color: var(--sheet-fg, var(--foreground));
+}
+
+.skald-conditions-label {
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.skald-conditions-list {
+  display: grid;
+  grid-template-columns: repeat(var(--cond-cols, 1), minmax(0, 1fr));
+  gap: 0.25rem 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skald-condition {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+}
+
+.skald-condition-toggle {
+  display: inline-flex;
+  min-height: 2.75rem;
+  min-width: 0;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0 0.25rem;
+  color: inherit;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: var(--sheet-radius-sm, 0.5rem);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.skald-condition-toggle:disabled {
+  cursor: default;
+}
+
+.skald-condition-toggle:focus-visible {
+  outline: 2px solid var(--sheet-ring, var(--ring));
+  outline-offset: 2px;
+}
+
+.skald-condition-box {
+  display: inline-flex;
+  width: 1.375rem;
+  height: 1.375rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  background: var(--sheet-surface, transparent);
+  border: 2px solid var(--sheet-border-strong, var(--border));
+  border-radius: 0.375rem;
+  transition:
+    background-color 120ms,
+    border-color 120ms;
+}
+
+.skald-condition-toggle:hover:not(:disabled) .skald-condition-box {
+  border-color: var(--sheet-accent, var(--primary));
+}
+
+.skald-condition[data-checked="true"] .skald-condition-box {
+  /* 勾選記號用頁面底色，淺色／深色主題下都和強調色有對比 */
+  color: var(--background);
+  background: var(--sheet-accent, var(--primary));
+  border-color: var(--sheet-accent, var(--primary));
+}
+
+.skald-condition-tick {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.skald-condition-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* 建議勾選：虛線、不填色，和已勾選的實心狀態一眼分得開 */
+.skald-condition-hint {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--sheet-accent, var(--primary));
+  white-space: nowrap;
+  border: 1px dashed var(--sheet-accent, var(--primary));
+  border-radius: 999px;
+  cursor: help;
+}
+
+.skald-condition-hint:focus-visible {
+  outline: 2px solid var(--sheet-ring, var(--ring));
+  outline-offset: 2px;
+}
+
+/* 列印：空框或打勾，不顯示互動提示 */
+.skald-conditions[data-view-mode="print"] .skald-condition-toggle {
+  min-height: 0;
+  padding: 0.125rem 0;
+}
+
+.skald-conditions[data-view-mode="print"] .skald-condition-box {
+  color: transparent;
+  background: transparent;
+  border-color: currentColor;
+}
+
+.skald-conditions[data-view-mode="print"]
+  .skald-condition[data-checked="true"]
+  .skald-condition-box {
+  color: currentColor;
+  background: transparent;
+}

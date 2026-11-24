@@ -1,0 +1,4 @@
+# One hoisted node_modules, as in the private source repo: the packages resolve each other's
+# dependencies (React, next-intl, Tailwind) from the root.
+[install]
+linker = "hoisted"

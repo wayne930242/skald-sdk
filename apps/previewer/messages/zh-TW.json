@@ -1,0 +1,40 @@
+{
+  "previewer": {
+    "title": "Skald 角色卡預覽器",
+    "intro": "以編輯、遊玩或列印模式開啟系統的角色卡。角色資料只存在這個瀏覽器（localStorage），不會傳到任何地方。",
+    "language": "語言",
+    "systems": {
+      "fate-condensed": "Fate Condensed",
+      "dnd5e-2024": "D&D 2024（SRD 5.2.1）"
+    },
+    "modes": {
+      "play": "遊玩",
+      "edit": "編輯",
+      "print": "列印"
+    },
+    "home": "所有系統",
+    "character": "角色",
+    "characters": {
+      "blank": "空白角色卡",
+      "sample": "範例角色",
+      "saved": "存在這個瀏覽器的角色"
+    },
+    "load": "載入",
+    "importJson": "匯入 JSON",
+    "exportJson": "匯出 JSON",
+    "reset": "重設為選定的角色",
+    "importFailed": "這個檔案不是角色的 JSON 物件。",
+    "loading": "正在載入角色卡…",
+    "notFound": "預覽器裡沒有這個系統。",
+    "rollLog": {
+      "title": "擲骰紀錄",
+      "empty": "在角色卡上擲的骰會列在這裡。",
+      "clear": "清除"
+    },
+    "unavailable": "預覽器沒有的功能：遊戲桌、上傳肖像、下載 PDF、Excel 公式與擴充包。",
+    "locales": {
+      "en": "English",
+      "zh-TW": "繁體中文"
+    }
+  }
+}

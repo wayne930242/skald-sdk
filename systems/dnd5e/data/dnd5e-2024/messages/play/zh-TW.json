@@ -1,0 +1,93 @@
+{
+  "tabs": {
+    "label": "Sheet sections",
+    "character": "Character",
+    "combat": "Combat",
+    "skills": "Skills",
+    "spells": "Spells",
+    "features": "Features",
+    "items": "Items"
+  },
+  "hp": {
+    "title": "Hit Points",
+    "value": "{current} of {max} hit points",
+    "damage": "Lose 1 hit point",
+    "heal": "Regain 1 hit point",
+    "temp": "Temp",
+    "addTemp": "Add 1 temporary hit point"
+  },
+  "ac": "Armor Class",
+  "acShort": "AC",
+  "initiative": "Initiative",
+  "speed": "Speed",
+  "armorStr": "Str too low −10",
+  "feet": "{value} ft.",
+  "prof": "Proficiency Bonus",
+  "profShort": "Prof.",
+  "passive": "Passive Perception",
+  "hitDice": {
+    "title": "Hit Dice d{faces}",
+    "short": "Hit Dice",
+    "left": "{left}/{max} left",
+    "use": "Use Hit Die",
+    "roll": "Hit Die",
+    "none": "No Hit Point Dice left"
+  },
+  "death": {
+    "title": "Death Saves",
+    "successes": "Successes",
+    "failures": "Failures",
+    "mark": "{label}: {count} of 3",
+    "roll": "Roll a death save",
+    "rollLabel": "Death save"
+  },
+  "inspiration": "Heroic Inspiration",
+  "inspirationShort": "Inspiration",
+  "conditions": {
+    "title": "Conditions",
+    "none": "None",
+    "add": "Condition",
+    "remove": "Remove {name}",
+    "exhaustionLevel": "Exhaustion {level}",
+    "exhaustionEffect": "D20 Tests −{d20}, Speed −{feet} ft.",
+    "exhaustionDeath": "Dead (Exhaustion level 6)",
+    "exhaustionSet": "Exhaustion level",
+    "levelOption": "Exhaustion level {level}",
+    "removeExhaustion": "Remove Exhaustion",
+    "exhaustionChip": "{label}: {effect}"
+  },
+  "rest": {
+    "short": "Short Rest",
+    "long": "Long Rest"
+  },
+  "abilities": {
+    "save": "Save",
+    "check": "{ability} check",
+    "saveRoll": "{ability} save",
+    "proficient": "Proficient",
+    "expertise": "Expertise"
+  },
+  "skills": {
+    "title": "Skills",
+    "passive": "Passive Perception {value}"
+  },
+  "spells": {
+    "concentrating": "Concentrating: {name}",
+    "endConcentration": "End concentration on {name}"
+  },
+  "features": {
+    "empty": "None"
+  },
+  "character": {
+    "unnamed": "Unnamed character",
+    "level": "Level {level}",
+    "blank": "—",
+    "notWritten": "Not written yet.",
+    "noPortrait": "No portrait yet",
+    "upload": "Upload portrait",
+    "uploading": "Uploading…",
+    "showMore": "Show more",
+    "showLess": "Show less"
+  },
+  "armorStealth": "Disadv. (armor)"
+}

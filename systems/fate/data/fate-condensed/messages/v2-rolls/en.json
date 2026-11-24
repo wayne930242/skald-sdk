@@ -1,0 +1,311 @@
+{
+  "fateRolls": {
+    "chat": {
+      "root": "{skill} #{tag}",
+      "followUp": "{skill} · {effect} · #{tag}",
+      "effect": {
+        "plus2": "Invoke +2",
+        "reroll": "Invoke reroll"
+      }
+    },
+    "outcome": {
+      "fail": "Fail (short by {shifts} {shifts, plural, one {shift} other {shifts}})",
+      "tie": "Tie",
+      "success": "Success ({shifts} {shifts, plural, one {shift} other {shifts}})",
+      "style": "Success with style ({shifts} {shifts, plural, one {shift} other {shifts}})"
+    },
+    "dice": {
+      "plus": "plus",
+      "minus": "minus",
+      "blank": "blank",
+      "separator": ", ",
+      "label": "Dice: {faces}, sum {sum}"
+    },
+    "action": {
+      "overcome": "Overcome",
+      "createAdvantage": "Create an advantage",
+      "attack": "Attack",
+      "defend": "Defend"
+    },
+    "trigger": {
+      "name": "Roll {skill} {rating}"
+    },
+    "options": {
+      "title": "Roll options",
+      "subtitle": "{skill} {rating}",
+      "action": "Action",
+      "rules": "{section} rules",
+      "advantage": {
+        "title": "Advantage on",
+        "new": "New aspect",
+        "known": "Known aspect",
+        "unknown": "Hidden aspect"
+      },
+      "opposition": "Opposition",
+      "lower": "Lower {field}",
+      "raise": "Raise {field}",
+      "oppositionHint": "Enter the difficulty or the opponent’s defense total; +0 by default.",
+      "scale": {
+        "title": "Scale",
+        "apply": "Compare scale on this roll",
+        "selfTier": "Us",
+        "otherTier": "Them",
+        "mode": "Use",
+        "tiers": {
+          "mundane": "Mundane",
+          "supernatural": "Supernatural",
+          "otherworldly": "Otherworldly",
+          "legendary": "Legendary",
+          "godlike": "Godlike"
+        },
+        "modes": {
+          "beforeRoll": "+{value} per step before the roll",
+          "afterRoll": "+{value} per step after a success",
+          "result": "{value} free invoke per step on a success"
+        },
+        "notHigher": "Only the side with the higher scale uses the difference.",
+        "difference": "We are {tiers} {tiers, plural, one {step} other {steps}} higher"
+      },
+      "gear": {
+        "weapon": "Weapon rating",
+        "armor": "Target armor",
+        "yours": "Weapon on this sheet: {rating}"
+      },
+      "stunts": "Stunts",
+      "stunt": "Stunt",
+      "confirmCondition": "I confirm this applies: {condition}",
+      "confirmFiction": "I confirm the stunt’s situation applies",
+      "stuntBlocked": {
+        "used": "Already used this session.",
+        "noSession": "Start a session before using a once-per-session stunt.",
+        "readOnly": "A read-only sheet cannot record the stunt’s use."
+      },
+      "preview": {
+        "title": "Before the dice",
+        "range": "Every result of the four Fate dice against {opposition}",
+        "cell": "Dice {dice}, total {total}",
+        "outcome": {
+          "fail": "Fail",
+          "tie": "Tie",
+          "success": "Success",
+          "style": "Success with style"
+        },
+        "note": "The total is compared with the opposition after you roll four Fate dice. With dice summing to +0:"
+      },
+      "cancel": "Cancel",
+      "roll": "Roll"
+    },
+    "invoke": {
+      "title": "Invoke an aspect",
+      "rules": "Invoke rules",
+      "subtitle": "Choose an aspect that helps this {action}.",
+      "free": "Free invokes",
+      "noFree": "No free invokes right now.",
+      "paid": "My aspects",
+      "paidCost": "−1 fate point each",
+      "noAspects": "No aspects to invoke yet.",
+      "hidden": "Secret aspect",
+      "boostNote": "Boost · gone once used",
+      "freeCount": "{count} free {count, plural, one {invoke} other {invokes}}",
+      "refusal": {
+        "readOnly": "A read-only sheet cannot invoke.",
+        "wrongCharacter": "This roll belongs to another character.",
+        "unknownAspect": "That aspect is no longer on the sheet.",
+        "duplicateOperation": "This invoke is already recorded.",
+        "boostCannotBePaid": "A boost can only be invoked for free.",
+        "paidRepeat": "You already paid to invoke this aspect on this roll.",
+        "noFatePoints": "No fate points left.",
+        "noFreeInvokes": "No free invokes left.",
+        "busy": "The last action is still in progress.",
+        "noRoll": "There is no roll to invoke on.",
+        "settled": "This roll’s result is settled and takes no more invokes.",
+        "blocked": "Choose to keep it on this sheet first.",
+        "stale": "The sheet just changed, so this invoke was not recorded and nothing was spent. Please check and confirm again.",
+        "editMode": "Switch to play mode to invoke."
+      },
+      "original": "Original roll",
+      "originalLine": "Original roll · {skill} {rating}",
+      "total": "Total {total}",
+      "opposition": "Opposition {opposition}",
+      "effect": "Invoke for",
+      "effects": {
+        "plus2": "+2 to the total",
+        "reroll": "Reroll 4 dice"
+      },
+      "costPaid": "−1 fate point: {from} → {to}",
+      "costBoost": "Uses up this boost; it disappears.",
+      "costFree": "Free invokes {from} → {to}",
+      "preview": "After the invoke",
+      "plus2Line": "{total} + {bonus} = {after}",
+      "rerollLine": "Throw four new Fate dice; earlier bonuses stay, and the total is compared with the same opposition.",
+      "blocked": {
+        "privateAudience": "The original roll was shown to only some people, so the invoke result will not be sent to chat.",
+        "notPosted": "The original roll could not be confirmed as posted, so the invoke result will not be sent.",
+        "noBinding": "The table the original roll went to could not be confirmed, so the invoke result will not be sent.",
+        "bindingChanged": "The table connection or character has changed, so the invoke result will not be sent."
+      },
+      "keepLocal": "Keep it on this sheet only",
+      "noteChat": "Confirming sends a new roll message to the same audience as the original; the original message is not changed.",
+      "noteLocal": "This invoke stays on the sheet; nothing is sent to chat.",
+      "noteNothingYet": "Nothing is spent until you confirm.",
+      "cancel": "Cancel",
+      "confirm": "Confirm invoke",
+      "confirmLocal": "Confirm invoke (sheet only)",
+      "playOnly": "Switch to play mode to invoke."
+    },
+    "tray": {
+      "title": "Dice tray",
+      "rules": "Outcome rules",
+      "last": "Last roll · {skill} {rating}",
+      "empty": "No roll yet.",
+      "noRoller": "Rolling is not available here.",
+      "gestures": "Long-press a skill for options.",
+      "helpLabel": "How to roll",
+      "help": "Tap a skill to roll: overcome against +0. Long-press, right-click or Shift+Enter for options.",
+      "total": "Total",
+      "beyond": {
+        "below": "Below the adjective ladder",
+        "above": "Above the adjective ladder"
+      },
+      "opposition": "Opposition {opposition}",
+      "invokePlus2": "Invoke aspect +2",
+      "invokeReroll": "Reroll",
+      "modifiers": "Bonuses",
+      "scalePending": "The scale bonus is added once the roll succeeds.",
+      "offers": "What the outcome offers",
+      "outcomeHelp": "How to handle: {outcome}",
+      "actionHelp": "{action} rules",
+      "settled": "This roll’s reward was taken; the result is settled.",
+      "readOnly": "A read-only sheet can roll but cannot invoke or take outcomes.",
+      "deliveryChat": "Invokes go out as new roll messages to the original roll’s audience.",
+      "deliveryLocal": "Invokes on this roll stay on the sheet.",
+      "deliveryBlocked": {
+        "privateAudience": "The original roll was private: choose to keep invokes on this sheet first.",
+        "notPosted": "The original roll could not be confirmed as sent: choose to keep invokes on this sheet first.",
+        "noBinding": "The original roll’s table could not be confirmed: choose to keep invokes on this sheet first.",
+        "bindingChanged": "The table connection has changed: choose to keep invokes on this sheet first."
+      },
+      "nonAtomic": "If the message fails, points aren't refunded.",
+      "goneAspect": "Removed aspect",
+      "hiddenAspect": "Secret aspect",
+      "modifier": {
+        "stunt": "{name} {value}",
+        "stuntFallback": "Stunt",
+        "scale": "Scale {value}",
+        "invoke": {
+          "plus2": "Invoked “{aspect}” +2 ({payment})",
+          "reroll": "Invoked “{aspect}” to reroll ({payment})"
+        },
+        "payment": {
+          "free": "free",
+          "paid": "fate point"
+        }
+      },
+      "playOnly": "Switch to play mode to invoke, reverse or take outcomes."
+    },
+    "delivery": {
+      "local": "Invoke recorded on the sheet.",
+      "pending": "Invoke recorded on the sheet; sending the message…",
+      "posted": "Invoke recorded on the sheet; message sent.",
+      "rejected": "Invoke recorded on the sheet, but the chat refused the message.",
+      "unknown": "Invoke recorded on the sheet; whether the message arrived is unknown, so check the chat. It will not be resent or refunded automatically.",
+      "reversed": "This invoke was undone and refunded.",
+      "reverse": "Undo the invoke and refund"
+    },
+    "offers": {
+      "fail": "Fail: the goal is not met",
+      "majorCost": "Or succeed at a serious cost",
+      "minorCost": "Succeed at a minor cost",
+      "success": "Success: the goal is met",
+      "deny": "The defense holds",
+      "noAspect": "No aspect is created",
+      "boost": "Gain a boost",
+      "failWithBoost": "Or fail but gain a boost",
+      "successWithBoost": "Succeed and gain a boost",
+      "armorBoost": "Armor stops the hit: the attacker gains a boost",
+      "enemyFreeInvoke": "The opponent gains a free invoke",
+      "enemyMayReveal": "The opponent may reveal the aspect",
+      "freeInvokes": "{count} free {count, plural, one {invoke} other {invokes}} on the aspect",
+      "hit": "Deal a {shifts}-shift hit",
+      "hitWithBoost": "Or deal a {shifts}-shift hit and gain a boost",
+      "takeHit": "Take a {shifts}-shift hit"
+    },
+    "claim": {
+      "takeBoost": "Take the boost",
+      "takeInvokes": "Take {count} free {count, plural, one {invoke} other {invokes}}",
+      "boostText": "The boost",
+      "aspectText": "The new aspect",
+      "which": "On which aspect",
+      "option": "{kind}: {name}",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    },
+    "table": {
+      "title": "Invoke at the table",
+      "subtitle": "The table settles it: the payment, the +2 or reroll and the chat message go out together.",
+      "free": "Free invokes and boosts",
+      "paid": "Pay a fate point",
+      "payerWallet": "Paid from this character's fate points ({count} left)",
+      "payerPool": "Paid from the GM scene pool ({count} left)",
+      "noPayer": "No fate point source can pay",
+      "group": {
+        "own": "Own aspects and consequences",
+        "scene": "Scene and zone aspects",
+        "others": "Other characters' aspects and consequences"
+      },
+      "hostile": "Hostile invoke: they get a fate point when the scene ends",
+      "remaining": "{count} left",
+      "boost": "Boost · gone after one use",
+      "paidRepeat": "This roll already paid for this aspect.",
+      "noPoints": "Not enough fate points.",
+      "gmAudience": "A GM-only roll: payments others would notice and public free invokes cannot be used.",
+      "note": "On confirm the table settles it at once and posts a new roll message to the same audience; the original message is not changed.",
+      "unknownAspect": "An aspect you cannot read",
+      "delivery": "This roll is at the table: invokes are settled there with their payment.",
+      "revisionPosted": "The table settled this invoke and posted it.",
+      "noClaim": "At the table, the GM hands out boosts and free invokes on the scene board.",
+      "scaleSkipped": "The table totals the roll as rolled; an after-roll scale effect is not included.",
+      "confirmAgain": "Confirm again (resends the same operation; never charges twice)",
+      "failure": {
+        "forbidden": "The table refused: you may not do that.",
+        "not_found": "The roll or the aspect is gone or out of sight.",
+        "conflict": "The table changed (the scene ended, the result moved on or the rules are off). Nothing was charged.",
+        "invalid": "The table did not accept it (already paid, not enough points or a GM-only roll). Nothing was charged.",
+        "unavailable": "Connection lost; the outcome is unconfirmed. Confirm again; it never charges twice.",
+        "audience": "The table takes rolls for everyone or for the GM only. Choose another audience.",
+        "readOnly": "The table keeps this copy but cannot be reached: view only, no rolls or invokes.",
+        "busy": "The last action is still running.",
+        "noRoll": "No roll to invoke on yet.",
+        "settled": "This roll's result is settled.",
+        "editMode": "Switch to play mode to invoke.",
+        "abandoned": "Stopped waiting: if the roll did reach the table, chat shows it, but this sheet does not keep it."
+      },
+      "actions": {
+        "loading": "Reading the table…",
+        "unavailable": "The table is out of reach: fate points and invokes are view only.",
+        "retry": "Read again",
+        "scene": "Scene {ordinal}: {title}",
+        "untitled": "Untitled",
+        "noScene": "No scene is open",
+        "wallet": "Fate points at the table: {count}",
+        "handIn": "Hand in to the GM pool",
+        "handInAmount": "Points",
+        "confirming": "Confirming…",
+        "failed": {
+          "forbidden": "You may not hand in points.",
+          "not_found": "No table fate points for this character.",
+          "conflict": "The table changed; nothing was handed in.",
+          "invalid": "Not enough points or a wrong amount; nothing was handed in."
+        },
+        "sceneClosed": "Scene {ordinal} “{title}” ended: press Scene end on the sheet to clear stress.",
+        "dismiss": "Got it",
+        "handInRetry": "Confirm again",
+        "handInConfirming": "Unconfirmed; resending the same operation…"
+      },
+      "othersAspect": "{name}: {text}",
+      "rootPending": "Whether this roll reached the table is unknown. Confirm again resends the same operation; it never rolls twice.",
+      "rootConfirm": "Confirm again",
+      "rootAbandon": "Stop waiting"
+    }
+  }
+}

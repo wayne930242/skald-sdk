@@ -1,0 +1,260 @@
+{
+  "referenceUi": {
+    "kind": {
+      "creature": "生物",
+      "table": "表格",
+      "chapter": "章節"
+    },
+    "tag": {
+      "attackRoll": "{value, select, m {近戰攻擊檢定：} r {遠程攻擊檢定：} other {近戰或遠程攻擊檢定：}}",
+      "spellAttack": "加值等於你的法術攻擊調整值",
+      "saveFailNth": "{value, select, 1 {第一次失敗：} 2 {第二次失敗：} other {第三次失敗：}}",
+      "saveFailBy": "低於 DC {value} 以上：",
+      "saveSuccessOrFail": "失敗或成功：",
+      "hitOrMiss": "命中或未命中："
+    },
+    "overlay": {
+      "badge": "原文（內容包）",
+      "source": {
+        "xphb": "出處：《玩家手冊》（2024）",
+        "xmm": "出處：2024 年版怪物書（XMM）",
+        "xdmg": "出處：2024 年版城主指南（XDMG）"
+      },
+      "showSrd": "顯示 SRD 版本",
+      "lore": "背景故事",
+      "habitat": "棲息地",
+      "treasure": "寶藏"
+    },
+    "statBlock": {
+      "ac": "護甲等級",
+      "initiative": "先攻",
+      "hp": "生命值",
+      "speed": "速度",
+      "mod": "調整值",
+      "save": "豁免",
+      "skills": "技能",
+      "gear": "裝備",
+      "resistances": "抗性",
+      "vulnerabilities": "易傷",
+      "immunities": "免疫",
+      "senses": "感官",
+      "passive": "被動睿知（感知） {value}",
+      "languages": "語言",
+      "none": "無",
+      "cr": "挑戰等級",
+      "crLine": "{cr}（經驗值 {xp}；熟練加值 {pb}）",
+      "crLineLair": "{cr}（經驗值 {xp}，巢穴內為 {xpLair}；熟練加值 {pb}）",
+      "crSummon": "無（經驗值 0；熟練加值 {pb}）",
+      "pbYours": "等於你的熟練加值",
+      "yourChoice": "{choice}（由你選擇）",
+      "feet": "{value}呎",
+      "hover": "（懸浮）",
+      "errata": "SRD 勘誤，第 {page} 頁",
+      "section": {
+        "trait": "特性",
+        "action": "動作",
+        "bonus": "附贈動作",
+        "reaction": "反應",
+        "legendary": "傳奇動作"
+      },
+      "size": {
+        "T": "微型",
+        "S": "小型",
+        "M": "中型",
+        "L": "大型",
+        "H": "巨型",
+        "G": "超巨型"
+      },
+      "type": {
+        "aberration": "異怪",
+        "beast": "野獸",
+        "celestial": "天界生物",
+        "construct": "構裝生物",
+        "dragon": "龍類",
+        "elemental": "元素生物",
+        "fey": "精類",
+        "fiend": "邪魔",
+        "giant": "巨人",
+        "humanoid": "類人生物",
+        "monstrosity": "怪獸",
+        "ooze": "泥形生物",
+        "plant": "植物",
+        "undead": "不死生物"
+      },
+      "swarm": "{size}叢集（{swarmSize}{type}）",
+      "swarmType": {
+        "beast": "野獸",
+        "undead": "不死生物"
+      },
+      "creatureTag": {
+        "angel": "天使",
+        "chromatic": "彩色龍",
+        "cleric": "牧師",
+        "demon": "惡魔",
+        "devil": "魔鬼",
+        "dinosaur": "恐龍",
+        "druid": "德魯伊",
+        "genie": "巨靈",
+        "goblinoid": "類地精",
+        "lycanthrope": "獸化人",
+        "metallic": "金屬龍",
+        "titan": "泰坦",
+        "wizard": "法師"
+      },
+      "alignment": {
+        "U": "無陣營",
+        "N": "中立",
+        "LG": "守序善良",
+        "NG": "中立善良",
+        "CG": "混亂善良",
+        "LN": "守序中立",
+        "CN": "混亂中立",
+        "LE": "守序邪惡",
+        "NE": "中立邪惡",
+        "CE": "混亂邪惡",
+        "A": "任意陣營"
+      },
+      "speedMode": {
+        "burrow": "掘穴",
+        "climb": "攀爬",
+        "fly": "飛行",
+        "swim": "游泳"
+      },
+      "sense": {
+        "blindsight": "盲視",
+        "darkvision": "黑暗視覺",
+        "tremorsense": "震顫感知",
+        "truesight": "真實視覺"
+      },
+      "damage": {
+        "acid": "強酸",
+        "bludgeoning": "鈍擊",
+        "cold": "寒冷",
+        "fire": "火焰",
+        "force": "力場",
+        "lightning": "閃電",
+        "necrotic": "黯蝕",
+        "piercing": "穿刺",
+        "poison": "毒素",
+        "psychic": "心靈",
+        "radiant": "光耀",
+        "slashing": "揮砍",
+        "thunder": "雷鳴"
+      },
+      "subtitle": "{type}，{alignment}",
+      "sizedType": "{size}{type}",
+      "sep": "，",
+      "modeSpeed": "{mode} {speed}",
+      "ability": {
+        "str": "力量",
+        "dex": "敏捷",
+        "con": "體質",
+        "int": "智力",
+        "wis": "睿知",
+        "cha": "魅力"
+      }
+    },
+    "item": {
+      "category": {
+        "Armor": "護甲",
+        "Potion": "藥水",
+        "Ring": "戒指",
+        "Rod": "權杖",
+        "Scroll": "卷軸",
+        "Staff": "法杖",
+        "Wand": "魔杖",
+        "Weapon": "武器",
+        "Wondrous Item": "奇物",
+        "Poison": "毒藥"
+      },
+      "rarity": {
+        "common": "普通",
+        "uncommon": "非普通",
+        "rare": "稀有",
+        "very rare": "極稀有",
+        "legendary": "傳奇",
+        "artifact": "神器",
+        "varies": "稀有度不定",
+        "none": "非魔法"
+      },
+      "attunement": "需要同調",
+      "attunementBy": "須{by}同調",
+      "variantOf": "原型：",
+      "any": "任一{list}",
+      "except": "{list}，{item}除外",
+      "anyGroup": {
+        "simple-or-martial": "簡易或軍用武器",
+        "light-medium-or-heavy": "輕甲、中甲或重甲",
+        "medium-or-heavy": "中甲或重甲",
+        "ammunition": "彈藥",
+        "melee-weapon": "近戰武器"
+      },
+      "withDetail": "{category}（{detail}）",
+      "line": "{type}，{rarity}",
+      "withAttunement": "{line}（{attunement}）",
+      "by": {
+        "by-a-spellcaster": "由施法者",
+        "by-a-sorcerer-warlock-or-wizard": "由術士、契術師或法師",
+        "by-a-bard-cleric-druid-sorcerer-warlock-or-wizard": "由吟遊詩人、牧師、德魯伊、術士、契術師或法師",
+        "by-a-druid-sorcerer-warlock-or-wizard": "由德魯伊、術士、契術師或法師",
+        "by-a-wizard": "由法師",
+        "by-a-paladin": "由聖武士",
+        "by-a-cleric-druid-or-paladin": "由牧師、德魯伊或聖武士",
+        "by-a-bard-cleric-or-druid": "由吟遊詩人、牧師或德魯伊",
+        "by-a-druid": "由德魯伊",
+        "by-a-cleric-or-paladin": "由牧師或聖武士",
+        "by-a-dwarf-or-a-creature-attuned-to-a-item-belt-of-dwarvenkind-xdmg": "由矮人或已與矮人腰帶同調的生物"
+      }
+    },
+    "monsters": {
+      "tab": "怪物",
+      "search": "搜尋怪物",
+      "maxCr": "挑戰等級上限",
+      "anyCr": "不限挑戰等級",
+      "type": "類型",
+      "allTypes": "所有類型",
+      "size": "體型",
+      "allSizes": "所有體型",
+      "count": "{count} 種生物",
+      "empty": "無符合的生物",
+      "wildShape": "瀏覽荒野形態可選的野獸"
+    },
+    "magicItems": {
+      "tab": "魔法物品",
+      "search": "搜尋魔法物品",
+      "category": "類別",
+      "allCategories": "所有類別",
+      "rarity": "稀有度",
+      "allRarities": "所有稀有度",
+      "attunement": "同調",
+      "anyAttunement": "不限同調",
+      "attunes": "需要同調",
+      "noAttunement": "不需同調",
+      "count": "{count} 件物品",
+      "empty": "無符合的魔法物品"
+    },
+    "books": {
+      "tab": "書籍",
+      "srd": "SRD 5.2.1",
+      "dmg": "《城主指南》（2024）",
+      "phb": "《玩家手冊》（2024）",
+      "contents": "目錄",
+      "filter": "篩選章節",
+      "empty": "無符合的章節",
+      "loading": "載入中…",
+      "open": "開啟閱讀器"
+    },
+    "refList": {
+      "filter": "篩選清單",
+      "count": "{count} 筆條目"
+    },
+    "compendium": {
+      "featureLevel": "{level} 級"
+    },
+    "packFrom": "內容包：{name}",
+    "packNames": {
+      "xdmg-extras": "XDMG 擴充內容",
+      "xphb-extras": "XPHB 擴充內容"
+    }
+  }
+}

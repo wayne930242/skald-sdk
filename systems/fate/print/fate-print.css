@@ -1,0 +1,245 @@
+.fate-print {
+  --fate-ink: #161616;
+  --fate-rule: #888;
+  --fate-rung: 16mm;
+  --fate-zero-pitch: 7.5mm;
+  --fate-note: 24mm;
+  --fate-left: calc((100% - 6mm) * 103 / 184);
+  color: var(--fate-ink);
+  font-family: var(--font-sans), sans-serif;
+  font-size: 3.5mm;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.fate-print[data-paper="letter"] {
+  --fate-rung: 13mm;
+  --fate-zero-pitch: 6mm;
+  --fate-note: 21mm;
+}
+
+.fate-print[data-compact="true"] {
+  --fate-rung: 10mm;
+  --fate-zero-pitch: 5.5mm;
+  font-size: 3.1mm;
+}
+
+.fate-print :is(p, h1, h2, h3, dl, dd, ul) { margin: 0; padding: 0; }
+.fate-print small { font-size: 2.5mm; }
+
+.fate-print-page {
+  print-color-adjust: exact;
+}
+
+.fate-print-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3mm;
+  height: 100%;
+  overflow: hidden;
+}
+.fate-print-page[data-clipped="true"] .fate-print-content { height: calc(100% - 8mm); }
+.fate-print .fate-print-overflow {
+  position: absolute;
+  inset: auto 0 var(--pk-footer-band);
+  min-height: 5mm;
+  border-top: .25mm solid var(--fate-rule);
+  padding-top: 1mm;
+  background: #fff;
+  font-size: 2.6mm;
+}
+.fate-print .fate-print-overflow[data-footer="true"] {
+  inset-inline-end: auto;
+  width: var(--fate-left);
+  text-align: end;
+}
+
+@media screen {
+  .fate-print { width: max-content; margin: 0 auto; padding: 10mm; }
+  .fate-print .fate-print-portrait-status { margin: 0 0 12mm; color: var(--foreground); }
+}
+
+@media print {
+  .fate-print-portrait-status { display: none; }
+}
+
+.fate-print-header {
+  display: flex;
+  flex: none;
+  align-items: flex-start;
+  gap: 5mm;
+  min-height: 40mm;
+  padding-top: 2mm;
+}
+.fate-print-identity { flex: 1; min-width: 0; }
+.fate-print-header b, .fate-print-system { font-size: 2.5mm; color: #555; font-weight: 700; }
+.fate-print .fate-print-system { letter-spacing: .16mm; margin-bottom: 1.5mm; }
+.fate-print .fate-print-identity h1, .fate-print-name-line {
+  display: block;
+  min-height: 10mm;
+  border-bottom: .4mm solid var(--fate-ink);
+}
+.fate-print h1 { font-size: 8mm; font-weight: 800; line-height: 1.1; }
+.fate-print-bio { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 5fr); gap: 6mm; margin-top: 2mm; }
+.fate-print-bio p {
+  min-height: 5.8mm;
+  line-height: 5.8mm;
+  white-space: pre-wrap;
+  background: repeating-linear-gradient(to bottom, transparent 0 5.55mm, var(--fate-rule) 5.55mm 5.8mm);
+}
+.fate-print-bio .fate-print-description { min-height: 11.6mm; }
+.fate-print-portrait { display: block; width: 25mm; height: 37mm; object-fit: cover; filter: grayscale(1); }
+.fate-print-meter {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  flex: none;
+  width: 36mm;
+  height: 36mm;
+  margin-inline-end: 1.5mm;
+  border: .75mm solid var(--fate-ink);
+  border-radius: 50%;
+  overflow: hidden;
+  text-align: center;
+}
+.fate-print-meter > div { display: flex; flex-direction: column; align-items: center; gap: .6mm; padding-top: 2mm; }
+.fate-print-points { border-bottom: .4mm solid var(--fate-ink); }
+.fate-print-circles { display: flex; gap: 1.2mm; margin-top: auto; margin-bottom: 1.6mm; }
+.fate-print-circles.pk-track { --pk-rule-w: .35mm; --pk-ink: var(--fate-ink); gap: 1.2mm; }
+.fate-print-refresh { font-size: 8mm; font-weight: 750; line-height: 1; }
+
+.fate-print-columns {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 103fr) minmax(0, 81fr);
+  gap: 6mm;
+}
+.fate-print-columns::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 calc(var(--fate-left) + 2.75mm);
+  border-left: .5mm solid var(--fate-ink);
+}
+.fate-print-columns[data-full-width="true"] { grid-template-columns: minmax(0, 1fr); }
+.fate-print-columns[data-full-width="true"]::after { display: none; }
+.fate-print-columns[data-continued="true"] { margin-bottom: 5mm; }
+.fate-print-columns[data-continued="true"]::after { bottom: -5mm; }
+.fate-print-column { display: flex; flex-direction: column; min-width: 0; min-height: 0; padding-bottom: 2mm; }
+.fate-print-column > * { flex: none; }
+.fate-print .fate-print-banner {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5mm;
+  min-height: 7mm;
+  padding: .6mm 2.5mm .45mm;
+  background: var(--fate-ink);
+  color: white;
+  font-size: 4.4mm;
+  font-weight: 750;
+  clip-path: polygon(0 0, calc(100% - 2.5mm) 0, 100% 2.5mm, 100% 100%, 0 100%);
+}
+
+.fate-print-prose { white-space: pre-wrap; }
+.fate-print-line { border-bottom: .24mm solid var(--fate-rule); }
+.fate-print-aspect { display: flex; flex-direction: column; min-height: 15.4mm; padding-top: 2mm; }
+.fate-print-aspect dt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .4mm 2mm;
+  color: #555;
+  font-size: 2.5mm;
+  font-weight: 700;
+}
+.fate-print .fate-print-aspect dd { flex: 1; padding: 2mm 0 1.4mm; }
+.fate-print-aspect dd[data-long="true"] { font-size: 3.4mm; padding-block: .5mm; }
+.fate-print-aspect dd[data-secret="true"] { color: #666; }
+.fate-print-invokes { display: inline-flex; align-items: center; gap: .45mm; }
+.fate-print-box {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 7mm;
+  height: 7mm;
+  border: .45mm solid var(--fate-ink);
+  color: #555;
+  font-size: 3mm;
+  line-height: 1;
+}
+.fate-print-invokes > .pk-track { --pk-rule-w: .45mm; --pk-ink: var(--fate-ink); gap: inherit; }
+.fate-print-box[data-marked="true"] { color: var(--fate-ink); font-size: 8.5mm; line-height: .65; font-weight: 650; }
+.fate-print-box[data-optional="true"] { color: #777; border: .35mm dashed #999; }
+.fate-print .fate-print-stress { padding: 1.7mm 0 3mm; }
+.fate-print-track { display: flex; align-items: center; min-height: 10mm; }
+.fate-print-track dt { min-width: 11.3mm; padding-inline-end: 1mm; font-weight: 750; }
+.fate-print-boxes { display: flex; flex-wrap: wrap; gap: 1.4mm; }
+.fate-print .fate-print-injuries dl { padding: 1mm 0 4mm; }
+.fate-print-injury { display: grid; grid-template-columns: 7.5mm minmax(0, 1fr); gap: 3mm; min-height: 13.6mm; padding-top: 1.9mm; }
+.fate-print-injury .fate-print-box { width: 7.5mm; height: 8.6mm; color: var(--fate-ink); font-size: 4.8mm; }
+.fate-print-injury .fate-print-box[data-marked="true"] { font-size: 7mm; }
+.fate-print-injury-write { display: flex; flex-direction: column; }
+.fate-print-injury-write dt { color: #555; font-size: 2.5mm; font-weight: 700; }
+.fate-print .fate-print-injury-write dd { flex: 1; padding: 1.2mm 0; }
+.fate-print-injury[data-optional="true"] :is(dt, .fate-print-box) { color: #777; }
+.fate-print[data-compact="true"] .fate-print-injury { min-height: 10.5mm; padding-top: 1mm; }
+
+.fate-print-rung {
+  display: grid;
+  grid-template-columns: 14mm minmax(0, 1fr);
+  align-items: start;
+  min-height: var(--fate-rung);
+  padding: 3mm 0 2mm;
+  border-bottom: .23mm dashed #999;
+}
+.fate-print-rung:last-child { border-bottom: none; }
+.fate-print-rung dt { display: grid; align-content: start; gap: .45mm; }
+.fate-print-rung dt strong { font-size: 5.4mm; line-height: 1; font-weight: 750; }
+.fate-print-rung dt span { color: #555; font-size: 2.5mm; font-weight: 700; }
+.fate-print-skills { display: flex; flex-wrap: wrap; align-items: baseline; gap: 1mm 1.6mm; list-style: none; }
+.fate-print-skills li { min-width: 9.7mm; }
+.fate-print-skills .fate-print-line { width: 15mm; height: 4.8mm; }
+.fate-print-rung[data-fate-print-rung="0"] .fate-print-skills {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-auto-rows: minmax(var(--fate-zero-pitch), auto);
+  gap: 0;
+}
+.fate-print-rung[data-fate-print-rung="0"] .fate-print-skills li { min-width: 0; }
+.fate-print:lang(en) .fate-print-rung[data-fate-print-rung="0"] .fate-print-skills { grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 1mm; }
+
+.fate-print-stunts { display: flex; flex-direction: column; margin-top: 4mm; }
+.fate-print-stunts[data-pencil="true"] { flex: 1; min-height: 32mm; }
+.fate-print-stunt-lines { display: grid; flex: 1; grid-template-rows: repeat(3, 1fr); }
+.fate-print-stunt-lines > div:not(:last-child) { border-bottom: .24mm dashed #999; }
+.fate-print-stunt-lines > div::before {
+  content: "";
+  display: block;
+  width: 42mm;
+  height: 6mm;
+  border-bottom: .24mm solid var(--fate-rule);
+}
+.fate-print-accounting { padding: 1mm 0; color: #555; font-size: 2.5mm; font-weight: 700; }
+.fate-print-ledger-gap { display: inline-block; width: 7mm; border-bottom: .24mm solid var(--fate-rule); }
+.fate-print-stunt { padding: 2mm 0; border-bottom: .24mm dashed #999; }
+.fate-print-stunt-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 2mm; }
+.fate-print-stunt-heading h3 { font-weight: 750; }
+.fate-print-stunt-heading small { margin-left: auto; color: #555; }
+.fate-print-notes { margin-top: auto; padding-top: 3mm; }
+.fate-print-note { min-height: var(--fate-note); }
+.fate-print .fate-print-note h2 { border-bottom: .45mm solid var(--fate-ink); font-weight: 750; }
+.fate-print .fate-print-note p { padding: 1.6mm 0 2mm; }
+.fate-print-continuation {
+  display: flex;
+  align-items: baseline;
+  gap: 2.5mm;
+  margin-top: 3mm;
+  padding-bottom: 1mm;
+  border-bottom: .4mm solid var(--fate-ink);
+}
+.fate-print-continuation b { font-size: 5mm; }
+.fate-print-continuation span { font-size: 2.6mm; color: #555; }
+.fate-print-page[data-continuation] .fate-print-stunts { margin-top: 0; }
+.fate-print-page[data-continuation] .fate-print-stunts + .fate-print-note { margin-top: 5mm; }

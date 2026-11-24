@@ -1,0 +1,163 @@
+{
+  "system": {
+    "name": "Fate Condensed",
+    "description": "Fate Condensed is a narrative-focused tabletop RPG where players define characters through aspects, skills, and stunts, using Fate dice to determine action outcomes."
+  },
+  "era": {
+    "universal": "Universal (All Settings)"
+  },
+  "panel": {
+    "title": "Character Settings"
+  },
+  "section": {
+    "dice": "Dice",
+    "tools": "Tools",
+    "aspects": "Aspects",
+    "stunts": "Stunts",
+    "skills": "Skills",
+    "vitality": "Vitality",
+    "stress": "Stress",
+    "consequences": "Consequences",
+    "notes": "Notes / Extras"
+  },
+  "toolbar": {
+    "editMode": "Edit",
+    "playMode": "Play"
+  },
+  "info": {
+    "fateRoll": "Fate Roll: Roll 4dF + skill value, compare vs difficulty"
+  },
+  "field": {
+    "name": "Name",
+    "player": "Player",
+    "description": "Description",
+    "portrait": "Portrait",
+    "aspects": "Aspects",
+    "highConcept": "High Concept",
+    "trouble": "Trouble",
+    "relationship": "Relationship",
+    "freeAspect": "Free Aspect",
+    "refresh": "Refresh",
+    "fatePoints": "Fate Points",
+    "skills": "Skills",
+    "physicalStress": "Physical Stress",
+    "mentalStress": "Mental Stress",
+    "mildConsequence": "Mild (2)",
+    "moderateConsequence": "Moderate (4)",
+    "severeConsequence": "Severe (6)",
+    "extraMildConsequence": "Extra Mild (2)",
+    "legacyExtraMildNotice": "Unassigned extra mild (2): {injury}",
+    "legacyExtraMildConsequence": "Unassigned extra mild (2)",
+    "stunts": "Stunts",
+    "extras": "Extras",
+    "notes": "Notes",
+    "resetCharacter": "Reset Character"
+  },
+  "aspect": {
+    "new": "New Aspect",
+    "add": "Add Aspect",
+    "highConcept": "High Concept",
+    "trouble": "Trouble",
+    "relationship": "Relationship",
+    "free": "Free Aspect",
+    "situation": "Situation Aspect",
+    "boost": "Boost",
+    "legacyConflict": "An older value is still saved for this aspect: {text}"
+  },
+  "stress": {
+    "markPair": "{previous}, {mark}",
+    "inactive": "Marks outside current capacity: {marks}"
+  },
+  "stunt": {
+    "type": {
+      "bonus": "Bonus",
+      "ruleChange": "Rule Change",
+      "custom": "Custom"
+    },
+    "template": {
+      "because": "Because I ",
+      "whenIUse": "when I use ",
+      "toPerform": " to ",
+      "when": ", in ",
+      "getBonus": " situations I get +2",
+      "iCan": "I can ",
+      "butOnly": "but only "
+    },
+    "free": "free",
+    "add": "Add Stunt",
+    "empty": "No stunts yet",
+    "refreshCost": "{count}/{free} free, Refresh -{cost}",
+    "placeholder": "Stunt {index}"
+  },
+  "skill": {
+    "newSkill": "New Skill",
+    "add": "Add Skill",
+    "academics": "Academics",
+    "athletics": "Athletics",
+    "burglary": "Burglary",
+    "contacts": "Contacts",
+    "crafts": "Crafts",
+    "deceive": "Deceive",
+    "drive": "Drive",
+    "empathy": "Empathy",
+    "fight": "Fight",
+    "investigate": "Investigate",
+    "lore": "Lore",
+    "notice": "Notice",
+    "physique": "Physique",
+    "physiqueLinkedTo": "Linked: Physical Stress, Extra Mild Consequence",
+    "provoke": "Provoke",
+    "rapport": "Rapport",
+    "resources": "Resources",
+    "shoot": "Shoot",
+    "stealth": "Stealth",
+    "will": "Will",
+    "willLinkedTo": "Linked: Mental Stress, Extra Mild Consequence"
+  },
+  "reset": {
+    "confirmTitle": "Reset character?",
+    "confirmDescription": "This will clear all character data. This action cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Reset"
+  },
+  "ladder": {
+    "-4": "Horrifying (-4)",
+    "-3": "Catastrophic (-3)",
+    "-2": "Terrible (-2)",
+    "-1": "Poor (-1)",
+    "0": "Mediocre (+0)",
+    "1": "Average (+1)",
+    "2": "Fair (+2)",
+    "3": "Good (+3)",
+    "4": "Great (+4)",
+    "5": "Superb (+5)",
+    "6": "Fantastic (+6)",
+    "7": "Epic (+7)",
+    "8": "Legendary (+8)"
+  },
+  "roll": {
+    "successWithStyle": "Success with Style",
+    "success": "Success",
+    "tie": "Tie",
+    "failure": "Failure"
+  },
+  "action": {
+    "overcome": "Overcome",
+    "createAdvantage": "Create Advantage",
+    "attack": "Attack",
+    "defend": "Defend"
+  },
+  "difficulty": {
+    "terrible": "Terrible (-2)",
+    "poor": "Poor (-1)",
+    "mediocre": "Mediocre (+0)",
+    "average": "Average (+1)",
+    "fair": "Fair (+2)",
+    "good": "Good (+3)",
+    "great": "Great (+4)",
+    "superb": "Superb (+5)",
+    "fantastic": "Fantastic (+6)",
+    "epic": "Epic (+7)",
+    "legendary": "Legendary (+8)"
+  }
+}

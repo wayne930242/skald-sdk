@@ -1,0 +1,198 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "skald/roll-rules/v1",
+  "title": "Skald Roll Rules",
+  "description": "Schema for user-defined roll rules and success levels",
+  "type": "object",
+  "required": ["rules"],
+  "properties": {
+    "default": {
+      "type": "string",
+      "description": "Default rule set to use"
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          { "$ref": "#/definitions/rollUnderRule" },
+          { "$ref": "#/definitions/rollOverRule" },
+          { "$ref": "#/definitions/comparisonRule" }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "successLevel": {
+      "type": "object",
+      "required": ["id", "label", "condition"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "condition": { "type": "string", "pattern": "^\\{\\{.*\\}\\}$" },
+        "style": {
+          "type": "string",
+          "enum": ["critical", "success", "partial", "failure", "fumble"]
+        }
+      }
+    },
+    "rollUnderRule": {
+      "type": "object",
+      "required": ["type", "dice", "successLevels"],
+      "properties": {
+        "type": { "const": "roll-under" },
+        "dice": { "type": "string" },
+        "successLevels": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/successLevel" },
+          "minItems": 1
+        },
+        "postRollActions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/postRollAction" }
+        }
+      }
+    },
+    "rollOverRule": {
+      "type": "object",
+      "required": ["type", "dice", "successLevels"],
+      "properties": {
+        "type": { "const": "roll-over" },
+        "dice": { "type": "string" },
+        "totalRollDice": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[1-9][0-9]*d([1-9][0-9]*|[Ff])(?:k[hl][1-9][0-9]*)?$" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "modifier": { "type": "string" },
+        "successLevels": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/successLevel" },
+          "minItems": 1
+        },
+        "postRollActions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/postRollAction" }
+        }
+      }
+    },
+    "comparisonRule": {
+      "type": "object",
+      "required": ["type", "dice", "comparison", "target"],
+      "properties": {
+        "type": { "const": "comparison" },
+        "dice": { "type": "string" },
+        "modifier": { "type": "string" },
+        "comparison": { "type": "string", "enum": ["<", ">", "<=", ">=", "="] },
+        "target": { "type": "string" },
+        "postRollActions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/postRollAction" }
+        }
+      }
+    },
+    "formula": { "type": "string", "pattern": "^\\{\\{.*\\}\\}$" },
+    "idList": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "postRollAction": {
+      "description": "What a roll can do once it is on the table. Systems that declare none get no post-roll UI.",
+      "oneOf": [
+        { "$ref": "#/definitions/rerollAction" },
+        { "$ref": "#/definitions/spendAction" },
+        { "$ref": "#/definitions/improveAction" }
+      ]
+    },
+    "rerollAction": {
+      "type": "object",
+      "required": ["id", "kind", "when"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "kind": { "const": "reroll" },
+        "when": {
+          "$ref": "#/definitions/idList",
+          "description": "Success level ids after which the roll may be re-rolled"
+        },
+        "once": {
+          "type": "boolean",
+          "description": "At most once per roll (default true)"
+        },
+        "notFor": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Roll keys (field or row ids) this never applies to; a trailing * matches every key with that prefix (e.g. fighting:*); a group:* pattern also matches the group id itself and its numbered blank slots (fighting, fighting[1])"
+        }
+      }
+    },
+    "spendAction": {
+      "type": "object",
+      "required": ["id", "kind", "resource", "cost", "ladder", "levels"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "kind": { "const": "spend" },
+        "resource": {
+          "type": "string",
+          "description": "Character data path of the resource, e.g. luck.current"
+        },
+        "fallback": {
+          "type": "string",
+          "description": "Path read when the resource was never stored"
+        },
+        "cost": {
+          "const": "toThreshold",
+          "description": "Effective roll minus the threshold of the level bought"
+        },
+        "ladder": {
+          "$ref": "#/definitions/idList",
+          "description": "Success level ids, weakest to strongest"
+        },
+        "levels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "threshold"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string" },
+              "threshold": { "$ref": "#/definitions/formula" }
+            }
+          }
+        },
+        "notFrom": { "type": "array", "items": { "type": "string" } },
+        "notAfter": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Ids of other actions that rule this one out once used"
+        },
+        "notFor": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "improveAction": {
+      "type": "object",
+      "required": ["id", "kind", "levels"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "kind": { "const": "improve" },
+        "levels": {
+          "$ref": "#/definitions/idList",
+          "description": "Success level ids that earn an improvement tick"
+        },
+        "excludeBonus": {
+          "type": "boolean",
+          "description": "No tick when a bonus die was rolled"
+        },
+        "excludePushed": {
+          "type": "boolean",
+          "description": "No tick on a pushed roll"
+        },
+        "notFor": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

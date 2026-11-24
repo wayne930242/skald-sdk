@@ -1,0 +1,55 @@
+{
+  "resources": [
+    { "name": "empty card: the default refresh, and the balance defaults to it", "data": {}, "fatePoints": 3, "refresh": 3 },
+    { "name": "saved balance and default legacy refresh", "data": { "fatePoints": 2, "refresh": 3 }, "fatePoints": 2, "refresh": 3 },
+    { "name": "an explicit zero is kept", "data": { "fatePoints": 0 }, "fatePoints": 0, "refresh": 3 },
+    { "name": "legacy nondefault refresh is the effective refresh", "data": { "refresh": 2 }, "fatePoints": 2, "refresh": 2 },
+    { "name": "legacy default refresh is no override", "data": { "refresh": 3, "fatePoints": 1 }, "fatePoints": 1, "refresh": 3 },
+    { "name": "v2 accounting: base plus earned", "data": { "fatePoints": 0, "fateV2": { "refresh": { "base": 3, "earned": 1 } } }, "fatePoints": 0, "refresh": 4 },
+    { "name": "v2 override wins and ends the legacy field", "data": { "refresh": 2, "fateV2": { "refresh": { "base": 3, "earned": 0, "override": 5 } } }, "fatePoints": 5, "refresh": 5 },
+    { "name": "a present v2 refresh (even null) ends the legacy override", "data": { "refresh": 2, "fateV2": { "refresh": null } }, "fatePoints": 3, "refresh": 3 },
+    {
+      "name": "each nonblank stunt past three costs one refresh",
+      "data": { "stunts": { "stunts": [
+        { "id": "s1", "type": "custom", "customText": "One" },
+        { "id": "s2", "type": "bonus", "quality": "Two" },
+        { "id": "s3", "type": "rule-change", "effect": "Three" },
+        { "id": "s4", "type": "custom", "because": "Four" }
+      ] } },
+      "fatePoints": 2,
+      "refresh": 2
+    },
+    {
+      "name": "blank (including ideographic space) and malformed stunts are free",
+      "data": { "stunts": { "stunts": [
+        { "id": "s1", "type": "custom", "customText": "One" },
+        { "id": "s2", "type": "custom", "customText": "Two" },
+        { "id": "s3", "type": "custom", "customText": "Three" },
+        { "id": "s4", "type": "custom", "customText": " 　 " },
+        { "id": "s5", "type": "weird", "customText": "Five" },
+        { "id": " ", "type": "custom", "customText": "Six" },
+        { "type": "custom", "customText": "Seven" },
+        "not a stunt"
+      ] } },
+      "fatePoints": 3,
+      "refresh": 3
+    },
+    {
+      "name": "the refresh never drops below one",
+      "data": { "fateV2": { "refresh": { "base": 1 } }, "stunts": { "stunts": [
+        { "id": "s1", "type": "custom", "customText": "a" },
+        { "id": "s2", "type": "custom", "customText": "b" },
+        { "id": "s3", "type": "custom", "customText": "c" },
+        { "id": "s4", "type": "custom", "customText": "d" },
+        { "id": "s5", "type": "custom", "customText": "e" }
+      ] } },
+      "fatePoints": 1,
+      "refresh": 1
+    },
+    { "name": "a negative balance is not a balance", "data": { "fatePoints": -1 }, "fatePoints": 3, "refresh": 3 },
+    { "name": "a fractional balance is not a balance", "data": { "fatePoints": 1.5 }, "fatePoints": 3, "refresh": 3 },
+    { "name": "a string balance is not a balance", "data": { "fatePoints": "2" }, "fatePoints": 3, "refresh": 3 },
+    { "name": "an array stunts field holds no stunts", "data": { "stunts": [{ "id": "s1", "type": "custom", "customText": "x" }] }, "fatePoints": 3, "refresh": 3 },
+    { "name": "a zero base is not a base", "data": { "fateV2": { "refresh": { "base": 0, "earned": 2 } } }, "fatePoints": 5, "refresh": 5 }
+  ]
+}

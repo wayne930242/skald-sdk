@@ -1,0 +1,18 @@
+/*
+ * The previewer's styles: the sheet SDK first, then Tailwind's sources (every directory with sheet
+ * code) and the fonts the SDK's theme reads. The previewer loads no web fonts, so it builds offline.
+ */
+@import "@skald/sheet-sdk/styles.css";
+
+@source "../../../packages";
+@source "../../../systems";
+@source "..";
+
+:root {
+  --font-instrument-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-instrument-serif: ui-serif, Georgia, serif;
+  --font-noto-sans-tc: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  --font-noto-serif-tc: "Noto Serif TC", "PMingLiU", serif;
+  --font-cormorant: ui-serif, Georgia, serif;
+  --font-geist-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}

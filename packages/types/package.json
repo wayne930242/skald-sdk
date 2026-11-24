@@ -1,0 +1,22 @@
+{
+  "name": "@skald/types",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "main": "./src/public.ts",
+  "types": "./src/public.ts",
+  "exports": {
+    ".": "./src/public.ts",
+    "./schema": "./src/schema.ts",
+    "./schemas": "./src/schemas/index.ts",
+    "./character": "./src/character.ts",
+    "./system": "./src/system.ts",
+    "./template-migration": "./src/template-migration.ts",
+    "./action-schema": "./src/action-schema.ts",
+    "./wizard": "./src/wizard.ts"
+  },
+  "dependencies": {
+    "@skald/dice": "workspace:*",
+    "valibot": "1.2.0"
+  }
+}

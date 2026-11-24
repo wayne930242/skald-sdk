@@ -1,0 +1,69 @@
+{
+  "presets": { "condensed-standard": "濃縮版標準" },
+  "recipes": {
+    "skills": "技能表",
+    "shape": "配點形狀",
+    "approaches": "取向",
+    "unified": "合軌壓力",
+    "conditions": "條件",
+    "extreme": "極端後果",
+    "gear": "武器、護甲與規模"
+  },
+  "skillLists": {
+    "condensed": "濃縮版",
+    "core": "核心",
+    "short-actions": "行動",
+    "short-approaches": "取向",
+    "short-aptitudes": "資質",
+    "short-attributes": "屬性",
+    "short-relationships": "關係",
+    "short-roles": "角色",
+    "short-themes": "主題",
+    "short-values": "價值"
+  },
+  "skills": {
+    "actions-endure": "忍耐", "actions-fight": "戰鬥", "actions-know": "知曉", "actions-move": "移動", "actions-notice": "覺察",
+    "actions-pilot": "駕駛", "actions-sneak": "隱匿", "actions-speak": "說話", "actions-tinker": "修補",
+    "approach-careful": "謹慎", "approach-clever": "機智", "approach-flashy": "華麗", "approach-forceful": "猛力",
+    "approach-quick": "迅捷", "approach-sneaky": "詭祕",
+    "aptitudes-athletics": "運動", "aptitudes-combat": "戰鬥", "aptitudes-leadership": "領導",
+    "aptitudes-scholarship": "學術", "aptitudes-subterfuge": "偽造",
+    "attributes-strength": "力量", "attributes-dexterity": "敏捷", "attributes-toughness": "堅韌",
+    "attributes-intelligence": "智力", "attributes-charm": "魅力",
+    "relationships-leading": "領導", "relationships-partnering": "合作", "relationships-supporting": "支持",
+    "relationships-solo": "單幹",
+    "roles-driver": "司機", "roles-hitter": "打擊手", "roles-hacker": "駭客", "roles-gearhead": "黑手",
+    "roles-grifter": "偷竊者", "roles-thief": "小偷", "roles-mastermind": "智囊",
+    "themes-air": "空氣", "themes-fire": "火", "themes-metal": "金屬", "themes-mind": "心靈", "themes-stone": "石",
+    "themes-void": "虛空", "themes-water": "水", "themes-wind": "風", "themes-wood": "木",
+    "values-duty": "責任", "values-glory": "榮耀", "values-justice": "正義", "values-love": "愛", "values-power": "權力",
+    "values-safety": "安全", "values-truth": "真理", "values-vengeance": "復仇"
+  },
+  "allocations": {
+    "pyramid": "金字塔",
+    "diamond": "菱形",
+    "fae": "取向起始（+3/+2/+2/+1/+1/+0）",
+    "point-buy": "點數購買"
+  },
+  "stress": { "split": "分軌", "unified": "合軌" },
+  "tracks": { "physical": "物理", "mental": "心靈", "unified": "壓力" },
+  "injuryModels": { "consequences": "後果", "conditions": "條件", "conditions-separate": "條件（分開）" },
+  "slots": {
+    "mild": "輕微", "moderate": "中度", "severe": "嚴重",
+    "extraMild-physical": "額外輕微（物理）", "extraMild-mental": "額外輕微（心靈）", "extreme": "極端"
+  },
+  "conditions": {
+    "hurt": "輕傷", "scared": "驚嚇", "injured": "受傷", "shaken": "動搖", "wounded": "重傷", "demoralized": "喪氣"
+  },
+  "extreme": { "off": "不使用", "srd": "極端後果" },
+  "ratings": { "off": "不使用", "srd": "武器與護甲等級" },
+  "scale": { "off": "不使用", "srd": "規模" },
+  "scaleTiers": {
+    "mundane": "世俗", "supernatural": "超自然", "otherworldly": "異界", "legendary": "傳奇", "godlike": "似神"
+  },
+  "scaleModes": {
+    "beforeRoll": "擲骰前每差一級 +1",
+    "afterSuccess": "擲骰成功後每差一級 +2",
+    "freeInvokes": "成功創造優勢時每差一級多 1 個免費援引"
+  }
+}

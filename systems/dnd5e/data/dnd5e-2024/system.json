@@ -1,0 +1,41 @@
+{
+  "$schema": "../schemas/system.schema.json",
+  "id": "dnd5e-2024",
+  "name": "龍與地下城 第五版（2024）",
+  "version": "1.0.0",
+  "category": "neo-classic",
+  "defaultGenre": "neutral",
+  "description": "Dungeons & Dragons 5th Edition (2024) character sheets, SRD 5.2.1",
+  "author": "Skald",
+  "schema": "./schema.json",
+  "template": "./template.json",
+  "defaultData": "./default-data.json",
+  "sheetComponent": "dnd5e",
+  "dsl": {
+    "lookupTables": "./dsl-lookup-tables.json",
+    "rollRules": "./dsl-roll-rules.json",
+    "aliases": "./dsl-aliases.json",
+    "rollMacros": "./roll-macros.json"
+  },
+  "gameData": {
+    "classes": "./game/classes.json",
+    "backgrounds": "./game/backgrounds.json",
+    "species": "./game/species.json",
+    "lineages": "./game/lineages.json",
+    "feats": "./game/feats.json",
+    "class-options": "./game/class-options.json",
+    "invocations": "./game/invocations.json",
+    "spells": "./game/spells.json",
+    "weapons": "./game/weapons.json",
+    "tools": "./game/tools.json",
+    "languages": "./game/languages.json",
+    "equipment-packages": "./game/equipment-packages.json",
+    "skills": "./game/skills.json",
+    "ability-arrays": "./game/ability-arrays.json"
+  },
+  "wizard": "./wizard.json",
+  "i18n": {
+    "en": "./messages/en.json",
+    "zh-TW": "./messages/zh-TW.json"
+  }
+}

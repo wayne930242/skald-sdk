@@ -1,0 +1,33 @@
+{
+  "name": "Wren Halloway",
+  "player": "Previewer",
+  "description": "A courier who reads every letter she carries.",
+  "highConcept": "Sky-Courier of the Glass Archipelago",
+  "trouble": "Curiosity Opens Every Envelope",
+  "relationship": "I Owe the Harbourmaster My Wings",
+  "freeAspect1": "Never Lost Above the Clouds",
+  "freeAspect2": "Pockets Full of Other People's Secrets",
+  "refresh": 3,
+  "fatePoints": 3,
+  "skills": {
+    "skills": [
+      { "id": "athletics", "level": 4 },
+      { "id": "notice", "level": 3 },
+      { "id": "drive", "level": 3 },
+      { "id": "rapport", "level": 2 },
+      { "id": "stealth", "level": 2 },
+      { "id": "investigate", "level": 2 },
+      { "id": "physique", "level": 1 },
+      { "id": "will", "level": 1 },
+      { "id": "contacts", "level": 1 },
+      { "id": "shoot", "level": 1 }
+    ]
+  },
+  "stunts": {
+    "stunts": [
+      { "id": "tailwind", "type": "custom", "customText": "Tailwind: once per session, arrive anywhere above the clouds just in time." },
+      { "id": "eavesdrop", "type": "custom", "customText": "Eavesdropper: +2 to Notice when you overhear a conversation you should not." }
+    ]
+  },
+  "notes": "Sample character for the Skald sheet previewer. Every name is made up."
+}

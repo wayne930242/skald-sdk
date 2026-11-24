@@ -1,0 +1,256 @@
+{
+  "$schema": "../schemas/schema.schema.json",
+  "id": "fate-condensed-character",
+  "name": "命運濃縮版角色",
+  "version": "2.0.0",
+  "description": "Fate Condensed Character Sheet",
+  "author": "Skald",
+  "system": "fate-condensed",
+  "language": "zh-TW",
+  "tags": ["fate", "condensed", "narrative", "aspects"],
+
+  "fields": {
+    "name": {
+      "id": "name",
+      "type": "text",
+      "label": "{{i18n:field.name}}",
+      "required": true
+    },
+    "player": {
+      "id": "player",
+      "type": "text",
+      "label": "{{i18n:field.player}}"
+    },
+    "description": {
+      "id": "description",
+      "type": "text",
+      "label": "{{i18n:field.description}}",
+      "multiline": true,
+      "rows": 2
+    },
+    "portrait": {
+      "id": "portrait",
+      "type": "image",
+      "label": "{{i18n:field.portrait}}",
+      "aspectRatio": "1:1",
+      "allowUpload": true
+    },
+
+    "highConcept": {
+      "id": "highConcept",
+      "type": "text",
+      "label": "{{i18n:field.highConcept}}"
+    },
+    "trouble": {
+      "id": "trouble",
+      "type": "text",
+      "label": "{{i18n:field.trouble}}"
+    },
+    "relationship": {
+      "id": "relationship",
+      "type": "text",
+      "label": "{{i18n:field.relationship}}"
+    },
+    "freeAspect1": {
+      "id": "freeAspect1",
+      "type": "text",
+      "label": "{{i18n:field.freeAspect}}"
+    },
+    "freeAspect2": {
+      "id": "freeAspect2",
+      "type": "text",
+      "label": "{{i18n:field.freeAspect}}"
+    },
+
+    "aspects": {
+      "id": "aspects",
+      "type": "fate-aspect-list",
+      "label": "{{i18n:field.aspects}}",
+      "defaultAspects": [
+        { "id": "highConcept", "label": "{{i18n:aspect.highConcept}}" },
+        { "id": "trouble", "label": "{{i18n:aspect.trouble}}" },
+        { "id": "relationship", "label": "{{i18n:aspect.relationship}}" },
+        { "id": "freeAspect1", "label": "{{i18n:aspect.free}}" },
+        { "id": "freeAspect2", "label": "{{i18n:aspect.free}}" }
+      ],
+      "allowAdd": true,
+      "allowRemove": true,
+      "allowEditLabel": true
+    },
+
+    "refresh": {
+      "id": "refresh",
+      "type": "fate-refresh",
+      "label": "{{i18n:field.refresh}}",
+      "baseRefresh": 3,
+      "freeStunts": 3,
+      "stuntsField": "stunts"
+    },
+    "fatePoints": {
+      "id": "fatePoints",
+      "type": "number",
+      "label": "{{i18n:field.fatePoints}}",
+      "readonly": true,
+      "min": 0,
+      "max": 99,
+      "defaultValue": 3
+    },
+
+    "skills": {
+      "id": "skills",
+      "type": "fate-skill-pyramid",
+      "label": "{{i18n:field.skills}}",
+      "skillI18nPrefix": "skill",
+      "ladderI18nPrefix": "ladder",
+      "defaultSkills": [
+        { "id": "academics", "name": "學術" },
+        { "id": "athletics", "name": "運動" },
+        { "id": "burglary", "name": "盜竊" },
+        { "id": "contacts", "name": "人脈" },
+        { "id": "crafts", "name": "工匠" },
+        { "id": "deceive", "name": "欺瞞" },
+        { "id": "drive", "name": "駕駛" },
+        { "id": "empathy", "name": "同理" },
+        { "id": "fight", "name": "戰鬥" },
+        { "id": "investigate", "name": "調查" },
+        { "id": "lore", "name": "傳說" },
+        { "id": "notice", "name": "感知" },
+        { "id": "physique", "name": "體魄" },
+        { "id": "provoke", "name": "挑弄" },
+        { "id": "rapport", "name": "親善" },
+        { "id": "resources", "name": "資源" },
+        { "id": "shoot", "name": "射擊" },
+        { "id": "stealth", "name": "隱匿" },
+        { "id": "will", "name": "意志" }
+      ],
+      "pyramidConfig": {
+        "levels": [
+          { "level": 4, "count": 1 },
+          { "level": 3, "count": 2 },
+          { "level": 2, "count": 3 },
+          { "level": 1, "count": 4 }
+        ]
+      },
+      "linkedSkills": [
+        { "skillId": "physique", "linkedTo": "{{i18n:skill.physiqueLinkedTo}}" },
+        { "skillId": "will", "linkedTo": "{{i18n:skill.willLinkedTo}}" }
+      ],
+      "allowCustomSkills": true,
+      "minLevel": -4,
+      "maxLevel": 8
+    },
+
+    "physicalStress": {
+      "id": "physicalStress",
+      "type": "fate-stress-track",
+      "label": "{{i18n:field.physicalStress}}",
+      "skillPyramidField": "skills",
+      "linkedSkillId": "physique",
+      "baseBoxes": 3,
+      "bonusThresholds": [
+        { "skillLevel": 0, "totalBoxes": 3 },
+        { "skillLevel": 1, "totalBoxes": 4 },
+        { "skillLevel": 3, "totalBoxes": 6 }
+      ]
+    },
+    "mentalStress": {
+      "id": "mentalStress",
+      "type": "fate-stress-track",
+      "label": "{{i18n:field.mentalStress}}",
+      "skillPyramidField": "skills",
+      "linkedSkillId": "will",
+      "baseBoxes": 3,
+      "bonusThresholds": [
+        { "skillLevel": 0, "totalBoxes": 3 },
+        { "skillLevel": 1, "totalBoxes": 4 },
+        { "skillLevel": 3, "totalBoxes": 6 }
+      ]
+    },
+
+    "mildConsequence": {
+      "id": "mildConsequence",
+      "type": "text",
+      "label": "{{i18n:field.mildConsequence}}"
+    },
+    "moderateConsequence": {
+      "id": "moderateConsequence",
+      "type": "text",
+      "label": "{{i18n:field.moderateConsequence}}"
+    },
+    "severeConsequence": {
+      "id": "severeConsequence",
+      "type": "text",
+      "label": "{{i18n:field.severeConsequence}}"
+    },
+    "extraMildConsequence": {
+      "id": "extraMildConsequence",
+      "type": "text",
+      "label": "{{i18n:field.legacyExtraMildConsequence}}",
+      "readonly": true
+    },
+
+    "stunts": {
+      "id": "stunts",
+      "type": "fate-stunt-list",
+      "label": "{{i18n:field.stunts}}",
+      "skillPyramidField": "skills",
+      "refreshField": "refresh",
+      "freeStunts": 3,
+      "actions": ["overcome", "createAdvantage", "attack", "defend"]
+    },
+
+    "extras": {
+      "id": "extras",
+      "type": "text",
+      "label": "{{i18n:field.extras}}",
+      "multiline": true,
+      "rows": 4
+    },
+    "notes": {
+      "id": "notes",
+      "type": "text",
+      "label": "{{i18n:field.notes}}",
+      "multiline": true,
+      "rows": 4
+    },
+    "fateV2": {
+      "id": "fateV2",
+      "type": "object"
+    }
+  },
+
+  "editorConfig": {
+    "toolbar": {
+      "items": [
+        {
+          "type": "button",
+          "id": "toggleSetup",
+          "label": "{{i18n:toolbar.playMode}}",
+          "labelActive": "{{i18n:toolbar.editMode}}",
+          "icon": "Edit",
+          "action": "toggleEdit"
+        }
+      ]
+    },
+    "settingsPanel": {
+      "title": "{{i18n:panel.title}}",
+      "width": "320px",
+      "defaultOpen": false,
+      "sections": [
+        {
+          "id": "dice",
+          "title": "{{i18n:section.dice}}",
+          "icon": "Dices",
+          "defaultOpen": true,
+          "items": [
+            {
+              "type": "display",
+              "id": "diceInfo",
+              "template": "{{i18n:info.fateRoll}}"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

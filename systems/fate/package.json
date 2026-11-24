@@ -1,0 +1,30 @@
+{
+  "name": "@skald/system-fate",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "exports": {
+    "./*": "./*"
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@skald/dice": "workspace:*",
+    "@skald/sheet-sdk": "workspace:*",
+    "@skald/types": "workspace:*",
+    "lucide-react": "0.562.0",
+    "nanoid": "5.1.6",
+    "next": "16.1.3",
+    "next-intl": "4.8.1",
+    "react": "19.2.3",
+    "remark-gfm": "4.0.1",
+    "remark-parse": "11.0.0",
+    "sonner": "2.0.7",
+    "unified": "11.0.5",
+    "zustand": "5.0.10"
+  },
+  "devDependencies": {
+    "@types/mdast": "4.0.4"
+  }
+}

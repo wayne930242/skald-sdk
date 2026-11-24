@@ -1,0 +1,56 @@
+# Public CI (plan T11). Runs on GitHub's runners with a read-only token and no secrets; pull
+# requests from forks run as `pull_request`, never `pull_request_target`. The CLA check is the
+# cla-assistant.io app's `license/cla` status, not a workflow.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Typecheck, lint, test, previewer build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: 1.4.4
+      - run: bun install --frozen-lockfile
+      - run: bun run ci
+
+  protected-paths:
+    name: No generated or overlaid files
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: 1.4.4
+      # The check and its list (.github/protected-paths.json) are both read from the base branch, and
+      # the check runs from the runner's temp directory with .env files off, so the pull request's
+      # bunfig.toml, preload or .env cannot reach it. Editing this workflow still bypasses the job:
+      # the real gate is the maintainer's reading of the diff and oss:import. No install needed.
+      - name: Check the pull request against the base branch's protected paths
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        working-directory: ${{ runner.temp }}
+        run: |
+          git -C "$GITHUB_WORKSPACE" show "origin/${BASE_REF}:scripts/check-protected-paths.ts" > check-protected-paths.ts
+          GIT_DIR="$GITHUB_WORKSPACE/.git" bun --no-env-file check-protected-paths.ts "origin/${BASE_REF}"

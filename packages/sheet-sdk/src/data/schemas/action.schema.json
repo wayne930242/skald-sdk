@@ -1,0 +1,416 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "skald/action/v1",
+  "title": "Skald Action Schema",
+  "description": "Schema for Skald declarative action DSL",
+  "definitions": {
+    "actionBase": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Action type identifier"
+        },
+        "when": {
+          "type": "string",
+          "description": "Condition expression - action only runs if true"
+        }
+      },
+      "required": ["type"]
+    },
+    "setAction": {
+      "allOf": [
+        { "$ref": "#/definitions/actionBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "set" },
+            "target": {
+              "type": "string",
+              "description": "Target field path (e.g., 'str.value', 'skills[0].improved')"
+            },
+            "value": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "number" },
+                { "type": "boolean" }
+              ],
+              "description": "Value expression (e.g., '{{result.newValue}}', '{{@str + 10}}')"
+            }
+          },
+          "required": ["type", "target", "value"]
+        }
+      ]
+    },
+    "modifyAction": {
+      "allOf": [
+        { "$ref": "#/definitions/actionBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["increment", "decrement"]
+            },
+            "target": {
+              "type": "string",
+              "description": "Target field path"
+            },
+            "amount": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "number" }
+              ],
+              "description": "Amount to modify (number or expression)"
+            }
+          },
+          "required": ["type", "target", "amount"]
+        }
+      ]
+    },
+    "pushAction": {
+      "allOf": [
+        { "$ref": "#/definitions/actionBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "push" },
+            "target": {
+              "type": "string",
+              "description": "Target array field path"
+            },
+            "value": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "object" }
+              ],
+              "description": "Value to push (string expression or object)"
+            }
+          },
+          "required": ["type", "target", "value"]
+        }
+      ]
+    },
+    "removeAction": {
+      "allOf": [
+        { "$ref": "#/definitions/actionBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "remove" },
+            "target": {
+              "type": "string",
+              "description": "Target array field path"
+            },
+            "index": {
+              "oneOf": [
+                { "type": "integer" },
+                { "type": "string" }
+              ],
+              "description": "Index (number) or filter expression (string)"
+            }
+          },
+          "required": ["type", "target", "index"]
+        }
+      ]
+    },
+    "conditionalAction": {
+      "allOf": [
+        { "$ref": "#/definitions/actionBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "conditional" },
+            "condition": {
+              "type": "string",
+              "description": "Condition expression"
+            },
+            "then": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/action" },
+              "description": "Actions to run if condition is true"
+            },
+            "else": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/action" },
+              "description": "Actions to run if condition is false (optional)"
+            }
+          },
+          "required": ["type", "condition", "then"]
+        }
+      ]
+    },
+    "lookupAction": {
+      "allOf": [
+        { "$ref": "#/definitions/actionBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "lookup" },
+            "table": {
+              "type": "string",
+              "description": "Lookup table ID or path"
+            },
+            "input": {
+              "type": "string",
+              "description": "Input value expression"
+            },
+            "outputTarget": {
+              "type": "string",
+              "description": "Output target field path"
+            }
+          },
+          "required": ["type", "table", "input", "outputTarget"]
+        }
+      ]
+    },
+    "rollAction": {
+      "allOf": [
+        { "$ref": "#/definitions/actionBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "roll" },
+            "expression": {
+              "type": "string",
+              "description": "Roll expression (e.g., 'coc7:1d100<={{@skill}}')"
+            },
+            "onResult": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/action" },
+              "description": "Actions to run after roll (optional)"
+            }
+          },
+          "required": ["type", "expression"]
+        }
+      ]
+    },
+    "resetAction": {
+      "allOf": [
+        { "$ref": "#/definitions/actionBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "reset" },
+            "target": {
+              "type": "string",
+              "description": "Target field path (supports wildcards like 'skills.*.improved')"
+            },
+            "resetTo": {
+              "description": "Value to reset to (optional, uses schema default if not specified)"
+            }
+          },
+          "required": ["type", "target"]
+        }
+      ]
+    },
+    "action": {
+      "oneOf": [
+        { "$ref": "#/definitions/setAction" },
+        { "$ref": "#/definitions/modifyAction" },
+        { "$ref": "#/definitions/pushAction" },
+        { "$ref": "#/definitions/removeAction" },
+        { "$ref": "#/definitions/conditionalAction" },
+        { "$ref": "#/definitions/lookupAction" },
+        { "$ref": "#/definitions/rollAction" },
+        { "$ref": "#/definitions/resetAction" }
+      ]
+    },
+    "modalAction": {
+      "allOf": [
+        { "$ref": "#/definitions/actionBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "modal" },
+            "modal": {
+              "type": "string",
+              "description": "Modal type identifier (maps to Modal Registry)"
+            },
+            "params": {
+              "type": "object",
+              "description": "Parameters passed to modal",
+              "additionalProperties": true
+            },
+            "onConfirm": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/action" },
+              "description": "Actions to run on confirm"
+            },
+            "onCancel": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/action" },
+              "description": "Actions to run on cancel"
+            }
+          },
+          "required": ["type", "modal"]
+        }
+      ]
+    },
+    "inlineAction": {
+      "allOf": [
+        { "$ref": "#/definitions/actionBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "inline" },
+            "actions": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/action" },
+              "description": "Actions to execute"
+            }
+          },
+          "required": ["type", "actions"]
+        }
+      ]
+    },
+    "fieldActionConfig": {
+      "oneOf": [
+        { "$ref": "#/definitions/modalAction" },
+        { "$ref": "#/definitions/inlineAction" }
+      ]
+    },
+    "legacyFieldAction": {
+      "type": "object",
+      "description": "Legacy field action using handler string (deprecated)",
+      "properties": {
+        "handler": {
+          "type": "string",
+          "description": "Handler name"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Icon name"
+        },
+        "tooltip": {
+          "type": "string",
+          "description": "Tooltip text"
+        },
+        "visibleWhen": {
+          "type": "string",
+          "description": "Visibility condition"
+        }
+      },
+      "required": ["handler"]
+    },
+    "fieldAction": {
+      "oneOf": [
+        { "$ref": "#/definitions/legacyFieldAction" },
+        {
+          "allOf": [
+            { "$ref": "#/definitions/fieldActionConfig" },
+            {
+              "type": "object",
+              "properties": {
+                "icon": {
+                  "type": "string",
+                  "description": "Icon name"
+                },
+                "tooltip": {
+                  "type": "string",
+                  "description": "Tooltip text"
+                },
+                "visibleWhen": {
+                  "type": "string",
+                  "description": "Visibility condition"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Field action button configuration (supports legacy handler or declarative action)"
+    },
+    "batchAction": {
+      "allOf": [
+        { "$ref": "#/definitions/actionBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "batch" },
+            "actions": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/action" },
+              "description": "Actions to execute in batch"
+            }
+          },
+          "required": ["type", "actions"]
+        }
+      ]
+    },
+    "delayAction": {
+      "allOf": [
+        { "$ref": "#/definitions/actionBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "delay" },
+            "ms": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Delay in milliseconds"
+            },
+            "then": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/action" },
+              "description": "Actions to run after delay"
+            }
+          },
+          "required": ["type", "ms"]
+        }
+      ]
+    },
+    "actionResult": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "Whether the action succeeded"
+        },
+        "error": {
+          "type": "string",
+          "description": "Error message (if failed)"
+        },
+        "changes": {
+          "type": "object",
+          "description": "Data changes produced by the action",
+          "additionalProperties": true
+        },
+        "result": {
+          "description": "Additional result data (e.g., roll result)"
+        }
+      },
+      "required": ["success"]
+    },
+    "actionContext": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "description": "Current character data",
+          "additionalProperties": true
+        },
+        "schema": {
+          "type": "object",
+          "description": "Schema definition",
+          "additionalProperties": true
+        },
+        "sourceFieldId": {
+          "type": "string",
+          "description": "Triggering field ID"
+        },
+        "extra": {
+          "type": "object",
+          "description": "Additional context (e.g., modal result)",
+          "additionalProperties": true
+        }
+      },
+      "required": ["data"]
+    }
+  },
+  "type": "object",
+  "oneOf": [
+    { "$ref": "#/definitions/action" },
+    { "$ref": "#/definitions/fieldActionConfig" }
+  ]
+}

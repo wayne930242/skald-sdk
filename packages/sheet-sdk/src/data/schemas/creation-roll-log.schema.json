@@ -1,0 +1,125 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "skald/creation-roll-log/v1",
+  "title": "Skald Creation Roll Log",
+  "description": "The rolls and rerolls made by a Character Creation Wizard, kept in the Wizard Draft and committed with the Character as read-only data (ADR 0011). TypeScript twin: CreationRollLog in packages/types/src/wizard.ts; the limits here are CREATION_ROLL_LOG_LIMITS there. Publish validation holds every macro a wizard can call to the per-entry limits. A roll is never refused because the log is full: when the log would exceed maxItems of entries or x-skald-maxBytes, the engine drops whole entries from the oldest end until it fits and adds the number dropped to droppedEntries. Restarting the wizard discards the draft and its log. A committed log is never changed or deleted.",
+  "x-skald-maxBytes": 262144,
+  "type": "object",
+  "required": ["$schema", "templateVersionId", "entries"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "const": "skald/creation-roll-log/v1" },
+    "templateVersionId": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+    },
+    "droppedEntries": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many of the oldest entries were dropped to keep the log within its limits; absent or 0 when the log is complete. The first entry's order is droppedEntries + 1"
+    },
+    "entries": {
+      "type": "array",
+      "maxItems": 2000,
+      "description": "Oldest first",
+      "items": { "$ref": "#/definitions/entry" }
+    }
+  },
+  "definitions": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
+    "macroId": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$" },
+    "entry": {
+      "type": "object",
+      "required": [
+        "order",
+        "stepId",
+        "purpose",
+        "attempt",
+        "sequence",
+        "macro",
+        "result",
+        "rolledAt"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "1-based number of the macro call among all the wizard made since the draft started, dropped ones included; contiguous within the log"
+        },
+        "stepId": { "$ref": "#/definitions/id" },
+        "methodId": { "$ref": "#/definitions/id" },
+        "purpose": { "enum": ["roll", "rollWrites", "pickByRoll"] },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "1 for the step's first roll, +1 per reroll"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "0-based index of the macro call within its attempt"
+        },
+        "macro": {
+          "type": "object",
+          "required": ["id", "owner", "args"],
+          "additionalProperties": false,
+          "properties": {
+            "id": { "$ref": "#/definitions/macroId" },
+            "owner": { "enum": ["template", "system", "global"] },
+            "args": {
+              "type": "array",
+              "maxItems": 8,
+              "items": { "type": "number" }
+            }
+          }
+        },
+        "result": {
+          "type": "object",
+          "required": ["value", "rolls"],
+          "additionalProperties": false,
+          "properties": {
+            "value": { "type": ["number", "null"] },
+            "outcome": { "type": "string", "maxLength": 200 },
+            "rolls": {
+              "type": "array",
+              "maxItems": 50,
+              "items": {
+                "type": "object",
+                "required": ["expression", "rolled", "dice"],
+                "additionalProperties": false,
+                "properties": {
+                  "expression": { "type": "string", "minLength": 1, "maxLength": 200 },
+                  "rolled": { "type": "number" },
+                  "dice": {
+                    "type": "array",
+                    "maxItems": 1001,
+                    "items": { "type": "number" }
+                  }
+                }
+              }
+            },
+            "writes": {
+              "type": "array",
+              "maxItems": 50,
+              "items": {
+                "type": "object",
+                "required": ["field", "value"],
+                "additionalProperties": false,
+                "properties": {
+                  "field": { "type": "string", "minLength": 1, "maxLength": 200 },
+                  "value": { "type": ["number", "string"] }
+                }
+              }
+            }
+          }
+        },
+        "rolledAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,3})?Z$",
+          "description": "ISO 8601 UTC timestamp"
+        }
+      }
+    }
+  }
+}

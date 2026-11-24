@@ -1,0 +1,26 @@
+{
+  "referenceSearch": {
+    "filters": "Filter reference",
+    "filter": {
+      "all": "All",
+      "rules": "Rules",
+      "spells": "Spells",
+      "items": "Items",
+      "creatures": "Monsters",
+      "options": "Character Options"
+    },
+    "filterByKind": "Show only: {kind}",
+    "glossary": "Rules Glossary",
+    "groupCount": "{kind} ({count, number})",
+    "more": "Show more",
+    "moreKind": "Show more: {kind}",
+    "pin": "Pin",
+    "pinned": "Pinned",
+    "pinnedEmpty": "No pinned entries yet.",
+    "quickLinks": "Quick links",
+    "recent": "Recently Viewed",
+    "recentEmpty": "No recently viewed entries yet.",
+    "unpin": "Unpin",
+    "viewInBook": "View in book"
+  }
+}

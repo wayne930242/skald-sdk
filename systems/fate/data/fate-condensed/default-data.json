@@ -1,0 +1,37 @@
+{
+  "name": "",
+  "player": "",
+  "description": "",
+  "portrait": "",
+
+  "highConcept": "",
+  "trouble": "",
+  "relationship": "",
+  "freeAspect1": "",
+  "freeAspect2": "",
+
+  "refresh": 3,
+  "fatePoints": 3,
+
+  "skills": {
+    "skills": []
+  },
+
+  "physicalStress": [],
+  "mentalStress": [],
+
+  "mildConsequence": "",
+  "moderateConsequence": "",
+  "severeConsequence": "",
+  "extraMildConsequence": "",
+
+  "stunts": {
+    "stunts": []
+  },
+
+  "extras": "",
+  "notes": "",
+  "fateV2": {
+    "refresh": { "base": 3, "earned": 0 }
+  }
+}

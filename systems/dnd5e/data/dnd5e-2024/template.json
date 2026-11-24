@@ -1,0 +1,1931 @@
+{
+  "$schema": "../schemas/template.schema.json",
+  "id": "dnd5e-2024-standard",
+  "name": "D&D 5e (2024) Standard",
+  "version": "1.0.0",
+  "schemaId": "dnd5e-2024-character",
+  "schemaVersion": "1.0.0",
+  "description": "Two-page character sheet following the official 2024 layout",
+  "author": "Skald",
+  "printSettings": {
+    "pageSize": "A4",
+    "orientation": "portrait",
+    "margins": {
+      "top": "10mm",
+      "right": "10mm",
+      "bottom": "10mm",
+      "left": "10mm"
+    }
+  },
+  "header": {
+    "portrait": "portrait"
+  },
+  "pages": [
+    {
+      "id": "front",
+      "title": "{{i18n:section.front}}",
+      "size": "A4",
+      "orientation": "portrait",
+      "margin": "sm",
+      "layout": {
+        "type": "stack",
+        "direction": "column",
+        "gap": "md"
+      },
+      "children": [
+        {
+          "id": "header",
+          "type": "section",
+          "layout": {
+            "type": "stack",
+            "direction": "row",
+            "gap": "md",
+            "align": "start"
+          },
+          "mobileLayout": {
+            "type": "stack",
+            "direction": "column",
+            "gap": "md"
+          },
+          "children": [
+            {
+              "type": "field-ref",
+              "fieldId": "portrait",
+              "layout": {
+                "width": "120px",
+                "height": "120px"
+              }
+            },
+            {
+              "id": "header-fields",
+              "type": "section",
+              "sectionLayout": {
+                "width": "fill"
+              },
+              "layout": {
+                "type": "stack",
+                "direction": "column",
+                "gap": "sm"
+              },
+              "children": [
+                {
+                  "id": "header-name",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "row",
+                    "gap": "md",
+                    "wrap": true
+                  },
+                  "children": [
+                    {
+                      "type": "field-ref",
+                      "fieldId": "name"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "player"
+                    }
+                  ]
+                },
+                {
+                  "id": "header-origin",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "row",
+                    "gap": "md",
+                    "wrap": true
+                  },
+                  "children": [
+                    {
+                      "type": "field-ref",
+                      "fieldId": "background"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "className"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "subclass"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "species"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "lineage"
+                    }
+                  ]
+                },
+                {
+                  "id": "header-level",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "row",
+                    "gap": "md",
+                    "wrap": true
+                  },
+                  "children": [
+                    {
+                      "type": "field-ref",
+                      "fieldId": "level"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "xp"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "vitals",
+          "type": "section",
+          "layout": {
+            "type": "stack",
+            "direction": "row",
+            "gap": "md",
+            "wrap": true
+          },
+          "children": [
+            {
+              "id": "armor-box",
+              "type": "section",
+              "layout": {
+                "type": "stack",
+                "direction": "column",
+                "gap": "xs"
+              },
+              "children": [
+                {
+                  "type": "field-ref",
+                  "fieldId": "ac"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "armorType"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "armorBase"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "shield"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "unarmoredDefense"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "acMisc"
+                }
+              ],
+              "title": "{{i18n:section.armorClass}}",
+              "titleVariant": "underlined",
+              "border": "solid"
+            },
+            {
+              "id": "hp-box",
+              "type": "section",
+              "layout": {
+                "type": "stack",
+                "direction": "column",
+                "gap": "xs"
+              },
+              "children": [
+                {
+                  "type": "field-ref",
+                  "fieldId": "hp"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "hpTemp"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "hpMax"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "hitDieFaces"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "hpPerLevelBonus"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "hpMaxMisc"
+                }
+              ],
+              "title": "{{i18n:section.hitPoints}}",
+              "titleVariant": "underlined",
+              "border": "solid"
+            },
+            {
+              "id": "hit-dice-box",
+              "type": "section",
+              "layout": {
+                "type": "stack",
+                "direction": "column",
+                "gap": "xs"
+              },
+              "children": [
+                {
+                  "type": "field-ref",
+                  "fieldId": "hitDiceSpent"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "hitDiceMax"
+                }
+              ],
+              "title": "{{i18n:section.hitDice}}",
+              "titleVariant": "underlined",
+              "border": "solid"
+            },
+            {
+              "id": "death-box",
+              "type": "section",
+              "layout": {
+                "type": "stack",
+                "direction": "column",
+                "gap": "xs"
+              },
+              "children": [
+                {
+                  "type": "field-ref",
+                  "fieldId": "deathSuccesses"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "deathFailures"
+                }
+              ],
+              "title": "{{i18n:section.deathSaves}}",
+              "titleVariant": "underlined",
+              "border": "solid"
+            }
+          ]
+        },
+        {
+          "id": "stat-bar",
+          "type": "section",
+          "layout": {
+            "type": "stack",
+            "direction": "row",
+            "gap": "md",
+            "wrap": true
+          },
+          "children": [
+            {
+              "type": "field-ref",
+              "fieldId": "profBonus"
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "initiative"
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "initiativeProf"
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "initiativeMisc"
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "speed"
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "currentSpeed"
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "size"
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "darkvision"
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "passivePerception"
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "heroicInspiration"
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "jackOfAllTrades"
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "orderLoreBonus"
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "conditions"
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "exhaustion"
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "d20Penalty"
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "concentration"
+            }
+          ],
+          "border": "solid"
+        },
+        {
+          "id": "body",
+          "type": "section",
+          "layout": {
+            "type": "stack",
+            "direction": "row",
+            "gap": "md",
+            "wrap": true
+          },
+          "children": [
+            {
+              "id": "left-column",
+              "type": "section",
+              "layout": {
+                "type": "stack",
+                "direction": "column",
+                "gap": "sm"
+              },
+              "children": [
+                {
+                  "id": "ability-str",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "column",
+                    "gap": "xs"
+                  },
+                  "children": [
+                    {
+                      "id": "ab-str-scores",
+                      "type": "section",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "row",
+                        "gap": "sm",
+                        "wrap": true
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "str",
+                          "labelPosition": "top"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "strMod"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "ab-str-save",
+                      "type": "section",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "row",
+                        "gap": "sm",
+                        "wrap": true
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "strSave"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "strSaveProf",
+                          "label": "{{i18n:option.prof.proficient}}"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-athletics",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "athleticsProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "athletics"
+                        }
+                      ]
+                    }
+                  ],
+                  "title": "{{i18n:ability.str}}",
+                  "titleVariant": "underlined",
+                  "border": "solid"
+                },
+                {
+                  "id": "ability-dex",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "column",
+                    "gap": "xs"
+                  },
+                  "children": [
+                    {
+                      "id": "ab-dex-scores",
+                      "type": "section",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "row",
+                        "gap": "sm",
+                        "wrap": true
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "dex",
+                          "labelPosition": "top"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "dexMod"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "ab-dex-save",
+                      "type": "section",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "row",
+                        "gap": "sm",
+                        "wrap": true
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "dexSave"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "dexSaveProf",
+                          "label": "{{i18n:option.prof.proficient}}"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-acrobatics",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "acrobaticsProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "acrobatics"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-sleightOfHand",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "sleightOfHandProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "sleightOfHand"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-stealth",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "stealthProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "stealth"
+                        }
+                      ]
+                    }
+                  ],
+                  "title": "{{i18n:ability.dex}}",
+                  "titleVariant": "underlined",
+                  "border": "solid"
+                },
+                {
+                  "id": "ability-con",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "column",
+                    "gap": "xs"
+                  },
+                  "children": [
+                    {
+                      "id": "ab-con-scores",
+                      "type": "section",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "row",
+                        "gap": "sm",
+                        "wrap": true
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "con",
+                          "labelPosition": "top"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "conMod"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "ab-con-save",
+                      "type": "section",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "row",
+                        "gap": "sm",
+                        "wrap": true
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "conSave"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "conSaveProf",
+                          "label": "{{i18n:option.prof.proficient}}"
+                        }
+                      ]
+                    }
+                  ],
+                  "title": "{{i18n:ability.con}}",
+                  "titleVariant": "underlined",
+                  "border": "solid"
+                },
+                {
+                  "id": "ability-int",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "column",
+                    "gap": "xs"
+                  },
+                  "children": [
+                    {
+                      "id": "ab-int-scores",
+                      "type": "section",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "row",
+                        "gap": "sm",
+                        "wrap": true
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "int",
+                          "labelPosition": "top"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "intMod"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "ab-int-save",
+                      "type": "section",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "row",
+                        "gap": "sm",
+                        "wrap": true
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "intSave"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "intSaveProf",
+                          "label": "{{i18n:option.prof.proficient}}"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-arcana",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "arcanaProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "arcana"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-history",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "historyProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "history"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-investigation",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "investigationProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "investigation"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-nature",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "natureProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "nature"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-religion",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "religionProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "religion"
+                        }
+                      ]
+                    }
+                  ],
+                  "title": "{{i18n:ability.int}}",
+                  "titleVariant": "underlined",
+                  "border": "solid"
+                },
+                {
+                  "id": "ability-wis",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "column",
+                    "gap": "xs"
+                  },
+                  "children": [
+                    {
+                      "id": "ab-wis-scores",
+                      "type": "section",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "row",
+                        "gap": "sm",
+                        "wrap": true
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "wis",
+                          "labelPosition": "top"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "wisMod"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "ab-wis-save",
+                      "type": "section",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "row",
+                        "gap": "sm",
+                        "wrap": true
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "wisSave"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "wisSaveProf",
+                          "label": "{{i18n:option.prof.proficient}}"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-animalHandling",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "animalHandlingProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "animalHandling"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-insight",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "insightProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "insight"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-medicine",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "medicineProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "medicine"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-perception",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "perceptionProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "perception"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-survival",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "survivalProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "survival"
+                        }
+                      ]
+                    }
+                  ],
+                  "title": "{{i18n:ability.wis}}",
+                  "titleVariant": "underlined",
+                  "border": "solid"
+                },
+                {
+                  "id": "ability-cha",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "column",
+                    "gap": "xs"
+                  },
+                  "children": [
+                    {
+                      "id": "ab-cha-scores",
+                      "type": "section",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "row",
+                        "gap": "sm",
+                        "wrap": true
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "cha",
+                          "labelPosition": "top"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "chaMod"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "ab-cha-save",
+                      "type": "section",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "row",
+                        "gap": "sm",
+                        "wrap": true
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "chaSave"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "chaSaveProf",
+                          "label": "{{i18n:option.prof.proficient}}"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-deception",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "deceptionProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "deception"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-intimidation",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "intimidationProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "intimidation"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-performance",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "performanceProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "performance"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "sk-persuasion",
+                      "type": "section",
+                      "layout": {
+                        "type": "grid",
+                        "columns": [
+                          "6.5rem",
+                          "1fr"
+                        ],
+                        "baseColumns": 2,
+                        "gap": "sm",
+                        "align": "center"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "persuasionProf",
+                          "label": "",
+                          "layout": {
+                            "width": "100%"
+                          }
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "persuasion"
+                        }
+                      ]
+                    }
+                  ],
+                  "title": "{{i18n:ability.cha}}",
+                  "titleVariant": "underlined",
+                  "border": "solid"
+                },
+                {
+                  "id": "training",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "column",
+                    "gap": "xs"
+                  },
+                  "children": [
+                    {
+                      "id": "armor-training",
+                      "type": "section",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "row",
+                        "gap": "sm",
+                        "wrap": true
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "armorLight"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "armorMedium"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "armorHeavy"
+                        },
+                        {
+                          "type": "field-ref",
+                          "fieldId": "armorShields"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "weaponProficiencies"
+                    },
+                    {
+                      "id": "tools-box",
+                      "type": "section",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "column",
+                        "gap": "xs"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "toolProficiencies"
+                        }
+                      ],
+                      "title": "{{i18n:field.toolProficiencies}}",
+                      "titleVariant": "underlined"
+                    },
+                    {
+                      "id": "masteries-box",
+                      "type": "section",
+                      "layout": {
+                        "type": "stack",
+                        "direction": "column",
+                        "gap": "xs"
+                      },
+                      "children": [
+                        {
+                          "type": "field-ref",
+                          "fieldId": "weaponMasteries"
+                        }
+                      ],
+                      "title": "{{i18n:field.weaponMasteries}}",
+                      "titleVariant": "underlined"
+                    }
+                  ],
+                  "title": "{{i18n:section.training}}",
+                  "titleVariant": "underlined",
+                  "border": "solid"
+                }
+              ],
+              "sectionLayout": {
+                "width": "fill"
+              }
+            },
+            {
+              "id": "right-column",
+              "type": "section",
+              "layout": {
+                "type": "stack",
+                "direction": "column",
+                "gap": "sm"
+              },
+              "children": [
+                {
+                  "id": "weapons-box",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "column",
+                    "gap": "xs"
+                  },
+                  "children": [
+                    {
+                      "type": "field-ref",
+                      "fieldId": "rangedAttackBonus"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "weapons"
+                    }
+                  ],
+                  "title": "{{i18n:section.weapons}}",
+                  "titleVariant": "underlined",
+                  "border": "solid"
+                },
+                {
+                  "id": "features-box",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "column",
+                    "gap": "xs"
+                  },
+                  "children": [
+                    {
+                      "type": "field-ref",
+                      "fieldId": "features"
+                    }
+                  ],
+                  "title": "{{i18n:section.features}}",
+                  "titleVariant": "underlined",
+                  "border": "solid"
+                },
+                {
+                  "id": "traits-box",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "column",
+                    "gap": "xs"
+                  },
+                  "children": [
+                    {
+                      "type": "field-ref",
+                      "fieldId": "speciesTraits"
+                    }
+                  ],
+                  "title": "{{i18n:section.speciesTraits}}",
+                  "titleVariant": "underlined",
+                  "border": "solid"
+                },
+                {
+                  "id": "feats-box",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "column",
+                    "gap": "xs"
+                  },
+                  "children": [
+                    {
+                      "type": "field-ref",
+                      "fieldId": "feats"
+                    }
+                  ],
+                  "title": "{{i18n:section.feats}}",
+                  "titleVariant": "underlined",
+                  "border": "solid"
+                }
+              ],
+              "sectionLayout": {
+                "width": "fill"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "back",
+      "title": "{{i18n:section.back}}",
+      "size": "A4",
+      "orientation": "portrait",
+      "margin": "sm",
+      "layout": {
+        "type": "stack",
+        "direction": "column",
+        "gap": "md"
+      },
+      "children": [
+        {
+          "id": "spellcasting",
+          "type": "section",
+          "layout": {
+            "type": "stack",
+            "direction": "column",
+            "gap": "xs"
+          },
+          "children": [
+            {
+              "id": "spell-stats",
+              "type": "section",
+              "layout": {
+                "type": "stack",
+                "direction": "row",
+                "gap": "md",
+                "wrap": true
+              },
+              "children": [
+                {
+                  "type": "field-ref",
+                  "fieldId": "spellAbility"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "spellMod"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "spellSaveDc"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "spellAttack"
+                }
+              ]
+            },
+            {
+              "id": "spell-slots",
+              "type": "section",
+              "layout": {
+                "type": "stack",
+                "direction": "row",
+                "gap": "md",
+                "wrap": true
+              },
+              "children": [
+                {
+                  "id": "slot-1",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "row",
+                    "gap": "xs",
+                    "wrap": true
+                  },
+                  "children": [
+                    {
+                      "id": "slot-1-label",
+                      "type": "heading",
+                      "level": 6,
+                      "text": "{{i18n:field.slotLevel.1}}",
+                      "variant": "inline"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot1Total"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot1Used"
+                    }
+                  ]
+                },
+                {
+                  "id": "slot-2",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "row",
+                    "gap": "xs",
+                    "wrap": true
+                  },
+                  "children": [
+                    {
+                      "id": "slot-2-label",
+                      "type": "heading",
+                      "level": 6,
+                      "text": "{{i18n:field.slotLevel.2}}",
+                      "variant": "inline"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot2Total"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot2Used"
+                    }
+                  ]
+                },
+                {
+                  "id": "slot-3",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "row",
+                    "gap": "xs",
+                    "wrap": true
+                  },
+                  "children": [
+                    {
+                      "id": "slot-3-label",
+                      "type": "heading",
+                      "level": 6,
+                      "text": "{{i18n:field.slotLevel.3}}",
+                      "variant": "inline"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot3Total"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot3Used"
+                    }
+                  ]
+                },
+                {
+                  "id": "slot-4",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "row",
+                    "gap": "xs",
+                    "wrap": true
+                  },
+                  "children": [
+                    {
+                      "id": "slot-4-label",
+                      "type": "heading",
+                      "level": 6,
+                      "text": "{{i18n:field.slotLevel.4}}",
+                      "variant": "inline"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot4Total"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot4Used"
+                    }
+                  ]
+                },
+                {
+                  "id": "slot-5",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "row",
+                    "gap": "xs",
+                    "wrap": true
+                  },
+                  "children": [
+                    {
+                      "id": "slot-5-label",
+                      "type": "heading",
+                      "level": 6,
+                      "text": "{{i18n:field.slotLevel.5}}",
+                      "variant": "inline"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot5Total"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot5Used"
+                    }
+                  ]
+                },
+                {
+                  "id": "slot-6",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "row",
+                    "gap": "xs",
+                    "wrap": true
+                  },
+                  "children": [
+                    {
+                      "id": "slot-6-label",
+                      "type": "heading",
+                      "level": 6,
+                      "text": "{{i18n:field.slotLevel.6}}",
+                      "variant": "inline"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot6Total"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot6Used"
+                    }
+                  ]
+                },
+                {
+                  "id": "slot-7",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "row",
+                    "gap": "xs",
+                    "wrap": true
+                  },
+                  "children": [
+                    {
+                      "id": "slot-7-label",
+                      "type": "heading",
+                      "level": 6,
+                      "text": "{{i18n:field.slotLevel.7}}",
+                      "variant": "inline"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot7Total"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot7Used"
+                    }
+                  ]
+                },
+                {
+                  "id": "slot-8",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "row",
+                    "gap": "xs",
+                    "wrap": true
+                  },
+                  "children": [
+                    {
+                      "id": "slot-8-label",
+                      "type": "heading",
+                      "level": 6,
+                      "text": "{{i18n:field.slotLevel.8}}",
+                      "variant": "inline"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot8Total"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot8Used"
+                    }
+                  ]
+                },
+                {
+                  "id": "slot-9",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "row",
+                    "gap": "xs",
+                    "wrap": true
+                  },
+                  "children": [
+                    {
+                      "id": "slot-9-label",
+                      "type": "heading",
+                      "level": 6,
+                      "text": "{{i18n:field.slotLevel.9}}",
+                      "variant": "inline"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot9Total"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "slot9Used"
+                    }
+                  ]
+                },
+                {
+                  "id": "pact",
+                  "type": "section",
+                  "layout": {
+                    "type": "stack",
+                    "direction": "row",
+                    "gap": "xs",
+                    "wrap": true
+                  },
+                  "children": [
+                    {
+                      "type": "field-ref",
+                      "fieldId": "pactSlots"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "pactSlotLevel"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "pactUsed"
+                    }
+                  ]
+                }
+              ],
+              "title": "{{i18n:section.spellSlots}}",
+              "titleVariant": "underlined"
+            },
+            {
+              "type": "field-ref",
+              "fieldId": "spells"
+            }
+          ],
+          "title": "{{i18n:section.spellcasting}}",
+          "titleVariant": "underlined",
+          "border": "solid"
+        },
+        {
+          "id": "details",
+          "type": "section",
+          "layout": {
+            "type": "stack",
+            "direction": "column",
+            "gap": "sm"
+          },
+          "children": [
+            {
+              "id": "appearance-box",
+              "type": "section",
+              "layout": {
+                "type": "stack",
+                "direction": "row",
+                "gap": "md",
+                "wrap": true
+              },
+              "children": [
+                {
+                  "type": "field-ref",
+                  "fieldId": "appearance",
+                  "layout": {
+                    "width": "fill"
+                  }
+                }
+              ],
+              "title": "{{i18n:section.appearance}}",
+              "titleVariant": "underlined",
+              "border": "solid"
+            },
+            {
+              "id": "backstory-box",
+              "type": "section",
+              "layout": {
+                "type": "stack",
+                "direction": "column",
+                "gap": "xs"
+              },
+              "children": [
+                {
+                  "type": "field-ref",
+                  "fieldId": "backstory"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "alignment"
+                }
+              ],
+              "title": "{{i18n:section.backstory}}",
+              "titleVariant": "underlined",
+              "border": "solid"
+            },
+            {
+              "id": "languages-box",
+              "type": "section",
+              "layout": {
+                "type": "stack",
+                "direction": "column",
+                "gap": "xs"
+              },
+              "children": [
+                {
+                  "type": "field-ref",
+                  "fieldId": "languages"
+                }
+              ],
+              "title": "{{i18n:section.languages}}",
+              "titleVariant": "underlined",
+              "border": "solid"
+            },
+            {
+              "id": "equipment-box",
+              "type": "section",
+              "layout": {
+                "type": "stack",
+                "direction": "column",
+                "gap": "xs"
+              },
+              "children": [
+                {
+                  "type": "field-ref",
+                  "fieldId": "equipment"
+                }
+              ],
+              "title": "{{i18n:section.equipment}}",
+              "titleVariant": "underlined",
+              "border": "solid"
+            },
+            {
+              "id": "attunement-box",
+              "type": "section",
+              "layout": {
+                "type": "stack",
+                "direction": "column",
+                "gap": "xs"
+              },
+              "children": [
+                {
+                  "type": "field-ref",
+                  "fieldId": "attunement1"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "attunement2"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "attunement3"
+                }
+              ],
+              "title": "{{i18n:section.attunement}}",
+              "titleVariant": "underlined",
+              "border": "solid"
+            },
+            {
+              "id": "coins-box",
+              "type": "section",
+              "layout": {
+                "type": "stack",
+                "direction": "row",
+                "gap": "md",
+                "wrap": true
+              },
+              "children": [
+                {
+                  "type": "field-ref",
+                  "fieldId": "cp"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "sp"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "ep"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "gp"
+                },
+                {
+                  "type": "field-ref",
+                  "fieldId": "pp"
+                }
+              ],
+              "title": "{{i18n:section.coins}}",
+              "titleVariant": "underlined",
+              "border": "solid"
+            },
+            {
+              "id": "notes-box",
+              "type": "section",
+              "layout": {
+                "type": "stack",
+                "direction": "column",
+                "gap": "xs"
+              },
+              "children": [
+                {
+                  "type": "field-ref",
+                  "fieldId": "notes"
+                }
+              ],
+              "title": "{{i18n:section.notes}}",
+              "titleVariant": "underlined",
+              "border": "solid"
+            }
+          ]
+        },
+        {
+          "id": "attribution-footer",
+          "type": "section",
+          "layout": {
+            "type": "stack",
+            "direction": "column",
+            "gap": "xs"
+          },
+          "children": [
+            {
+              "id": "attribution-notice",
+              "type": "heading",
+              "level": 6,
+              "text": "{{i18n:system.attribution}}",
+              "variant": "body"
+            },
+            {
+              "id": "translation-notice",
+              "type": "heading",
+              "level": 6,
+              "text": "{{i18n:system.translationNote}}",
+              "variant": "body"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

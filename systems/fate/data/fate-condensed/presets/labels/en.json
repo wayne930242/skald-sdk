@@ -1,0 +1,69 @@
+{
+  "presets": { "condensed-standard": "Fate Condensed standard" },
+  "recipes": {
+    "skills": "Skill list",
+    "shape": "Skill shape",
+    "approaches": "Approaches",
+    "unified": "Unified stress",
+    "conditions": "Conditions",
+    "extreme": "Extreme consequences",
+    "gear": "Weapons, armor and scale"
+  },
+  "skillLists": {
+    "condensed": "Fate Condensed",
+    "core": "Fate Core",
+    "short-actions": "Actions",
+    "short-approaches": "Approaches",
+    "short-aptitudes": "Aptitudes",
+    "short-attributes": "Attributes",
+    "short-relationships": "Relationships",
+    "short-roles": "Roles",
+    "short-themes": "Themes",
+    "short-values": "Values"
+  },
+  "skills": {
+    "actions-endure": "Endure", "actions-fight": "Fight", "actions-know": "Know", "actions-move": "Move", "actions-notice": "Notice",
+    "actions-pilot": "Pilot", "actions-sneak": "Sneak", "actions-speak": "Speak", "actions-tinker": "Tinker",
+    "approach-careful": "Careful", "approach-clever": "Clever", "approach-flashy": "Flashy", "approach-forceful": "Forceful",
+    "approach-quick": "Quick", "approach-sneaky": "Sneaky",
+    "aptitudes-athletics": "Athletics", "aptitudes-combat": "Combat", "aptitudes-leadership": "Leadership",
+    "aptitudes-scholarship": "Scholarship", "aptitudes-subterfuge": "Subterfuge",
+    "attributes-strength": "Strength", "attributes-dexterity": "Dexterity", "attributes-toughness": "Toughness",
+    "attributes-intelligence": "Intelligence", "attributes-charm": "Charm",
+    "relationships-leading": "Leading", "relationships-partnering": "Partnering", "relationships-supporting": "Supporting",
+    "relationships-solo": "Solo",
+    "roles-driver": "Driver", "roles-hitter": "Hitter", "roles-hacker": "Hacker", "roles-gearhead": "Gearhead",
+    "roles-grifter": "Grifter", "roles-thief": "Thief", "roles-mastermind": "Mastermind",
+    "themes-air": "Air", "themes-fire": "Fire", "themes-metal": "Metal", "themes-mind": "Mind", "themes-stone": "Stone",
+    "themes-void": "Void", "themes-water": "Water", "themes-wind": "Wind", "themes-wood": "Wood",
+    "values-duty": "Duty", "values-glory": "Glory", "values-justice": "Justice", "values-love": "Love", "values-power": "Power",
+    "values-safety": "Safety", "values-truth": "Truth", "values-vengeance": "Vengeance"
+  },
+  "allocations": {
+    "pyramid": "Pyramid",
+    "diamond": "Diamond",
+    "fae": "Approach spread (+3/+2/+2/+1/+1/+0)",
+    "point-buy": "Point buy"
+  },
+  "stress": { "split": "Split tracks", "unified": "Unified track" },
+  "tracks": { "physical": "Physical", "mental": "Mental", "unified": "Stress" },
+  "injuryModels": { "consequences": "Consequences", "conditions": "Conditions", "conditions-separate": "Conditions (kept apart)" },
+  "slots": {
+    "mild": "Mild", "moderate": "Moderate", "severe": "Severe",
+    "extraMild-physical": "Extra mild (physical)", "extraMild-mental": "Extra mild (mental)", "extreme": "Extreme"
+  },
+  "conditions": {
+    "hurt": "Hurt", "scared": "Scared", "injured": "Injured", "shaken": "Shaken", "wounded": "Wounded", "demoralized": "Demoralized"
+  },
+  "extreme": { "off": "Off", "srd": "Extreme consequences" },
+  "ratings": { "off": "Off", "srd": "Weapon and armor ratings" },
+  "scale": { "off": "Off", "srd": "Scale" },
+  "scaleTiers": {
+    "mundane": "Mundane", "supernatural": "Supernatural", "otherworldly": "Otherworldly", "legendary": "Legendary", "godlike": "Godlike"
+  },
+  "scaleModes": {
+    "beforeRoll": "+1 per level before the roll",
+    "afterSuccess": "+2 per level after a successful roll",
+    "freeInvokes": "+1 free invoke per level on a successful create an advantage"
+  }
+}

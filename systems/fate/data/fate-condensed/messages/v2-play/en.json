@@ -1,0 +1,145 @@
+{
+  "fatePlay": {
+    "edit": "Edit {field}",
+    "notWritten": "Not written yet",
+    "rules": {
+      "open": "Rules",
+      "section": "{section} rules"
+    },
+    "identity": {
+      "unnamed": "Unnamed character",
+      "noHighConcept": "No high concept yet",
+      "name": "name",
+      "player": "player",
+      "description": "description",
+      "playerLine": "Player {player}"
+    },
+    "points": {
+      "title": "Fate points",
+      "refresh": "Refresh {refresh}",
+      "tokens": "{count, plural, one {# fate point} other {# fate points}}",
+      "more": "+{count}",
+      "table": {
+        "managed": "Fate points kept by the table.",
+        "hidden": "You cannot see this character's fate points at the table.",
+        "unavailable": "The table is out of reach: the fate points are read-only here.",
+        "elsewhere": "The table keeps this copy's fate points. Use the character tab at the table."
+      },
+      "carry": {
+        "button": "Take booked points",
+        "title": "Take the table's booked fate points",
+        "body": "Write the {points} points booked at the table into this sheet. Free invokes, pending credits, compel offers and receipts stay at the table.",
+        "confirm": "Write to the sheet",
+        "cancel": "Cancel",
+        "sceneOpen": "A scene is open: take the points after it closes.",
+        "noFullSheet": "The full sheet cannot be opened here.",
+        "done": "Took {points} points.",
+        "note": "Took the table's booked points",
+        "deleted": "The table was deleted; this is the last balance you can take."
+      }
+    },
+    "aspects": {
+      "title": "Aspects",
+      "empty": "No aspects yet.",
+      "number": "{number}",
+      "kind": {
+        "highConcept": "High concept",
+        "trouble": "Trouble",
+        "relationship": "Relationship",
+        "free": "Aspect",
+        "situation": "Situation",
+        "boost": "Boost"
+      },
+      "prompt": {
+        "highConcept": "Who are you, in one sentence?",
+        "trouble": "What keeps getting you into trouble?",
+        "relationship": "Who matters to you?",
+        "free": "What experience do you carry with you?"
+      },
+      "numbered": "{label} {number}",
+      "write": "Write your {label}",
+      "freeInvokes": "{count, plural, one {# free invoke} other {# free invokes}}",
+      "add": "Add aspect",
+      "remove": "Remove {label}",
+      "hidden": "Secret aspect",
+      "hiddenNote": "Only the owner and the GM can see this card.",
+      "makeSecret": "Make aspect secret",
+      "secretOn": "Only you and the GM can see this",
+      "conflict": "An older value is still saved: {text}",
+      "invoke": "Invoke",
+      "invokeNamed": "Invoke {name}",
+      "invokeBlocked": {
+        "noRoll": "Roll first to invoke an aspect.",
+        "settled": "This roll is settled and takes no more invokes."
+      },
+      "compel": "Accept compel +1 fate point",
+      "compelDone": "Compel recorded +1",
+      "swipe": "Swipe for more"
+    },
+    "secret": {
+      "title": "Make this aspect secret?",
+      "body": "Hidden on screen only (including from you); the text still syncs and is not encrypted.",
+      "confirm": "Make secret",
+      "revealTitle": "Reveal this aspect?",
+      "revealBody": "Once revealed, everyone who can see this sheet can read it.",
+      "revealConfirm": "Reveal",
+      "cancel": "Cancel"
+    },
+    "held": {
+      "title": "Boosts and situation aspects held",
+      "empty": "None yet",
+      "remove": "Remove {kind}: {text}",
+      "add": "Add situation or boost",
+      "kind": "Kind",
+      "text": "Text",
+      "invokes": "Free invokes",
+      "submit": "Add",
+      "cancel": "Cancel"
+    },
+    "skills": {
+      "title": "Skill ladder",
+      "collapsed": "{from} {fromLabel} to {to} {toLabel}",
+      "collapsedNote": "empty rungs folded",
+      "complete": "{shape} complete",
+      "column": "{rating}: {filled}/{required}",
+      "points": "Points {spent}/{budget}"
+    },
+    "ladder": {
+      "-4": "Horrifying",
+      "-3": "Catastrophic",
+      "-2": "Terrible",
+      "-1": "Poor",
+      "0": "Mediocre",
+      "1": "Average",
+      "2": "Fair",
+      "3": "Good",
+      "4": "Great",
+      "5": "Superb",
+      "6": "Fantastic",
+      "7": "Epic",
+      "8": "Legendary"
+    },
+    "sticky": {
+      "label": "Character status",
+      "track": "{track} {marked}/{boxes}",
+      "none": "No consequences",
+      "noConditions": "No conditions",
+      "severity": {
+        "mild": "Mild",
+        "moderate": "Moderate",
+        "severe": "Severe",
+        "extreme": "Extreme"
+      },
+      "consequence": "{severity}: {text}"
+    },
+    "notes": {
+      "extras": "Extras",
+      "notes": "Notes"
+    },
+    "derived": {
+      "refresh": "Refresh",
+      "stress": "{id, select, unified {Stress boxes} other {{track} stress boxes}}",
+      "slot": "{slot} consequence slots"
+    }
+  }
+}

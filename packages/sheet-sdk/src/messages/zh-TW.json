@@ -1,0 +1,798 @@
+{
+  "renderer": {
+    "unknownFieldType": "未知欄位類型：{type}",
+    "computedColumnMissingFormula": "欄位「{column}」是 computed 但沒有設定 formula",
+    "refreshDerivedValue": "依範本公式重新計算",
+    "removeItem": "移除項目",
+    "addNamedItem": "新增{label}",
+    "rollTile": "擲 {label} {value}",
+    "tileHalf": "半值",
+    "tileFifth": "五分之一值",
+    "tileValueInput": "{label} 數值",
+    "resourceValue": "{label} 目前值 {current}，上限 {max}",
+    "resourceValueNoMax": "{label} 目前值 {current}",
+    "resourceDecrease": "{label} 減 {step}",
+    "resourceIncrease": "{label} 加 {step}",
+    "resourceMeterOpen": "{name}，開啟步進器",
+    "resourcePrintCurrent": "目前",
+    "resourcePrintMax": "上限",
+    "resourcePrintStart": "起始",
+    "conditionsSuggest": "建議勾選",
+    "conditionsSuggestTooltip": "依角色目前的數值，這個狀況可能成立。不會自動勾選，是否勾選由你決定。",
+    "statListSearchLabel": "搜尋",
+    "statListSearchPlaceholder": "搜尋名稱，例如「偵查」",
+    "statListFilters": "篩選",
+    "statListFilterPinned": "常用",
+    "statListFilterImproved": "可成長",
+    "statListFilterAll": "全部",
+    "statListColumnImprove": "成長",
+    "statListColumnBase": "基礎",
+    "statListColumnValue": "現值",
+    "statListColumnHalf": "現值的一半",
+    "statListColumnFifth": "現值的五分之一",
+    "statListImproved": "{name}：可成長",
+    "statListPin": "將 {name} 設為常用",
+    "statListUnpin": "取消 {name} 的常用",
+    "statListRoll": "擲 {name}",
+    "rollField": "擲 {name}",
+    "editValue": "編輯{name}",
+    "rollMove": "擲 {move}（{stat}）",
+    "rollDice": "擲骰",
+    "statListValueInput": "{name} 現值",
+    "statListSpecInput": "{parent} 的專門名稱",
+    "statListNoRows": "還沒有可列出的項目。",
+    "statListNoPinned": "沒有常用項目。點名稱旁的星號即可加入。",
+    "statListNoImproved": "沒有標記可成長的項目。",
+    "statListNoMatches": "沒有符合搜尋的項目。",
+    "statListHint": "點名稱或骰子即可擲骰；勾選代表本次劇本成功過，可在結算時成長。",
+    "statListSourceMissing": "數值清單「{field}」無法列出「{source}」：該欄位不存在，或沒有可用的列來源。",
+    "statListParentPrefix": "{parent}：",
+    "statListSpecLabel": "{parent}：{spec}",
+    "statListSpecPlaceholder": "＿＿＿",
+    "statListRollInvalid": "這一列的擲骰設定有誤。",
+    "webTabsFallbackName": "分頁區塊",
+    "tileEmptyValue": "—"
+  },
+  "dice": {
+    "droppedDie": "捨棄的骰子：{face}",
+    "roll": "擲骰",
+    "dice": "骰子",
+    "loadError": "載入骰子失敗",
+    "notationInput": "骰子標記",
+    "target": "目標值",
+    "bonusDice": "{count} 顆獎勵骰",
+    "penaltyDice": "{count} 顆懲罰骰",
+    "successLevel": {
+      "critical": "大成功",
+      "extreme": "極限成功",
+      "hard": "困難成功",
+      "regular": "一般成功",
+      "failure": "失敗",
+      "fumble": "大失敗",
+      "success-with-style": "絕妙成功",
+      "success": "成功",
+      "tie": "平手",
+      "strong": "完全成功",
+      "weak": "部分成功",
+      "miss": "失敗",
+      "bwb-extraordinary": "額外收益（12+）",
+      "bwb-strong": "完全成功（10–11）",
+      "bwb-weak": "部分成功（7–9）",
+      "bwb-miss": "失敗（6 以下）"
+    },
+    "visibility": {
+      "label": "擲骰對象",
+      "all": "所有人",
+      "gm": "暗骰"
+    },
+    "half": "半值",
+    "fifth": "五分之一",
+    "noBonusPenalty": "普通",
+    "rollSkill": "進行技能檢定",
+    "decreaseDice": "減少獎勵/懲罰骰",
+    "increaseDice": "增加獎勵/懲罰骰",
+    "rollControl": {
+      "tens": "十位",
+      "units": "個位"
+    },
+    "rollOptions": {
+      "title": "{name}（{value}）",
+      "bonusLabel": "獎懲骰",
+      "bonusGroup": "獎勵骰或懲罰骰",
+      "roll": "擲骰",
+      "cancel": "取消",
+      "hint": "長按或按右鍵，選難度和獎懲骰",
+      "formHint": "長按或按右鍵，打開這一擲的選項",
+      "loadFailed": "擲骰選項沒有載入，請再試一次",
+      "retry": "重試",
+      "normal": "一般",
+      "penaltyShort": "懲 {count}",
+      "bonusShort": "獎 {count}",
+      "normalLabel": "一般擲骰，不加獎勵骰或懲罰骰",
+      "regularLabel": "一般難度：擲出技能值以下",
+      "hardLabel": "困難難度：擲出技能值的一半以下",
+      "extremeLabel": "極難難度：擲出技能值的五分之一以下",
+      "bonusCountLabel": "{count} 顆獎勵骰",
+      "penaltyCountLabel": "{count} 顆懲罰骰"
+    },
+    "custom": "自訂",
+    "customPlaceholder": "例如 2d6+3, 4d10...",
+    "quickShortcuts": {
+      "title": "快捷骰組",
+      "editAll": "編輯快捷清單",
+      "editPlaceholder": "每行一個，例如：\n2d6\n4dF\n1d20+5",
+      "save": "儲存",
+      "current": "目前自訂快捷",
+      "empty": "尚未建立任何自訂快捷",
+      "importExport": "匯入／匯出",
+      "export": "匯出",
+      "import": "匯入",
+      "importPlaceholder": "貼上 JSON（陣列或含 shortcuts 欄位的物件）或逐行表達式",
+      "saved": "快捷骰組已儲存",
+      "imported": "已匯入 {count} 組快捷",
+      "invalidSkipped": "已略過 {count} 組無效或重複資料",
+      "importEmpty": "匯入資料中沒有可用的擲骰式",
+      "saveError": "儲存快捷骰組失敗",
+      "exportCopied": "已複製快捷骰組 JSON",
+      "exportFailed": "複製失敗，請稍後再試"
+    },
+    "selectDiceHint": "點擊骰子類型開始擲骰",
+    "rollDialog": {
+      "title": "擲骰檢定",
+      "reference": "參考資料",
+      "options": "修正項目",
+      "targetValue": "目標值",
+      "cancel": "取消",
+      "roll": "擲骰"
+    },
+    "syntaxHelp": {
+      "title": "擲骰語法說明",
+      "description": "支援標準骰子記號與進階修飾符",
+      "sections": {
+        "basic": {
+          "title": "基本語法",
+          "items": [
+            {
+              "syntax": "NdM",
+              "desc": "擲 N 顆 M 面骰",
+              "example": "2d6, 1d20"
+            },
+            {
+              "syntax": "NdF",
+              "desc": "擲 N 顆命運骰（-1, 0, +1）",
+              "example": "4dF"
+            },
+            {
+              "syntax": "+N / -N",
+              "desc": "加減修正值",
+              "example": "1d20+5"
+            },
+            {
+              "syntax": "×N 或 *N",
+              "desc": "結果乘以 N",
+              "example": "3d6×5"
+            },
+            {
+              "syntax": "組合",
+              "desc": "可組合多組骰子",
+              "example": "2d6+1d8+3"
+            }
+          ]
+        },
+        "keepDrop": {
+          "title": "保留/丟棄",
+          "items": [
+            {
+              "syntax": "kN / khN",
+              "desc": "保留最高 N 顆",
+              "example": "4d6kh3"
+            },
+            {
+              "syntax": "klN",
+              "desc": "保留最低 N 顆",
+              "example": "4d6kl1"
+            },
+            {
+              "syntax": "dhN",
+              "desc": "丟棄最高 N 顆",
+              "example": "4d6dh1"
+            },
+            {
+              "syntax": "dN / dlN",
+              "desc": "丟棄最低 N 顆",
+              "example": "4d6dl1"
+            }
+          ]
+        },
+        "exploding": {
+          "title": "爆炸骰",
+          "items": [
+            {
+              "syntax": "!",
+              "desc": "擲到最大值時額外擲一顆",
+              "example": "1d6!"
+            },
+            {
+              "syntax": "!!",
+              "desc": "擲到最大值時累加到同一顆",
+              "example": "1d6!!"
+            },
+            {
+              "syntax": "!p",
+              "desc": "爆炸但額外骰 -1",
+              "example": "1d6!p"
+            },
+            {
+              "syntax": "!>N",
+              "desc": "自訂爆炸門檻",
+              "example": "1d6!>5"
+            }
+          ]
+        },
+        "reference": {
+          "title": "角色屬性參照",
+          "items": [
+            {
+              "syntax": "{{#name[args]}}",
+              "desc": "呼叫系統擲骰巨集並帶入參數（支援 #name[args] 簡寫）",
+              "example": "#coc[@str] 或 {{#coc[@str]}}"
+            },
+            {
+              "syntax": "{{@attr}}",
+              "desc": "參照角色屬性值",
+              "example": "1d100+{{@dex}}"
+            }
+          ]
+        }
+      }
+    },
+    "validation": {
+      "empty": "請輸入擲骰表達式",
+      "invalidSyntax": "無效的擲骰語法",
+      "invalidChars": "無效字符：{chars}",
+      "startsWithSign": "表達式以符號開頭，將視為修正值",
+      "hasAttrRef": "包含屬性參照，需要角色數據才能計算",
+      "hasMacroRef": "包含擲骰巨集參照，需要角色資料與系統巨集",
+      "tooManySides": "d{sides} 骰子面數過大",
+      "tooManyDice": "{count}d{sides} 骰子數量過多",
+      "keepDropExceedsCount": "保留/丟棄數量（{total}）不能大於或等於骰子數（{count}）"
+    },
+    "rollResult": {
+      "titleDice": "擲骰結果",
+      "titleCheck": "技能檢定",
+      "titleAttribute": "屬性擲骰",
+      "modifier": "修正值",
+      "target": "目標",
+      "hardThreshold": "困難 (1/2)",
+      "extremeThreshold": "極限 (1/5)",
+      "total": "總計",
+      "rerollSuggestion": "有 {count} 個屬性低於 50，建議重骰",
+      "reroll": "重骰",
+      "cancel": "取消",
+      "accept": "接受"
+    },
+    "followUp": {
+      "pushed": "孤注一擲",
+      "luckSpent": "花 {cost} 點幸運：{skill} {target} → {level}"
+    },
+    "ruleLabel": {
+      "normal": "標準檢定",
+      "bonus": "獎勵骰 ×{count}",
+      "penalty": "懲罰骰 ×{count}",
+      "compare": "比較",
+      "roll": "擲骰"
+    },
+    "difficulty": {
+      "label": "難度",
+      "regular": "一般",
+      "hard": "困難",
+      "extreme": "極難",
+      "withTarget": "{level}（{target}）"
+    }
+  },
+  "roll": {
+    "pushAlreadyDone": "這一擲已經在別處孤注一擲過了。",
+    "luckAlreadyDone": "這一擲已經接續過了。",
+    "error": {
+      "title": "擲骰失敗",
+      "invalidExpression": "無效的表達式",
+      "noOptions": "沒有可供擲骰的選項"
+    },
+    "toast": {
+      "title": "{label} 擲骰",
+      "defaultTitle": "擲骰結果",
+      "rolled": "擲出 {rolled}",
+      "rolledWithTarget": "擲出 {rolled}（目標 {target}）",
+      "passed": "通過",
+      "failed": "未通過",
+      "coc7Breakdown": "十[{tens}] 個[{units}] → {selectedTotal}",
+      "diceBreakdown": "[{rolls}]"
+    },
+    "successLevel": {
+      "critical": "大成功",
+      "extreme": "極難成功",
+      "hard": "困難成功",
+      "regular": "成功",
+      "failure": "失敗",
+      "fumble": "大失敗",
+      "success-with-style": "絕妙成功",
+      "success": "成功",
+      "tie": "平手",
+      "strong": "完全成功",
+      "weak": "部分成功",
+      "miss": "失敗",
+      "bwb-extraordinary": "額外收益（12+）",
+      "bwb-strong": "完全成功（10–11）",
+      "bwb-weak": "部分成功（7–9）",
+      "bwb-miss": "失敗（6 以下）"
+    },
+    "check": "檢定",
+    "panel": {
+      "title": "擲骰台",
+      "close": "關閉擲骰台",
+      "audience": {
+        "label": "送到",
+        "group": "聊天裡誰看得到你的擲骰",
+        "all": "所有人",
+        "gm": "暗骰",
+        "gmHint": "暗骰：只有你和 GM 看得到"
+      },
+      "result": {
+        "target": "{label} {target}",
+        "tens": "十位",
+        "units": "個位",
+        "taken": "取用",
+        "regular": "一般 ≤{value}",
+        "hard": "困難 ≤{value}",
+        "extreme": "極限 ≤{value}",
+        "bonus": "獎勵骰 {count}",
+        "penalty": "懲罰骰 {count}",
+        "dice": "骰子",
+        "sentAll": "已送到聊天・所有人看得到",
+        "sentGm": "已送到聊天・只有你和 GM 看得到",
+        "notSent": "只顯示在這裡・沒有送到聊天",
+        "pushed": "孤注一擲",
+        "improveTicked": "已勾選可成長",
+        "improveUndone": "已撤銷可成長",
+        "improveBlindWithheld": "暗骰不自動勾可成長，結算時請自行勾選",
+        "improveUndo": "撤銷",
+        "luckSpent": "已花 {count} 點幸運：{from} → {to}"
+      },
+      "history": {
+        "title": "最近",
+        "inChat": "也在聊天裡",
+        "localOnly": "只在本頁"
+      },
+      "empty": "擲一次骰，結果會停在這裡。",
+      "open": "展開擲骰台",
+      "openWith": "展開擲骰台，{summary}",
+      "announce": "{label}：{total}",
+      "announceLevel": "{label}：{total}，{level}",
+      "actions": {
+        "push": "孤注一擲",
+        "pushHint": "重擲同一個目標；再失敗要承擔更糟的後果。每次檢定只能一次。",
+        "pushedFinal": "已孤注一擲：這一擲不能再重擲，也不能花幸運。",
+        "luck": {
+          "title": "花幸運",
+          "have": "幸運 {value}",
+          "option": "花 {cost} 點幸運，轉成{level}",
+          "optionLabel": "{level} −{cost}",
+          "tooLow": "幸運不足：轉成{level}要 {cost} 點，你只有 {value} 點。",
+          "notWritable": "只有角色的擁有者能花幸運。",
+          "failed": "訊息沒有送出，幸運已還回去。"
+        }
+      }
+    }
+  },
+  "common": {
+    "appName": "Skald",
+    "loading": "載入中...",
+    "error": "發生錯誤",
+    "save": "儲存",
+    "cancel": "取消",
+    "delete": "刪除",
+    "edit": "編輯",
+    "create": "建立",
+    "add": "新增",
+    "submit": "提交",
+    "search": "搜尋",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "close": "關閉",
+    "noResults": "無符合結果",
+    "addSkill": "新增技能",
+    "addSkillDescription": "選擇要新增到角色卡的技能",
+    "aiTranslatedNotice": "此語言由 AI 翻譯，可能存在錯誤",
+    "errorRetry": "發生錯誤，請稍後再試"
+  },
+  "characterReferenceField": {
+    "namePlaceholder": "輸入角色名稱...",
+    "selectPc": "選擇一位玩家角色",
+    "selectNpc": "選擇一位 NPC",
+    "selectAny": "選擇任一角色",
+    "noMembers": "尚無成員",
+    "openSheet": "開啟角色卡",
+    "status": {
+      "notPlaying": "已不在遊玩",
+      "archived": "已封存",
+      "gone": "已不在桌上"
+    },
+    "remove": "移除 {name}",
+    "addMember": "加入桌上的角色",
+    "noCandidates": "桌上的角色都已列入",
+    "addByName": "以名稱加入"
+  },
+  "characters": {
+    "derived": {
+      "updateFailed": "無法儲存衍生值覆寫",
+      "refreshFailed": "無法依範本重新計算衍生值",
+      "overridden": "已覆寫",
+      "auto": "自動計算",
+      "autoValue": "自動計算：{value}",
+      "fixed": "自動計算（不可覆寫）",
+      "noRuntime": "自動計算（這張卡不能覆寫）",
+      "input": "覆寫{name}",
+      "restore": "{name}恢復自動計算",
+      "recalc": {
+        "title": "已重新計算",
+        "changed": "{name}：{before} → {after}",
+        "overridden": "{name}維持覆寫 {value}（自動計算 {before} → {after}）",
+        "keptOutOfCap": "{name}：保留 {kept}（上限 {cap}）",
+        "restore": "恢復自動計算"
+      }
+    },
+    "chrome": {
+      "back": "返回我的角色卡",
+      "modeGroup": "角色卡模式",
+      "modePlay": "遊玩",
+      "modeEdit": "編輯",
+      "untitled": "未命名角色",
+      "portraitAlt": "肖像",
+      "portraitView": "查看{name}的肖像",
+      "portraitUpload": "上傳肖像",
+      "portraitReplace": "更換肖像",
+      "portraitRemove": "移除肖像",
+      "portraitUploading": "上傳中…",
+      "portraitUploadFailed": "肖像上傳失敗，請再試一次。",
+      "portraitNotImage": "請選擇圖片檔。",
+      "portraitDialogTitle": "肖像",
+      "portraitEmpty": "還沒有肖像",
+      "portraitUnnamed": "這個角色",
+      "advancedSettings": "進階設定",
+      "copyShareLink": "複製分享連結",
+      "shareMenu": "分享選項",
+      "syncLabel": "同步狀態"
+    }
+  },
+  "tables": {
+    "session": {
+      "createNpc": {
+        "title": "建立 NPC",
+        "description": "新 NPC 預設只有 GM 和 GM 助手看得到。你可以在角色卡分頁向全桌公開。",
+        "name": "名稱",
+        "system": "遊戲系統",
+        "chooseSystem": "選擇遊戲系統",
+        "template": "角色卡範本",
+        "loading": "正在載入遊戲系統與範本…",
+        "noTemplates": "沒有可用的已發布角色卡範本。",
+        "loadFailed": "無法載入角色卡範本，請關閉視窗後再試。",
+        "createFailed": "無法建立 NPC。",
+        "openFailed": "NPC 已建立，但無法開啟角色卡。請重新整理桌次。",
+        "visibilityFailed": "無法變更角色卡的可見範圍。"
+      },
+      "inProgress": "進行中的遊戲",
+      "noCharacter": "尚未選擇角色",
+      "selectCharacter": "選擇要扮演的角色",
+      "selectCharacterDesc": "選一個你在這桌扮演的角色，或帶一份角色卡的複本進來。桌上發生的事只留在這份複本，不會改到原本的角色卡。",
+      "noCharactersForSystem": "你還沒有「{system}」的角色卡，建立一張後就能在這張桌次使用。",
+      "viewExternalSheet": "查看外部角色卡連結",
+      "externalSheetLink": "外部角色卡連結",
+      "externalSheetLinkDesc": "沒有正式角色卡也可以貼一個外部連結（例如 Google Sheet）讓其他人查看",
+      "externalSheetLinkPlaceholder": "https://docs.google.com/...",
+      "externalSheetLinkSave": "儲存連結",
+      "externalSheetLinkClear": "清除連結",
+      "externalSheetLinkInvalid": "請輸入以 http:// 或 https:// 開頭的網址",
+      "externalSheetLinkOpen": "開啟外部角色卡",
+      "memberAvatar": "桌次頭像",
+      "memberAvatarDesc": "沒有正式角色卡也可以上傳一張頭像，作為你在這桌的顯示圖片",
+      "memberAvatarUpload": "上傳頭像",
+      "memberAvatarClear": "清除頭像",
+      "startSession": "開始遊戲",
+      "characterCard": "角色卡：{name}",
+      "playModeComingSoon": "（遊玩模式角色卡即將推出）",
+      "backToTable": "返回遊戲桌",
+      "backToSession": "返回遊戲",
+      "tableInfo": "遊戲桌資訊",
+      "settings": "設定",
+      "play": "開始遊玩",
+      "noCharactersInTable": "此遊戲桌尚無角色卡",
+      "addCharacters": "新增角色卡",
+      "backToHome": "返回首頁",
+      "settingsMenu": {
+        "genreTheme": "類型主題",
+        "genreThemeGmOverride": "GM 已指定這桌的主題，此開關暫不生效",
+        "gmGenre": "桌次主題",
+        "genreAuto": "自動（依遊戲系統）",
+        "genre": {
+          "neutral": "中性",
+          "hardboiled": "硬派推理",
+          "cozy": "溫馨推理",
+          "eastern": "東方"
+        },
+        "diceAnimation": "骰子動畫",
+        "diceColor": "骰子顏色",
+        "chatNotifications": "聊天通知",
+        "messageStacking": "訊息堆疊",
+        "resetPanels": "重置面板佈局",
+        "copyInviteCode": "複製邀請碼",
+        "leaveTable": "離開遊戲桌",
+        "gmSettings": "GM 設定",
+        "enableChat": "啟用聊天功能",
+        "enableMedia": "啟用媒體播放器",
+        "discordIntegration": "Discord 整合",
+        "deleteTable": "刪除遊戲桌",
+        "deleteTableConfirmTitle": "確定要刪除這個遊戲桌嗎？",
+        "deleteTableConfirmDescription": "此操作無法復原,將永久刪除這個遊戲桌,以及所有訊息、角色連結與筆記本。",
+        "deleteTableError": "刪除遊戲桌失敗",
+        "comingSoon": "即將推出",
+        "inviteCodeCopied": "已複製邀請碼！",
+        "leaveTableError": "離開遊戲桌失敗",
+        "settings": "遊戲設定",
+        "messageStackingTutorial": {
+          "title": "訊息堆疊操作說明",
+          "description": "開啟後，聊天輸入框的 Enter／方向鍵行為會改變：",
+          "stepEnter": "Enter：把目前輸入的內容存成一則待發送草稿，並清空輸入框",
+          "stepDoubleEnter": "輸入框清空後立刻再按一次 Enter：直接送出剛剛那則草稿",
+          "stepArrows": "游標在輸入框最開頭時按「上」：切換到瀏覽草稿佇列，繼續按上／下移動、Enter 把選到的草稿帶回輸入框編輯",
+          "stepEscape": "Esc：取消瀏覽草稿佇列，回到原本輸入框",
+          "close": "了解"
+        },
+        "aiAssistant": "AI 助理（MCP）",
+        "characterEditPreset": "誰能改桌上的角色卡",
+        "characterEditPresetHint": "只影響這桌的複本，玩家原本的角色卡不會被改到。",
+        "characterEditPresetOptions": {
+          "owner_and_gm": "卡主與 GM",
+          "owner_only": "只有卡主",
+          "all_members": "桌上所有人"
+        },
+        "characterEditPresetDescriptions": {
+          "owner_and_gm": "玩家改自己的複本，你可以改桌上每一份。",
+          "owner_only": "只有帶卡進來的玩家能改，你只能看。",
+          "all_members": "已加入的玩家都能改桌上有人在玩的卡。"
+        },
+        "characterEditPresetError": "無法變更誰能改桌上的角色卡",
+        "leaveTableConfirmTitle": "確定要離開這張遊戲桌？",
+        "leaveTableConfirmDescription": "你的角色複本會留在這張桌上。之後仍可以在「我的角色卡 → 桌上的複本」開啟，並存回你的角色卡。",
+        "deleteTableCopiesNote": "角色複本不會被刪除：每位玩家都能在「我的角色卡 → 桌上的複本」找到自己的複本，並存回角色卡。",
+        "tableCopies": "桌上的角色複本",
+        "tableSetup": "開團設定"
+      },
+      "editMode": "編輯",
+      "viewMode": "檢視",
+      "playMode": "遊玩",
+      "sheetMode": "角色卡模式",
+      "fullEditor": "完整編輯",
+      "tableUnavailable": "這個遊戲桌已無法使用",
+      "syncFailed": "同步變更失敗",
+      "characterTab": "角色卡",
+      "notesTab": "筆記",
+      "whiteboardTab": "白板",
+      "rightPanel": {
+        "topPanel": "上方面板",
+        "bottomPanel": "下方面板",
+        "expand": "展開",
+        "collapse": "收合",
+        "hide": "隱藏"
+      },
+      "tableRules": {
+        "title": "系統規則",
+        "back": "返回遊戲桌",
+        "loading": "正在載入系統規則…",
+        "unavailable": "無法載入系統規則，你仍可使用遊戲桌。",
+        "retry": "重試"
+      },
+      "partyStrip": {
+        "title": "全隊總覽",
+        "summary": "{count} 張角色卡・點卡片切換下方角色卡",
+        "unavailable": "無法載入隊伍摘要，角色卡仍可切換。",
+        "retry": "重試",
+        "hidden": "對玩家隱藏"
+      },
+      "topBar": {
+        "breadcrumb": "導覽路徑",
+        "tables": "遊戲桌",
+        "onlyYou": "只有你在線",
+        "online": "{count} 人在線",
+        "chat": "聊天",
+        "chatUnread": "{count} 則未讀訊息",
+        "chatUnreadMany": "超過 99 則未讀訊息"
+      },
+      "chatHandle": {
+        "label": "調整聊天欄寬度",
+        "valueText": "寬 {width} 像素",
+        "preview": "{width}px",
+        "hint": "←→ 切換・Enter 還原"
+      },
+      "sheetOwner": {
+        "label": "看誰的卡",
+        "readOnly": "唯讀・{name} 的卡"
+      },
+      "party": {
+        "label": "隊伍",
+        "empty": "還沒有隊友。",
+        "online": "在線",
+        "noCharacter": "沒有角色",
+        "viewSheet": "看卡（唯讀）",
+        "externalSheet": "外部角色卡"
+      },
+      "nav": {
+        "label": "遊戲桌頁面",
+        "myCard": "我的卡",
+        "party": "隊伍",
+        "chat": "聊天",
+        "pending": "{count} 件待審核申請",
+        "chatUnread": "{count} 則未讀訊息",
+        "chatUnreadMany": "超過 99 則未讀訊息",
+        "rules": "速查"
+      },
+      "chatDrawer": {
+        "label": "聊天欄",
+        "title": "聊天",
+        "close": "關閉聊天"
+      },
+      "emptyTable": {
+        "title": "這桌還沒有玩家",
+        "description": "把邀請碼或連結傳給玩家。他們送出申請後會出現在這裡等你批准。",
+        "codeLabel": "邀請碼",
+        "copyLink": "複製邀請連結",
+        "copyCode": "只複製代碼",
+        "linkCopied": "已複製邀請連結",
+        "codeCopied": "已複製邀請碼",
+        "copyFailed": "無法複製，請手動選取邀請碼",
+        "prepareHandbook": "先去準備 GM 手冊"
+      },
+      "noPlayerCharacters": {
+        "title": "還沒有玩家角色",
+        "description": "玩家加入並選好角色後，會出現在這裡。",
+        "goCrew": "到團務邀請玩家"
+      },
+      "characterPicker": {
+        "description": "這桌使用「{system}」。選一張相同系統的角色卡，桌上會放一份複本，原本的角色卡不變。GM 和隊友會在隊伍裡看到這份複本。",
+        "descriptionAnySystem": "選一張角色卡，桌上會放一份複本，原本的角色卡不變。GM 和隊友會在隊伍裡看到這份複本。",
+        "listLabel": "可以扮演的角色卡",
+        "lastUpdated": "最後更新 {date}",
+        "use": "帶一份複本進這桌",
+        "create": "建立角色卡",
+        "hint": "沒有角色也能聊天和擲骰；之後隨時可以在這裡選。"
+      },
+      "pending": {
+        "details": "申請資訊",
+        "table": "遊戲桌",
+        "gm": "GM",
+        "system": "系統",
+        "appliedAt": "申請時間",
+        "autoEnter": "這個頁面會自動進入桌次，不用重新整理",
+        "back": "回到遊戲桌列表",
+        "cancel": "取消申請",
+        "cancelTitle": "取消加入申請？",
+        "cancelDescription": "取消後會從「{table}」的審核名單中移除；之後想加入，要再用邀請碼重新申請。",
+        "cancelConfirm": "取消申請",
+        "cancelKeep": "保留申請",
+        "cancelled": "已取消加入申請",
+        "cancelFailed": "取消申請失敗，請稍後再試"
+      },
+      "tableCopiesHeading": "在這桌扮演",
+      "vaultSheetsHeading": "帶一份我的角色卡進來",
+      "tableCopy": {
+        "label": "這桌的複本",
+        "description": "這裡的變動只留在這桌，不會改到玩家原本的角色卡。",
+        "openSource": "開啟我原本的角色卡",
+        "saveToVault": "存回我的角色卡…"
+      },
+      "unplayedCopiesHeading": "你在這桌、目前沒在玩的複本",
+      "playAgain": "再次使用",
+      "removeCopy": {
+        "title": "把「{name}」移出遊玩？",
+        "description": "複本會連同進度留在這張桌上，只是不再遊玩。之後再帶同一張角色卡進來，就會接著用這份複本；也可以先把它存回你的角色卡。",
+        "saveFirst": "先存回我的角色卡",
+        "confirm": "移出遊玩"
+      },
+      "tableCopies": {
+        "title": "桌上的角色複本",
+        "description": "這桌所有的角色複本，包括玩家離開時留下的。沒有人在玩的可以封存；你自己的複本（預建角色、NPC）可以交給一位玩家。",
+        "empty": "這桌還沒有角色複本。",
+        "you": "你",
+        "formerPlayer": "已離開的玩家",
+        "inPlay": "遊玩中",
+        "notInPlay": "沒有人在玩",
+        "archived": "已封存",
+        "archive": "封存",
+        "unarchive": "取消封存",
+        "archivedToast": "已封存複本",
+        "unarchivedToast": "已取消封存",
+        "handOffTo": "交給玩家…",
+        "handOff": "提出",
+        "offeredTo": "已提議交給 {name}，等待對方回應",
+        "cancelOffer": "收回",
+        "offeredToast": "已送出，玩家會在遊戲桌內看到",
+        "cancelledToast": "已收回",
+        "handOffHint": "玩家同意後，這張複本就是玩家的卡；你仍可依這桌的編輯權限設定修改它。",
+        "failed": "操作失敗，請再試一次。",
+        "gmOnly": "僅 GM 可見",
+        "hide": "對玩家隱藏",
+        "show": "給玩家看",
+        "hiddenToast": "玩家已看不到這張複本",
+        "shownToast": "玩家現在看得到這張複本",
+        "visibilityHint": "僅 GM 可見的複本，玩家看不到也改不了；GM 助手仍然可以。在桌內建立的角色一開始是僅 GM 可見。"
+      },
+      "handoffOffer": {
+        "label": "角色轉交",
+        "title": "GM 想把「{name}」交給你",
+        "body": "接受後，它就是你在這桌的角色；之後也可以存回你的角色卡。",
+        "accept": "接受",
+        "decline": "婉拒",
+        "accepted": "這張角色卡現在是你的了",
+        "declined": "已婉拒",
+        "failed": "沒能回應，請再試一次。"
+      }
+    }
+  },
+  "sheetUi": {
+    "noSelectableSkills": "沒有可選擇的技能",
+    "searchSkills": "搜尋技能...",
+    "tabAvailableSkills": "可用技能",
+    "tabSpecializationSkills": "專門技能",
+    "tabCustom": "自訂",
+    "noMatchingSkills": "找不到符合的技能",
+    "noMatchingSpecializationSkills": "找不到符合的專門技能",
+    "specializationOptionsCount": "{count} 項",
+    "specializationBlankOption": "（空白 - 自行填寫）",
+    "customSkillName": "技能名稱",
+    "customSkillNamePlaceholder": "輸入技能名稱",
+    "baseValue": "基礎值",
+    "addCustomSkill": "新增自訂技能",
+    "assetItemPlaceholder": "項目...",
+    "assetValuePlaceholder": "價值",
+    "armorTypePlaceholder": "護甲類型",
+    "armorValuePlaceholder": "數值",
+    "shieldTypePlaceholder": "盾牌類型",
+    "shieldValuePlaceholder": "傷害/護甲",
+    "shieldDamagePlaceholder": "傷害",
+    "shieldArmorPlaceholder": "護甲",
+    "noItems": "無項目",
+    "fellowInvestigatorPlaceholder": "調查員...",
+    "fellowPlayerPlaceholder": "玩家...",
+    "fellowNotesPlaceholder": "備註...",
+    "noFellowInvestigators": "無同伴調查員",
+    "markKeyConnection": "標記為關鍵連帶",
+    "unmarkKeyConnection": "取消關鍵連帶",
+    "backstoryPlaceholder": "輸入內容...",
+    "loadingSkills": "載入技能中...",
+    "selectImageFile": "請選擇圖片檔案",
+    "imageProcessingFailed": "圖片處理失敗",
+    "processing": "處理中...",
+    "removeImage": "移除圖片",
+    "photo": "照片",
+    "uploadUnavailable": "這裡無法上傳圖片",
+    "stanceRollResults": "架勢動作結果",
+    "clearPrefix": "清除：",
+    "positive": "正面",
+    "negative": "負面",
+    "physicalShort": "物理",
+    "mentalShort": "心靈",
+    "pluginLoadFailed": "角色卡載入失敗。",
+    "pluginFieldsLoadFailed": "這個系統的欄位載入失敗。",
+    "pluginLoadRetry": "重試",
+    "zhFallbackNotice": "這個版本未收錄本系統的部分繁體中文內容，這些地方以英文顯示。"
+  },
+  "errorPages": {
+    "error": {
+      "title": "發生了一點問題",
+      "description": "發生未預期的錯誤。你可以再試一次，或回到首頁。",
+      "retry": "重試",
+      "home": "回首頁",
+      "reference": "錯誤代碼：{digest}"
+    }
+  }
+}

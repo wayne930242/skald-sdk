@@ -1,0 +1,47 @@
+{
+  "fateTableSetup": {
+    "items": {
+      "skills": "技能表",
+      "allocation": "起始配點",
+      "stress": "壓力",
+      "injuries": "傷勢",
+      "extreme": "極端後果",
+      "ratings": "武器與護甲",
+      "scale": "規模",
+      "pointBudget": "點數預算",
+      "pointCap": "等級上限"
+    },
+    "points": "{value}",
+    "issues": {
+      "invalid": "這一項無法讀取，已略過",
+      "unknownItem": "不認得這一項，已略過"
+    },
+    "blocked": {
+      "stress": "請先清除已記錄的壓力，再切換壓力模式",
+      "injuries": "請先處理現有傷勢，再切換傷勢模式",
+      "harm": "這項規則會讓現有傷勢或標記失效，請先處理受影響的項目",
+      "preset": "目前不支援這組配方，請重新載入頁面"
+    },
+    "editor": {
+      "shortcuts": "配方捷徑",
+      "shortcutsHint": "新設定的項目預設鎖定",
+      "importRecipe": "從角色卡帶入配方",
+      "importLoading": "正在載入你的角色卡…",
+      "importFailed": "無法載入你的角色卡，請再試一次",
+      "importEmpty": "你在庫存與本桌都沒有 Fate Condensed 角色卡",
+      "importChoose": "選擇角色卡",
+      "importPlaceholder": "請選擇角色卡…",
+      "importLocation": { "vault": "庫存", "table": "本桌複本" },
+      "choices": "規則項目",
+      "playerChoice": "由玩家選擇",
+      "policy": "{item}的鎖定方式",
+      "locked": "鎖定",
+      "default": "預設，玩家可改",
+      "points": "點數購買",
+      "pointsHint": "留空沿用規則書數值",
+      "unknownOption": "規則目錄已沒有這個選項，存檔後玩家會用預設值",
+      "loading": "正在載入規則目錄…",
+      "failed": "無法載入規則目錄"
+    }
+  }
+}

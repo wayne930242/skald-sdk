@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "skald/system/v1",
+  "title": "Skald Game System Configuration",
+  "description": "Configuration schema for game system registration",
+  "type": "object",
+  "required": ["id", "name", "version", "category", "schema", "template"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique system identifier (e.g., coc7e, dnd5e)",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name of the game system"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "category": {
+      "type": "string",
+      "description": "System category for grouping (e.g., pbta, neo-classic, fate)",
+      "enum": ["pbta", "neo-classic", "fate"]
+    },
+    "description": { "type": "string" },
+    "author": { "type": "string" },
+    "defaultGenre": {
+      "type": "string",
+      "description": "Genre theme a table of this system starts with (omit for neutral)",
+      "enum": ["neutral", "hardboiled", "cozy", "eastern"]
+    },
+    "schema": {
+      "type": "string",
+      "description": "Path to schema.json relative to system directory"
+    },
+    "template": {
+      "type": "string",
+      "description": "Path to template.json relative to system directory"
+    },
+    "defaultData": {
+      "type": "string",
+      "description": "Path to default-data.json relative to system directory"
+    },
+    "handlers": {
+      "type": "string",
+      "description": "Module path for system handlers (e.g., ./handlers)"
+    },
+    "sheetComponent": {
+      "type": "string",
+      "description": "Character sheet component to use. If not specified, uses generic renderer.",
+      "enum": ["coc7e", "avatar-legends", "dnd5e", "fate", "generic"]
+    },
+    "mappings": {
+      "type": "object",
+      "description": "System-specific mappings (era, categories, etc.)",
+      "properties": {
+        "eraMappings": { "type": "string" },
+        "categoryMappings": { "type": "string" }
+      }
+    },
+    "gameData": {
+      "type": "object",
+      "description": "Paths to game data files",
+      "additionalProperties": { "type": "string" }
+    },
+    "wizard": {
+      "type": "string",
+      "description": "Path to the Character Creation Wizard (skald/wizard/v1) the built-in template publishes; omit for none"
+    },
+    "i18n": {
+      "type": "object",
+      "description": "Paths to i18n message files",
+      "additionalProperties": { "type": "string" }
+    },
+    "dsl": {
+      "type": "object",
+      "description": "DSL configuration for user-submittable systems",
+      "properties": {
+        "lookupTables": {
+          "type": "string",
+          "description": "Path to lookup tables JSON file"
+        },
+        "rollRules": {
+          "type": "string",
+          "description": "Path to roll rules JSON file"
+        },
+        "aliases": {
+          "type": "string",
+          "description": "Path to attribute aliases JSON file"
+        },
+        "rollMacros": {
+          "type": "string",
+          "description": "Path to roll macros JSON file"
+        }
+      }
+    }
+  }
+}

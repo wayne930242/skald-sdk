@@ -1,0 +1,13 @@
+{
+  "$schema": "../schemas/roll-rules.schema.json",
+  "default": "dnd5e",
+  "rules": {
+    "dnd5e": {
+      "type": "comparison",
+      "dice": "1d20",
+      "description": "D&D 5e d20 test: total against a DC. Totals only; the kept die is not exposed to roll rules, so no critical marking.",
+      "comparison": ">=",
+      "target": "{{@target}}"
+    }
+  }
+}

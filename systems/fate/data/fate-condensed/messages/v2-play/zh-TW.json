@@ -1,0 +1,145 @@
+{
+  "fatePlay": {
+    "edit": "編輯{field}",
+    "notWritten": "尚未填寫",
+    "rules": {
+      "open": "規則參照",
+      "section": "{section}規則"
+    },
+    "identity": {
+      "unnamed": "未命名角色",
+      "noHighConcept": "尚未填寫高概念",
+      "name": "姓名",
+      "player": "玩家",
+      "description": "描述",
+      "playerLine": "玩家 {player}"
+    },
+    "points": {
+      "title": "命運點",
+      "refresh": "重振 {refresh}",
+      "tokens": "{count} 點命運點",
+      "more": "+{count}",
+      "table": {
+        "managed": "由遊戲桌管理的命運點。",
+        "hidden": "你看不到這個角色在遊戲桌上的命運點。",
+        "unavailable": "暫時連不上遊戲桌：命運點只能檢視，不能在角色卡上變動。",
+        "elsewhere": "這張角色卡的命運點由遊戲桌管理，請在遊戲桌的角色卡分頁操作。"
+      },
+      "carry": {
+        "button": "帶出已入帳點數",
+        "title": "帶出遊戲桌上已入帳的命運點",
+        "body": "把遊戲桌上已入帳的 {points} 點寫進這張角色卡。尚未入帳的免費援引、待結算款、強迫提案與收據不會帶出。",
+        "confirm": "寫入角色卡",
+        "cancel": "取消",
+        "sceneOpen": "場景進行中：關場後才能帶出命運點。",
+        "noFullSheet": "這裡無法開啟完整角色卡。",
+        "done": "已帶出 {points} 點。",
+        "note": "帶出遊戲桌已入帳點數",
+        "deleted": "這張遊戲桌已刪除，這是最後能帶出的餘額。"
+      }
+    },
+    "aspects": {
+      "title": "形象",
+      "empty": "還沒有形象。",
+      "number": "{number}",
+      "kind": {
+        "highConcept": "高概念",
+        "trouble": "麻煩",
+        "relationship": "關係",
+        "free": "自由",
+        "situation": "情境",
+        "boost": "推助"
+      },
+      "prompt": {
+        "highConcept": "用一句話說你是誰",
+        "trouble": "什麼總讓你陷入麻煩？",
+        "relationship": "誰對你很重要？",
+        "free": "你帶著什麼難忘的經歷？"
+      },
+      "numbered": "{label} {number}",
+      "write": "寫下{label}",
+      "freeInvokes": "免費援引 {count} 次",
+      "add": "新增形象",
+      "remove": "移除{label}",
+      "hidden": "祕密形象",
+      "hiddenNote": "只有擁有者和 GM 看得到這張牌。",
+      "makeSecret": "設為祕密形象",
+      "secretOn": "只有你和 GM 看得到",
+      "conflict": "先前填寫的內容仍保留：{text}",
+      "invoke": "援引",
+      "invokeNamed": "援引{name}",
+      "invokeBlocked": {
+        "noRoll": "先擲骰，才能援引形象。",
+        "settled": "這一擲已經結算，不能再援引。"
+      },
+      "compel": "接受強迫 +1 命運點",
+      "compelDone": "已記錄強迫 +1",
+      "swipe": "左右滑動"
+    },
+    "secret": {
+      "title": "設為祕密形象？",
+      "body": "只在畫面上蓋牌（包括你）；內容仍會同步，未加密",
+      "confirm": "設為祕密",
+      "revealTitle": "公開這個形象？",
+      "revealBody": "公開後，每個能看這張角色卡的人都看得到它的內容。",
+      "revealConfirm": "公開",
+      "cancel": "取消"
+    },
+    "held": {
+      "title": "持有的推助與情境形象",
+      "empty": "尚未取得",
+      "remove": "移除{kind}：{text}",
+      "add": "新增情境或推助",
+      "kind": "種類",
+      "text": "內容",
+      "invokes": "免費援引",
+      "submit": "加入",
+      "cancel": "取消"
+    },
+    "skills": {
+      "title": "技能梯度",
+      "collapsed": "{from} {fromLabel} ～ {to} {toLabel}",
+      "collapsedNote": "空階收合",
+      "complete": "{shape}已排滿",
+      "column": "{rating}：{filled}/{required}",
+      "points": "點數 {spent}/{budget}"
+    },
+    "ladder": {
+      "-4": "駭人",
+      "-3": "悲劇",
+      "-2": "糟糕",
+      "-1": "差勁",
+      "0": "平庸",
+      "1": "普通",
+      "2": "尚可",
+      "3": "良好",
+      "4": "傑出",
+      "5": "卓越",
+      "6": "驚人",
+      "7": "史詩",
+      "8": "傳奇"
+    },
+    "sticky": {
+      "label": "角色狀態",
+      "track": "{track} {marked}/{boxes}",
+      "none": "後果皆空",
+      "noConditions": "狀態皆空",
+      "severity": {
+        "mild": "輕微",
+        "moderate": "中度",
+        "severe": "嚴重",
+        "extreme": "極端"
+      },
+      "consequence": "{severity}：{text}"
+    },
+    "notes": {
+      "extras": "額外項目",
+      "notes": "筆記"
+    },
+    "derived": {
+      "refresh": "重振",
+      "stress": "{id, select, unified {壓力格數} other {{track}壓力格數}}",
+      "slot": "{slot}後果槽"
+    }
+  }
+}

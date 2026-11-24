@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "skald/template-macros/v1",
+  "title": "Skald Template Roll Macros",
+  "description": "Roll macros owned by a Character Sheet Template Version (the `macros` key of a template source, ADR 0011). Body restrictions (no field writes, allow-listed dice notation and functions, resolved references) are enforced by the publish validator.",
+  "type": "object",
+  "required": ["$schema", "macros"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "const": "skald/template-macros/v1" },
+    "macros": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "maxLength": 64,
+        "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+        "description": "Macro id, the form a {{#id[...]}} reference can spell (not __proto__/constructor/prototype)"
+      },
+      "additionalProperties": { "$ref": "#/definitions/macro" }
+    }
+  },
+  "definitions": {
+    "macro": {
+      "type": "object",
+      "required": ["params", "body"],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "Display label: {{i18n:key}} or plain text"
+        },
+        "params": {
+          "type": "array",
+          "description": "Ordered parameter declarations, referenced inside the body as @name",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+                "description": "Parameter name (not rolled/target/total/margin, not __proto__/constructor/prototype)"
+              },
+              "default": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256,
+                "description": "Formula-string default used when the call omits this argument. Evaluated in the caller's context: it can read numeric template fields, not parameters or roll results"
+              }
+            }
+          }
+        },
+        "body": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Macro body: if/elif/else, roll(\"...\") and return. Field writes (:=) are not allowed in a template macro. Every if needs a final else; rolled/total are readable after a roll, target/margin after a roll with a comparison. Length and roll limits are enforced by the publish validator."
+        }
+      }
+    }
+  }
+}

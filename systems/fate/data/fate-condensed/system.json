@@ -1,0 +1,24 @@
+{
+  "$schema": "../schemas/system.schema.json",
+  "id": "fate-condensed",
+  "name": "命運濃縮版",
+  "version": "1.0.0",
+  "sheetComponent": "fate",
+  "category": "fate",
+  "description": "Fate Condensed character sheets - a streamlined version of the Fate Core RPG",
+  "author": "Skald",
+  "schema": "./schema.json",
+  "template": "./template.json",
+  "defaultData": "./default-data.json",
+  "dsl": {
+    "rollRules": "./dsl-roll-rules.json",
+    "aliases": "./dsl-aliases.json"
+  },
+  "gameData": {
+    "skills": "./skills-master.json"
+  },
+  "i18n": {
+    "en": "./messages/en.json",
+    "zh-TW": "./messages/zh-TW.json"
+  }
+}

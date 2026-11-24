@@ -1,0 +1,49 @@
+{
+  "fatePrint": {
+    "title": "Fate Condensed",
+    "name": "Character",
+    "player": "Player",
+    "description": "Description",
+    "portrait": "Portrait",
+    "portraitLoading": "Loading portrait…",
+    "portraitFailed": "Portrait could not load; it will not print.",
+    "overflow": "Some text did not fit on the printed sheet. See the character sheet for the full text.",
+    "continued": "Continued",
+    "tailContinued": "→ Stunts, extras and notes continue overleaf",
+    "invokeLabel": "Free invokes",
+    "aspects": "Aspects",
+    "aspect": {
+      "highConcept": "High Concept",
+      "trouble": "Trouble",
+      "relationship": "Relationship",
+      "free": "Free Aspect",
+      "situation": "Situation Aspect",
+      "boost": "Boost"
+    },
+    "aspectLabel": "{kind} ({label})",
+    "secret": "Secret",
+    "freeInvokes": "Free invokes: {count}",
+    "skills": "Skill Ladder",
+    "rung": "{rank} {label}",
+    "ladder": {
+      "8": "Legendary", "7": "Epic", "6": "Fantastic", "5": "Superb", "4": "Great", "3": "Good", "2": "Fair", "1": "Average", "0": "Mediocre", "-1": "Poor", "-2": "Terrible", "-3": "Catastrophic", "-4": "Horrifying"
+    },
+    "fatePoints": "Fate Points",
+    "refresh": "Refresh",
+    "stress": "Stress",
+    "consequences": "Consequences",
+    "conditions": "Conditions",
+    "injury": "{name} ({value})",
+    "blocked": { "extremeUsed": "Already used", "legacyUnassigned": "Assign the legacy slot first" },
+    "legacyExtraMild": "Unassigned extra mild consequence",
+    "stunts": "Stunts",
+    "stuntBudget": "Stunts: {count} ({free} free) · Refresh cost: {cost}",
+    "blankStuntBudget": "Stunts: <gap></gap> (<gap></gap> free) · Refresh cost: <gap></gap>",
+    "blankRefreshBudget": "Base refresh: <gap></gap> · Earned: <gap></gap>",
+    "refreshBudget": "Base refresh: {base} · Earned: {earned}",
+    "refreshOverride": "Refresh override: {override}",
+    "oncePerSession": "Once per session",
+    "extras": "Extras",
+    "notes": "Notes"
+  }
+}

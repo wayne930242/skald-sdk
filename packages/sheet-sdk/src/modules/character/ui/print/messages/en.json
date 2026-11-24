@@ -1,0 +1,30 @@
+{
+  "sheetPrint": {
+    "title": "Print preview",
+    "paper": "Paper",
+    "paperA4": "A4",
+    "paperLetter": "Letter",
+    "blanks": "Keep blanks to fill in by hand",
+    "print": "Print",
+    "close": "Close",
+    "loading": "Preparing the print layout…",
+    "loadFailed": "The print layout failed to load.",
+    "retry": "Retry",
+    "downloadPdf": "Download PDF",
+    "pdfWorking": "Making the PDF…",
+    "pdfImagesDropped": "An image could not be included in this PDF.",
+    "gameIcons": "Game icons by game-icons.net (CC BY 3.0)",
+    "pdfError": {
+      "disabled": "PDF download is not available on this server yet. Use Print instead.",
+      "signInRequired": "Sign in (or join as a guest) to download a PDF.",
+      "tooLarge": "This sheet is too large to turn into a PDF.",
+      "staleBuild": "Skald was updated. Reload the page, then download the PDF again.",
+      "inFlight": "A PDF is already being made. Wait for it to finish.",
+      "rateLimited": "You have reached the hourly PDF limit. Try again in {minutes, plural, one {# minute} other {# minutes}}.",
+      "busy": "The PDF service is busy. Try again in a moment.",
+      "tooManyPages": "This sheet runs past 80 pages, too long for a PDF.",
+      "layoutChanged": "The layout changed while the PDF was being made. Select Download PDF again.",
+      "failed": "The PDF could not be made. Try again, or use Print instead."
+    }
+  }
+}

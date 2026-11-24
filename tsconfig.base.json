@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "allowJs": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "paths": {
+      "@skald/types": ["./packages/types/src/public.ts"],
+      "@skald/types/*": ["./packages/types/src/*"],
+      "@skald/dice": ["./packages/dice/src/index.ts"],
+      "@skald/dice/*": ["./packages/dice/src/*"],
+      "@skald/formula": ["./packages/formula/src/index.ts"],
+      "@skald/formula/*": ["./packages/formula/src/*"],
+      "@skald/sheet-sdk/*": ["./packages/sheet-sdk/src/*"],
+      "@skald/system-fate/*": ["./systems/fate/*"],
+      "@skald/system-dnd5e/*": ["./systems/dnd5e/*"]
+    }
+  }
+}

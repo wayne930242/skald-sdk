@@ -1,0 +1,30 @@
+{
+  "sheetPrint": {
+    "title": "列印預覽",
+    "paper": "紙張",
+    "paperA4": "A4",
+    "paperLetter": "Letter",
+    "blanks": "保留手寫空白",
+    "print": "列印",
+    "close": "關閉",
+    "loading": "正在準備列印版面…",
+    "loadFailed": "列印版面載入失敗。",
+    "retry": "重試",
+    "downloadPdf": "下載 PDF",
+    "pdfWorking": "正在產生 PDF…",
+    "pdfImagesDropped": "有圖片無法放進這份 PDF。",
+    "gameIcons": "遊戲圖示來源：game-icons.net（CC BY 3.0）",
+    "pdfError": {
+      "disabled": "這個伺服器尚未開放 PDF 下載，請改用「列印」。",
+      "signInRequired": "登入（或以訪客身分加入）後才能下載 PDF。",
+      "tooLarge": "這張角色卡內容太大，無法產生 PDF。",
+      "staleBuild": "Skald 已更新，請重新整理頁面後再下載 PDF。",
+      "inFlight": "已有一份 PDF 正在產生，請等它完成。",
+      "rateLimited": "PDF 下載已達每小時上限，請 {minutes} 分鐘後再試。",
+      "busy": "PDF 服務忙碌中，請稍後再試。",
+      "tooManyPages": "這張角色卡超過 80 頁，無法產生 PDF。",
+      "layoutChanged": "版面在產生 PDF 時變更了，請再按一次「下載 PDF」。",
+      "failed": "PDF 產生失敗。請再試一次，或改用「列印」。"
+    }
+  }
+}

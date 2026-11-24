@@ -1,0 +1,345 @@
+/*
+ * The print kit (scratch/print-ref/kit-plan.md §2): tokens, the paper frame and the shared parts of
+ * every character-sheet print. Loaded with the print chunk only (print-sheet.tsx), scoped to the
+ * kit root. A System overrides a token through PrintSheet `tokens` or its own CSS.
+ */
+
+[data-print-kit] {
+  --pk-ink: #111;
+  --pk-ink-2: #444;
+  --pk-ink-3: #666;
+  --pk-rule: #777;
+  --pk-line: #929292;
+  --pk-band: #e8e8e8;
+  /* the type floor of every print (boss, CoC print: nothing under 7pt) */
+  --pk-text-min: 7pt;
+  --pk-label: 7pt;
+  --pk-body: 9pt;
+  --pk-value: 10pt;
+  --pk-title: 11pt;
+  --pk-hair: 0.4pt;
+  --pk-rule-w: 0.6pt;
+  --pk-strong: 1.2pt;
+  /* = FOOTER_BAND_PT (geometry.ts) */
+  --pk-footer-band: 12pt;
+  --pk-box-size: 8pt;
+  --pk-circle-size: 18pt;
+  --pk-line-pitch: 14pt;
+}
+
+/* ── footer: skald.tw, bottom right of every printed page ── */
+/*
+ * Fixed inside the page area: Chromium repeats it and its link on every sheet. In the bottom margin
+ * instead it is lost on page 1 and paints at the top of later sheets (kit-plan.md, experiment).
+ * Nothing between it and the kit root may set transform, filter, contain or container-type.
+ */
+.pk-footer {
+  display: none;
+}
+
+@media print {
+  [data-print-kit] > .pk-footer {
+    display: block;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-sans);
+    font-size: 7pt;
+    font-weight: 400;
+    line-height: var(--pk-footer-band);
+    color: var(--pk-ink-3);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  /* the paper under and between the pages stays white, whatever the app's theme */
+  html:has([data-print-kit]),
+  body:has([data-print-kit]) {
+    background: #fff !important;
+  }
+}
+
+/* The generic template pages' former 「created by Skald」 line: the kit's footer replaces it. */
+[data-print-kit] [data-print-watermark] {
+  display: none !important;
+}
+
+/* ── fixed pages ── */
+.pk-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  /* the footer band: the body never reaches it */
+  padding-bottom: var(--pk-footer-band);
+  overflow: hidden;
+  background: #fff;
+  color: var(--pk-ink);
+  font-variant-numeric: tabular-nums;
+  break-after: page;
+  page-break-after: always;
+  break-inside: avoid;
+}
+
+.pk-page:last-child {
+  break-after: auto;
+  page-break-after: auto;
+}
+
+.pk-page-body {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.pk-page[data-overflow="clip"] > .pk-page-body {
+  overflow: hidden;
+}
+
+.pk-page[data-overflow="visible"],
+.pk-page[data-overflow="visible"] > .pk-page-body {
+  overflow: visible;
+}
+
+.pk-page-note {
+  flex: none;
+  padding-top: 2pt;
+  font-size: var(--pk-label);
+  line-height: 1.25;
+  color: var(--pk-ink-2);
+}
+
+/* ── flowing pages ── */
+.pk-flow[data-break-before] {
+  break-before: page;
+  page-break-before: always;
+}
+
+@media print {
+  /* every printed fragment ends a footer band above the page bottom */
+  .pk-flow[data-pack="css"] {
+    width: var(--pk-area-width);
+    padding-bottom: var(--pk-footer-band);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    background: #fff;
+  }
+}
+
+@media screen {
+  .pk-page,
+  .pk-flow[data-paper-on-screen] {
+    /* the paper around the printable area, as the sheet will look */
+    margin: 10mm auto calc(20mm + 1.5rem);
+    background: #fff;
+    box-shadow: 0 0 0 10mm #fff, 0 2px 14px 10mm rgb(0 0 0 / 0.18);
+  }
+
+  .pk-flow[data-paper-on-screen] {
+    width: var(--pk-area-width);
+  }
+
+  /* the footer as it will print, in the band of each fixed page */
+  .pk-page::after {
+    content: "skald.tw";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    font-family: var(--font-sans);
+    font-size: 7pt;
+    line-height: var(--pk-footer-band);
+    color: var(--pk-ink-3);
+  }
+}
+
+/* ── attribution ── */
+.pk-attribution {
+  margin: 4pt 0 0;
+  font-size: var(--pk-label);
+  line-height: 1.3;
+  color: var(--pk-ink-2);
+  break-inside: avoid;
+}
+
+.pk-attribution a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ── parts ── */
+.pk-banner {
+  margin: 0;
+  font-size: var(--pk-title);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--pk-ink);
+}
+
+.pk-banner[data-tone="rule"] {
+  padding-bottom: 1pt;
+  border-bottom: var(--pk-rule-w) solid var(--pk-rule);
+}
+
+.pk-banner[data-tone="band"] {
+  padding: 1.5pt 4pt;
+  background: var(--pk-band);
+}
+
+.pk-banner[data-tone="solid"] {
+  padding: 2pt 6pt;
+  background: var(--pk-ink);
+  color: #fff;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 6pt) 100%, 0 100%);
+}
+
+.pk-banner-note {
+  margin-left: 4pt;
+  font-size: var(--pk-label);
+  font-weight: 400;
+  color: inherit;
+  opacity: 0.8;
+}
+
+.pk-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 4pt;
+  font-size: var(--pk-label);
+  line-height: 1.2;
+  color: var(--pk-ink-2);
+}
+
+.pk-label small {
+  font-size: inherit;
+}
+
+.pk-write-field[data-inline] {
+  display: flex;
+  align-items: baseline;
+  gap: 4pt;
+}
+
+.pk-write-field[data-inline] > .pk-write-line {
+  flex: 1 1 auto;
+}
+
+.pk-write-line {
+  min-height: var(--pk-line-pitch);
+  border-bottom: var(--pk-hair) solid var(--pk-line);
+}
+
+.pk-value {
+  font-size: var(--pk-value);
+  line-height: var(--pk-line-pitch);
+  color: var(--pk-ink);
+}
+
+.pk-write-lines > .pk-write-line,
+.pk-ruled > .pk-write-line {
+  height: var(--pk-line-pitch);
+}
+
+.pk-ruled {
+  height: 100%;
+  overflow: hidden;
+}
+
+.pk-box,
+.pk-track[data-shape="box"] > .pk-track-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  box-sizing: border-box;
+  width: var(--pk-box-size);
+  height: var(--pk-box-size);
+  border: var(--pk-rule-w) solid var(--pk-ink);
+  vertical-align: middle;
+}
+
+.pk-box[data-optional],
+.pk-track-cell[data-optional] {
+  border-style: dashed;
+}
+
+.pk-box svg,
+.pk-track-cell svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--pk-ink);
+  stroke-width: 1.4;
+}
+
+.pk-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 3pt;
+}
+
+.pk-track {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2pt;
+  vertical-align: middle;
+}
+
+.pk-track-cell {
+  position: relative;
+}
+
+.pk-track-number {
+  font-size: var(--pk-text-min);
+  line-height: 1;
+}
+
+.pk-track-cell > .pk-track-number + svg {
+  position: absolute;
+  inset: 0;
+}
+
+.pk-track[data-shape="pip"] > .pk-track-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--pk-box-size);
+  height: var(--pk-box-size);
+  border: var(--pk-rule-w) solid var(--pk-ink);
+  border-radius: 50%;
+}
+
+.pk-track[data-shape="pip"] > .pk-track-cell[data-marked] {
+  background: var(--pk-ink);
+  color: #fff;
+}
+
+.pk-circle {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1pt;
+}
+
+.pk-circle-ring {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--pk-circle-size);
+  height: var(--pk-circle-size);
+  border: var(--pk-rule-w) solid var(--pk-ink);
+  border-radius: 50%;
+}
+
+.pk-circle-value {
+  font-size: var(--pk-value);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.pk-circle-caption {
+  font-size: var(--pk-label);
+  color: var(--pk-ink-2);
+}

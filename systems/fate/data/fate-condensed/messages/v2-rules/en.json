@@ -1,0 +1,17 @@
+{
+  "fateRules": {
+    "title": "Rules reference",
+    "book": "Fate Condensed",
+    "contents": "Contents",
+    "search": "Search the rules…",
+    "empty": "No matching sections",
+    "en": "English",
+    "zh-TW": "中文",
+    "credits": "Sources and credits",
+    "changes": "Reformatted for the reader. Internal links point to sections instead of printed pages.",
+    "license": "CC BY 3.0",
+    "translation": "Wei Hung’s Traditional Chinese translation",
+    "source": "English SRD",
+    "fallback": "This section is only available in English. Showing the introduction instead."
+  }
+}

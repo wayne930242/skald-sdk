@@ -1,0 +1,211 @@
+{
+  "dndPrint": {
+    "footer": "Printed from the data on screen in Skald",
+    "unnamed": "Unnamed character",
+    "level": "Level {level}",
+    "feet": "{value} ft.",
+    "separator": ", ",
+    "noteSeparator": "; ",
+    "continued": "{title} (continued)",
+    "goto": "→ see “{title}”",
+    "gotoCompact": "→ {title}",
+    "moreRows": "▶ {count} more → see “{title}”",
+    "moreEntries": "{count} more → see “{title}”",
+    "identity": {
+      "name": "Character Name",
+      "background": "Background",
+      "className": "Class",
+      "species": "Species",
+      "speciesLineage": "{species} ({lineage})",
+      "subclass": "Subclass",
+      "player": "Player",
+      "level": "Level",
+      "xp": "XP"
+    },
+    "ability": {
+      "save": "Saving Throw",
+      "score": "Score"
+    },
+    "combat": {
+      "ac": "Armor Class",
+      "shield": "Shield",
+      "acBonus": "bonus {value}",
+      "initiative": "Initiative",
+      "speed": "Speed",
+      "speedReduced": "base {base} ft.",
+      "size": "Size",
+      "passive": "Passive Perception",
+      "darkvision": "Darkvision {value} ft.",
+      "prof": "Proficiency Bonus",
+      "inspiration": "Heroic Inspiration"
+    },
+    "hp": {
+      "title": "Hit Points",
+      "current": "Current",
+      "max": "Max",
+      "temp": "Temp"
+    },
+    "hitDice": {
+      "title": "Hit Dice",
+      "dice": "{max}d{faces}",
+      "spent": "Spent",
+      "max": "Max"
+    },
+    "death": {
+      "title": "Death Saves",
+      "successes": "Successes",
+      "failures": "Failures"
+    },
+    "status": {
+      "title": "Conditions & Modifiers",
+      "exhaustion": "Exhaustion {level}: D20 Tests −{d20}, Speed −{feet} ft.",
+      "exhaustionLabel": "Exhaustion",
+      "concentration": "Concentrating: {name}",
+      "concentrationLabel": "Concentration"
+    },
+    "training": {
+      "title": "Equipment Training & Proficiencies",
+      "armor": "Armor Training",
+      "weapons": "Weapons",
+      "tools": "Tools",
+      "masteries": "Weapon Masteries"
+    },
+    "attacks": {
+      "title": "Weapons & Damage Cantrips",
+      "name": "Name",
+      "hit": "Atk Bonus / DC",
+      "damage": "Damage & Type",
+      "notes": "Notes",
+      "dc": "DC {dc} {ability}"
+    },
+    "regions": {
+      "identity": "Identity",
+      "features": "Class Features",
+      "speciesTraits": "Species Traits",
+      "feats": "Feats",
+      "items": "Item Descriptions",
+      "attackTexts": "Weapon Notes",
+      "notes": "Notes",
+      "noncaster": "Continued from Page 1"
+    },
+    "spells": {
+      "ability": "Spellcasting Ability",
+      "mod": "Spellcasting Modifier",
+      "dc": "Spell Save DC",
+      "attack": "Spell Attack Bonus",
+      "slots": "Spell Slots",
+      "slotsLegend": "level | total | expended ◆",
+      "slotLevel": "Lvl {level}",
+      "pact": "Pact Magic: {total} level {level} slots",
+      "title": "Cantrips & Prepared Spells",
+      "level": "Lvl",
+      "prepared": "Prep",
+      "name": "Name",
+      "castingTime": "Casting Time",
+      "range": "Range",
+      "crm": "Concentration, Ritual, Material",
+      "notes": "Notes",
+      "cantrip": "0",
+      "c": "C",
+      "r": "R",
+      "m": "M",
+      "legend": "◆ always prepared   ● prepared   ○ not prepared"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "portrait": "Portrait"
+    },
+    "backstory": {
+      "title": "Backstory & Personality",
+      "alignment": "Alignment"
+    },
+    "languages": "Languages",
+    "equipment": {
+      "title": "Equipment",
+      "equipped": "Eq.",
+      "qty": "Qty",
+      "name": "Name",
+      "weight": "Weight",
+      "lb": "{value} lb.",
+      "carry": "Carried {carried} / {capacity} lb. (coins {coins} lb.)",
+      "over": "Over capacity: drag, lift or push only",
+      "overDrag": "Over the drag, lift and push limit",
+      "attunement": "Magic Item Attunement"
+    },
+    "coins": "Coins",
+    "running": {
+      "continuation": "Continued",
+      "spellbook": "Spellbook"
+    },
+    "origin": {
+      "pack": "Pack",
+      "custom": "Custom"
+    },
+    "texts": {
+      "packMissing": "This content pack is not loaded on this device, so its text cannot be printed.",
+      "loading": "Loading the rules text…",
+      "layout": "Laying out the pages…"
+    },
+    "damageType": {
+      "acid": "acid",
+      "bludgeoning": "bludgeoning",
+      "cold": "cold",
+      "fire": "fire",
+      "force": "force",
+      "lightning": "lightning",
+      "necrotic": "necrotic",
+      "piercing": "piercing",
+      "poison": "poison",
+      "psychic": "psychic",
+      "radiant": "radiant",
+      "slashing": "slashing",
+      "thunder": "thunder"
+    },
+    "spellbook": {
+      "index": "Spellbook · Index",
+      "legend": "◆ always prepared   ● prepared   ○ not prepared; find full text by spell name",
+      "name": "Spell",
+      "level": "Lvl",
+      "prepared": "Prep",
+      "crm": "C · R · M",
+      "castingTime": "Casting Time",
+      "range": "Range",
+      "levelTitle": "Level {level}",
+      "cantrips": "Cantrips",
+      "slotCount": "{count, plural, one {# slot} other {# slots}}",
+      "concentrationBadge": "Concentration",
+      "ritualBadge": "Ritual",
+      "materialBadge": "Material",
+      "notes": "Notes: ",
+      "higher": "Using a Higher-Level Spell Slot: ",
+      "stats": {
+        "school": "School",
+        "castingTime": "Casting Time",
+        "range": "Range",
+        "components": "Components",
+        "duration": "Duration"
+      }
+    },
+    "school": {
+      "A": "Abjuration",
+      "C": "Conjuration",
+      "D": "Divination",
+      "E": "Enchantment",
+      "V": "Evocation",
+      "I": "Illusion",
+      "N": "Necromancy",
+      "T": "Transmutation"
+    },
+    "duration": {
+      "instant": "Instantaneous",
+      "special": "Special",
+      "permanent": "Until dispelled",
+      "permanentTrigger": "Until dispelled or triggered",
+      "round": "{amount, plural, one {# round} other {# rounds}}",
+      "minute": "{amount, plural, one {# minute} other {# minutes}}",
+      "hour": "{amount, plural, one {# hour} other {# hours}}",
+      "day": "{amount, plural, one {# day} other {# days}}",
+      "concentration": "Concentration, up to {time}"
+    }
+  }
+}

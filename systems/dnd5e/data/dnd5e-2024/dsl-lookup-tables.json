@@ -1,0 +1,43 @@
+{
+  "$schema": "../schemas/lookup-tables.schema.json",
+  "tables": {
+    "dnd-point-buy-cost": {
+      "type": "threshold",
+      "description": "D&D 2024 point buy: cost of an ability score from 8 to 15",
+      "entries": [
+        {
+          "threshold": 8,
+          "value": 0
+        },
+        {
+          "threshold": 9,
+          "value": 1
+        },
+        {
+          "threshold": 10,
+          "value": 2
+        },
+        {
+          "threshold": 11,
+          "value": 3
+        },
+        {
+          "threshold": 12,
+          "value": 4
+        },
+        {
+          "threshold": 13,
+          "value": 5
+        },
+        {
+          "threshold": 14,
+          "value": 7
+        },
+        {
+          "threshold": 15,
+          "value": 9
+        }
+      ]
+    }
+  }
+}

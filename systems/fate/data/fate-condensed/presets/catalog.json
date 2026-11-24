@@ -1,0 +1,274 @@
+{
+  "$schema": "skald/fate-presets/v1",
+  "version": 1,
+  "source": {
+    "work": "fate-condensed",
+    "file": "apps/web/scripts/fate-condensed/sources/Fate-Condensed-SRD-CC-BY.md",
+    "note": "srd = line range in the vendored EN SRD; rule = semantic section id from scripts/fate-condensed/section-map.json. Engine guidance follows the EN SRD where the sources differ."
+  },
+  "defaultPreset": "condensed-standard",
+  "axes": ["skills", "allocation", "stress", "injuries", "extreme", "ratings", "scale"],
+  "skillLists": [
+    {
+      "id": "condensed",
+      "group": "standard",
+      "skills": ["academics", "athletics", "burglary", "contacts", "crafts", "deceive", "drive", "empathy", "fight", "investigate", "lore", "notice", "physique", "provoke", "rapport", "resources", "shoot", "stealth", "will"],
+      "trackLinks": { "physical": "physique", "mental": "will" },
+      "suggestedAllocation": "pyramid",
+      "cite": { "rule": "character.skills.list", "srd": "352-412" }
+    },
+    {
+      "id": "core",
+      "group": "standard",
+      "skills": ["athletics", "burglary", "contacts", "crafts", "deceive", "drive", "empathy", "fight", "investigate", "lore", "notice", "physique", "provoke", "rapport", "resources", "shoot", "stealth", "will"],
+      "trackLinks": { "physical": "physique", "mental": "will" },
+      "suggestedAllocation": "pyramid",
+      "cite": { "rule": "character.skills.list", "srd": "352-412", "note": "Fate Core list: the Condensed list without Academics (Lore covers knowledge)." }
+    },
+    {
+      "id": "short-actions",
+      "group": "short",
+      "skills": ["actions-endure", "actions-fight", "actions-know", "actions-move", "actions-notice", "actions-pilot", "actions-sneak", "actions-speak", "actions-tinker"],
+      "trackLinks": {},
+      "growth": "slow",
+      "cite": { "rule": "optional.skills", "srd": "1637" }
+    },
+    {
+      "id": "short-approaches",
+      "group": "short",
+      "kind": "approaches",
+      "skills": ["approach-careful", "approach-clever", "approach-flashy", "approach-forceful", "approach-quick", "approach-sneaky"],
+      "trackLinks": {},
+      "growth": "slow",
+      "suggestedAllocation": "fae",
+      "cite": { "rule": "optional.skills", "srd": "1638", "note": "Fate Accelerated approaches; labelled as approaches only, not a switch to Fate Accelerated." }
+    },
+    {
+      "id": "short-aptitudes",
+      "group": "short",
+      "skills": ["aptitudes-athletics", "aptitudes-combat", "aptitudes-leadership", "aptitudes-scholarship", "aptitudes-subterfuge"],
+      "trackLinks": {},
+      "growth": "slow",
+      "cite": { "rule": "optional.skills", "srd": "1639" }
+    },
+    {
+      "id": "short-attributes",
+      "group": "short",
+      "skills": ["attributes-strength", "attributes-dexterity", "attributes-toughness", "attributes-intelligence", "attributes-charm"],
+      "trackLinks": {},
+      "growth": "slow",
+      "cite": { "rule": "optional.skills", "srd": "1640" }
+    },
+    {
+      "id": "short-relationships",
+      "group": "short",
+      "skills": ["relationships-leading", "relationships-partnering", "relationships-supporting", "relationships-solo"],
+      "trackLinks": {},
+      "growth": "slow",
+      "cite": { "rule": "optional.skills", "srd": "1641" }
+    },
+    {
+      "id": "short-roles",
+      "group": "short",
+      "skills": ["roles-driver", "roles-hitter", "roles-hacker", "roles-gearhead", "roles-grifter", "roles-thief", "roles-mastermind"],
+      "trackLinks": {},
+      "growth": "slow",
+      "cite": { "rule": "optional.skills", "srd": "1642" }
+    },
+    {
+      "id": "short-themes",
+      "group": "short",
+      "skills": ["themes-air", "themes-fire", "themes-metal", "themes-mind", "themes-stone", "themes-void", "themes-water", "themes-wind", "themes-wood"],
+      "trackLinks": {},
+      "growth": "slow",
+      "cite": { "rule": "optional.skills", "srd": "1643" }
+    },
+    {
+      "id": "short-values",
+      "group": "short",
+      "skills": ["values-duty", "values-glory", "values-justice", "values-love", "values-power", "values-safety", "values-truth", "values-vengeance"],
+      "trackLinks": {},
+      "growth": "slow",
+      "cite": { "rule": "optional.skills", "srd": "1644" }
+    }
+  ],
+  "allocations": [
+    {
+      "id": "pyramid",
+      "kind": "shape",
+      "slots": [{ "rank": 4, "count": 1 }, { "rank": 3, "count": 2 }, { "rank": 2, "count": 3 }, { "rank": 1, "count": 4 }],
+      "cap": 4,
+      "cite": { "rule": "character.skills", "srd": "108-114" }
+    },
+    {
+      "id": "diamond",
+      "kind": "shape",
+      "slots": [{ "rank": 4, "count": 1 }, { "rank": 3, "count": 2 }, { "rank": 2, "count": 3 }, { "rank": 1, "count": 2 }, { "rank": 0, "count": 1 }],
+      "cap": 4,
+      "cite": { "rule": "optional.skills", "srd": "1652", "note": "The +0 slot is an explicit allotment, not the default for unrated skills." }
+    },
+    {
+      "id": "fae",
+      "kind": "shape",
+      "slots": [{ "rank": 3, "count": 1 }, { "rank": 2, "count": 2 }, { "rank": 1, "count": 2 }, { "rank": 0, "count": 1 }],
+      "cap": 3,
+      "cite": { "rule": "optional.skills", "srd": "1638", "note": "Fate Accelerated starting approaches +3/+2/+2/+1/+1/+0." }
+    },
+    {
+      "id": "point-buy",
+      "kind": "pointBuy",
+      "budget": 20,
+      "cap": 4,
+      "cite": { "rule": "optional.skills", "srd": "1654", "note": "Free + Cap: the budget of a +4 pyramid (20), staying at or under the cap." }
+    }
+  ],
+  "growth": {
+    "columns": true,
+    "cite": { "rule": "advancement.skill-ratings", "srd": "1178-1180" }
+  },
+  "stress": [
+    {
+      "id": "split",
+      "tracks": [
+        { "id": "physical", "hitKinds": ["physical"], "links": ["physical"] },
+        { "id": "mental", "hitKinds": ["mental"], "links": ["mental"] }
+      ],
+      "thresholds": [{ "min": 0, "boxes": 3 }, { "min": 1, "boxes": 4 }, { "min": 3, "boxes": 6 }],
+      "defaultBoxes": 3,
+      "cite": { "rule": "character.stress-and-consequences", "srd": "467-561" }
+    },
+    {
+      "id": "unified",
+      "tracks": [
+        { "id": "unified", "hitKinds": ["physical", "mental"], "links": ["physical", "mental"] }
+      ],
+      "thresholds": [{ "min": 0, "boxes": 6 }, { "min": 1, "boxes": 7 }, { "min": 3, "boxes": 9 }],
+      "defaultBoxes": 6,
+      "cite": { "rule": "character.stress-variant", "srd": "567-570", "note": "Add three boxes to the split totals and use the higher of the linked skills." }
+    }
+  ],
+  "injuryModels": [
+    {
+      "id": "consequences",
+      "kind": "consequences",
+      "slots": [
+        { "id": "mild", "severity": "mild", "value": 2 },
+        { "id": "moderate", "severity": "moderate", "value": 4 },
+        { "id": "severe", "severity": "severe", "value": 6 }
+      ],
+      "extraSlots": [
+        { "id": "extraMild-physical", "severity": "mild", "value": 2, "link": "physical", "min": 5, "hitKinds": ["physical"] },
+        { "id": "extraMild-mental", "severity": "mild", "value": 2, "link": "mental", "min": 5, "hitKinds": ["mental"] }
+      ],
+      "cite": { "rule": "conflict.consequences", "srd": "1088-1102" }
+    },
+    {
+      "id": "conditions",
+      "kind": "conditions",
+      "conditions": [
+        { "id": "hurt", "severity": "mild", "value": 1, "boxes": 1, "row": "mild", "extraBoxes": { "link": "physical", "min": 5, "count": 2, "hitKinds": ["physical"] } },
+        { "id": "scared", "severity": "mild", "value": 1, "boxes": 1, "row": "mild", "extraBoxes": { "link": "mental", "min": 5, "count": 2, "hitKinds": ["mental"] } },
+        { "id": "injured", "severity": "moderate", "value": 2, "boxes": 1, "row": "moderate" },
+        { "id": "shaken", "severity": "moderate", "value": 2, "boxes": 1, "row": "moderate" },
+        { "id": "wounded", "severity": "severe", "value": 3, "boxes": 1, "row": "severe" },
+        { "id": "demoralized", "severity": "severe", "value": 3, "boxes": 1, "row": "severe" }
+      ],
+      "cite": { "rule": "optional.conditions", "srd": "1607-1621", "note": "Replaces consequences and extra mild slots entirely; any condition may take any hit when it makes sense." }
+    },
+    {
+      "id": "conditions-separate",
+      "kind": "conditions",
+      "conditions": [
+        { "id": "hurt", "severity": "mild", "value": 1, "boxes": 2, "row": "mild", "hitKinds": ["physical"], "extraBoxes": { "link": "physical", "min": 5, "count": 2, "hitKinds": ["physical"] } },
+        { "id": "scared", "severity": "mild", "value": 1, "boxes": 2, "row": "mild", "hitKinds": ["mental"], "extraBoxes": { "link": "mental", "min": 5, "count": 2, "hitKinds": ["mental"] } },
+        { "id": "injured", "severity": "moderate", "value": 2, "boxes": 2, "row": "moderate", "hitKinds": ["physical"] },
+        { "id": "shaken", "severity": "moderate", "value": 2, "boxes": 2, "row": "moderate", "hitKinds": ["mental"] },
+        { "id": "wounded", "severity": "severe", "value": 3, "boxes": 2, "row": "severe", "hitKinds": ["physical"] },
+        { "id": "demoralized", "severity": "severe", "value": 3, "boxes": 2, "row": "severe", "hitKinds": ["mental"] }
+      ],
+      "rowCutoff": 2,
+      "cite": { "rule": "optional.conditions.separate", "srd": "1623-1627", "note": "Two marks per row at most; each added box raises its row's cutoff by one." }
+    }
+  ],
+  "extreme": [
+    { "id": "off", "enabled": false },
+    {
+      "id": "srd",
+      "enabled": true,
+      "value": 8,
+      "activeWithKinds": ["consequences"],
+      "replacesAspect": true,
+      "protectedKinds": ["highConcept"],
+      "cite": { "rule": "optional.extreme", "srd": "1682-1690" }
+    }
+  ],
+  "ratings": [
+    { "id": "off", "enabled": false },
+    {
+      "id": "srd",
+      "enabled": true,
+      "min": 0,
+      "max": 4,
+      "weaponOnTie": true,
+      "armorZeroBoost": true,
+      "cite": { "rule": "optional.gear", "srd": "1904-1912" }
+    }
+  ],
+  "scale": [
+    { "id": "off", "enabled": false, "tiers": [], "modes": [] },
+    {
+      "id": "srd",
+      "enabled": true,
+      "tiers": ["mundane", "supernatural", "otherworldly", "legendary", "godlike"],
+      "modes": [
+        { "id": "beforeRoll", "timing": "beforeRoll", "perTier": 1, "effect": "total" },
+        { "id": "afterSuccess", "timing": "afterRoll", "perTier": 2, "effect": "total", "requiresOutcome": ["success", "style"] },
+        { "id": "freeInvokes", "timing": "result", "perTier": 1, "effect": "freeInvokes", "requiresOutcome": ["success", "style"], "actions": ["createAdvantage"] }
+      ],
+      "cite": { "rule": "optional.scale", "srd": "1787-1805", "note": "Only the higher side gets exactly one of the modes." }
+    }
+  ],
+  "economy": {
+    "baseRefresh": 3,
+    "freeStunts": 3,
+    "minRefresh": 1,
+    "sessionStart": "topUp",
+    "cite": { "rule": "character.refresh", "srd": "427-439" }
+  },
+  "recovery": {
+    "treatmentDifficulty": { "mild": 2, "moderate": 4, "severe": 6 },
+    "selfTreatmentPenalty": 2,
+    "boundary": { "mild": "scene", "moderate": "session", "severe": "majorMilestone" },
+    "cite": { "rule": "conflict.recovery", "srd": "1136-1148", "note": "EN SRD: treating yourself raises the difficulty by two." }
+  },
+  "advancement": {
+    "minor": ["swapSkills", "replaceAverage", "rewriteStunt", "purchaseStunt", "rewriteAspect"],
+    "major": { "skillPoints": 1, "gmRefresh": 1, "gmSkillPoints": 1 },
+    "cite": { "rule": "advancement", "srd": "1150-1180" }
+  },
+  "presets": [
+    {
+      "id": "condensed-standard",
+      "version": 1,
+      "axes": {
+        "skills": "condensed",
+        "allocation": "pyramid",
+        "stress": "split",
+        "injuries": "consequences",
+        "extreme": "off",
+        "ratings": "off",
+        "scale": "off"
+      },
+      "cite": { "rule": "character.creation", "srd": "54-575" }
+    }
+  ],
+  "recipes": [
+    { "id": "skills", "choose": "skills", "cite": { "rule": "character.skills.alternative", "srd": "414-425" } },
+    { "id": "shape", "choose": "allocation", "cite": { "rule": "optional.skills", "srd": "1646-1659" } },
+    { "id": "approaches", "set": { "skills": "short-approaches" }, "suggest": { "allocation": "fae" }, "cite": { "rule": "optional.skills", "srd": "1638" } },
+    { "id": "unified", "set": { "stress": "unified" }, "cite": { "rule": "character.stress-variant", "srd": "567-570" } },
+    { "id": "conditions", "set": { "injuries": "conditions" }, "cite": { "rule": "optional.conditions", "srd": "1607-1631" } },
+    { "id": "extreme", "set": { "extreme": "srd" }, "cite": { "rule": "optional.extreme", "srd": "1682-1690" } },
+    { "id": "gear", "set": { "ratings": "srd", "scale": "srd" }, "cite": { "rule": "optional.gear", "srd": "1904-1912", "note": "Also turns on scale (optional.scale, 1787-1805)." } }
+  ]
+}

@@ -1,0 +1,267 @@
+/* modules/character/ui/renderer/web-view.css
+ *
+ * `views.web` 的外觀。顏色、圓角一律走 --sheet-* 變數，預設指向 Folio 外殼 token；
+ * 之後的類型主題（data-genre）只要覆寫這些變數，不碰版面規則。
+ * 斷點由 JS 依容器寬度解析並輸出顯式版面，這裡不放任何 @media / @container 版面規則。
+ */
+
+.skald-web-view {
+  --sheet-surface: var(--card);
+  --sheet-surface-sunken: var(--muted);
+  --sheet-border: var(--border);
+  --sheet-border-strong: var(--border-strong);
+  --sheet-fg: var(--foreground);
+  --sheet-muted-fg: var(--muted-foreground);
+  --sheet-accent: var(--accent);
+  --sheet-ring: var(--ring);
+  --sheet-radius: var(--r-card, 16px);
+  --sheet-radius-sm: 12px;
+
+  color: var(--sheet-fg);
+  min-width: 0;
+}
+
+/* 第一次量到寬度前：不佔高度、不可見，避免版面閃動 */
+.skald-web-view[data-bp-pending] {
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+/*
+ * 可見文字下限 12px（U-01）。既有元件用 text-3xs（8px）、text-2xs（10px）、
+ * text-badge（10.5px）做小標，在網頁版面一律抬到 12px；
+ * text-[8~11px] 的任意值已由 styles/sheet-sdk.css 的 view-mode-web 規則處理。
+ */
+.skald-web-view :is(.text-3xs, .text-2xs, .text-badge) {
+  font-size: 0.75rem;
+}
+
+/* ---- 區塊 ---- */
+
+.skald-web-section {
+  min-width: 0;
+}
+
+.skald-web-section[data-border] {
+  border: 1px solid var(--sheet-border);
+  border-radius: var(--sheet-radius);
+  padding: 0.75rem;
+}
+
+.skald-web-section[data-border="dashed"] {
+  border-style: dashed;
+}
+
+.skald-web-section[data-background="light"] {
+  background: var(--sheet-surface);
+}
+
+.skald-web-section[data-background="dark"] {
+  background: var(--sheet-surface-sunken);
+}
+
+.skald-web-section[data-sticky] {
+  background: var(--background);
+}
+
+.skald-web-section-title {
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--sheet-fg);
+}
+
+.skald-web-section-title[data-variant="small"] {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--sheet-muted-fg);
+}
+
+.skald-web-section-title[data-variant="underlined"] {
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--sheet-border-strong);
+}
+
+.skald-web-section-title[data-variant="decorated"] {
+  text-align: center;
+}
+
+/* ---- 分頁 ---- */
+
+.skald-web-tablist {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--sheet-border);
+}
+
+.skald-web-tab {
+  flex: none;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--sheet-muted-fg);
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.skald-web-tab:hover {
+  color: var(--sheet-fg);
+}
+
+.skald-web-tab[aria-selected="true"] {
+  color: var(--sheet-fg);
+  border-bottom-color: var(--sheet-accent);
+}
+
+.skald-web-tab:focus-visible,
+.skald-web-tabpanel:focus-visible {
+  outline: 2px solid var(--sheet-ring);
+  outline-offset: -2px;
+}
+
+.skald-web-tabpanel {
+  padding-top: 0.75rem;
+}
+
+.skald-web-tabpanel[hidden] {
+  display: none;
+}
+
+/* ---- 磚（display: "tile"）---- */
+
+.skald-tile {
+  position: relative;
+  display: flex;
+  min-width: 0;
+}
+
+.skald-tile-surface {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 4.5rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  padding: 0.5rem;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+  background: var(--sheet-surface);
+  border: 1px solid var(--sheet-border);
+  border-radius: var(--sheet-radius-sm);
+}
+
+button.skald-tile-roll {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.skald-tile-roll:hover {
+  border-color: var(--sheet-border-strong);
+}
+
+button.skald-tile-roll:active {
+  background: var(--sheet-surface-sunken);
+}
+
+button.skald-tile-roll:focus-visible,
+.skald-tile-mini-roll:focus-visible {
+  outline: 2px solid var(--sheet-ring);
+  outline-offset: 2px;
+}
+
+.skald-tile-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--sheet-muted-fg);
+}
+
+.skald-tile-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.skald-tile-fractions {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--sheet-muted-fg);
+  font-variant-numeric: tabular-nums;
+}
+
+.skald-tile-icon {
+  position: absolute;
+  top: 0.375rem;
+  right: 0.375rem;
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--sheet-muted-fg);
+}
+
+.skald-tile-edit-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.skald-tile-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--sheet-border);
+  border-radius: 8px;
+}
+
+.skald-tile-mini-roll {
+  display: inline-flex;
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  color: var(--sheet-fg);
+  background: transparent;
+  border: 1px solid var(--sheet-border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skald-web-view * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* 列印永遠中性黑白：類型主題的變數覆寫在列印時失效 */
+@media print {
+  .skald-web-view[data-genre] {
+    --sheet-surface: transparent;
+    --sheet-surface-sunken: transparent;
+    --sheet-border: #000;
+    --sheet-border-strong: #000;
+    --sheet-fg: #000;
+    --sheet-muted-fg: #000;
+    --sheet-accent: #000;
+  }
+}

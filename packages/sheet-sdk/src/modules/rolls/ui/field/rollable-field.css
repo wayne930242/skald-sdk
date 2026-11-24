@@ -1,0 +1,58 @@
+/* modules/character/ui/renderer/rollable-field.css */
+
+/* Dice icon button - hidden by default, shown on hover */
+.rollable-field-button {
+  position: absolute;
+  right: 0.25rem;
+  top: 0.375rem;
+  opacity: 0;
+  transition: opacity 150ms ease-in-out;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border-radius: 9999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: hsl(var(--foreground));
+  background: hsl(var(--background) / 0.92);
+  border: 1px solid hsl(var(--border));
+  z-index: 10;
+}
+
+.rollable-field-button:hover {
+  color: hsl(var(--foreground));
+  background: hsl(var(--accent) / 0.85);
+  border-color: hsl(var(--foreground) / 0.4);
+}
+
+.rollable-field:hover .rollable-field-button {
+  opacity: 1;
+}
+
+.rollable-field-button:focus {
+  opacity: 1;
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+.rollable-field-button:active {
+  opacity: 0.8;
+}
+
+/* Make dice button more visible for PbtA stats (number fields) */
+.rollable-field[data-field-type="number"] .rollable-field-button {
+  opacity: 0.7;
+}
+
+.rollable-field[data-field-type="number"]:hover .rollable-field-button {
+  opacity: 1;
+}
+
+/* Hide in print mode */
+@media print {
+  .rollable-field-button {
+    display: none !important;
+  }
+}

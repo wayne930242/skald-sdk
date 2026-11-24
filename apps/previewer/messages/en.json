@@ -1,0 +1,40 @@
+{
+  "previewer": {
+    "title": "Skald sheet previewer",
+    "intro": "Open a system's sheet in edit, play or print mode. Characters stay in this browser (localStorage); nothing is sent anywhere.",
+    "language": "Language",
+    "systems": {
+      "fate-condensed": "Fate Condensed",
+      "dnd5e-2024": "D&D 2024 (SRD 5.2.1)"
+    },
+    "modes": {
+      "play": "Play",
+      "edit": "Edit",
+      "print": "Print"
+    },
+    "home": "All systems",
+    "character": "Character",
+    "characters": {
+      "blank": "Blank sheet",
+      "sample": "Sample character",
+      "saved": "Saved in this browser"
+    },
+    "load": "Load",
+    "importJson": "Import JSON",
+    "exportJson": "Export JSON",
+    "reset": "Reset to the selected character",
+    "importFailed": "That file is not a character JSON object.",
+    "loading": "Loading the sheet…",
+    "notFound": "No such system in this previewer.",
+    "rollLog": {
+      "title": "Roll log",
+      "empty": "Rolls you make on the sheet appear here.",
+      "clear": "Clear"
+    },
+    "unavailable": "Not available in the previewer: table sessions, portrait upload, PDF download, Excel formulas and content packs.",
+    "locales": {
+      "en": "English",
+      "zh-TW": "繁體中文"
+    }
+  }
+}

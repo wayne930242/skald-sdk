@@ -1,0 +1,1239 @@
+/*
+ * D&D 2024 print (plugins/dnd5e/print), in the official 2024 sheet's structure (LAYOUT.md).
+ * Black and white: rules and weights, no fills. Every page has the printable area's size and
+ * clips; every box is a fixed frame the pager fills to a line short of its height. Nothing is
+ * smaller than 7pt. Inside a frame, spacing is padding, never margin, so the measured heights add up.
+ */
+.dnd-print {
+  --dnd-ink: #111;
+  --dnd-ink-2: #555;
+  --dnd-rule: #999;
+  --dnd-faint: #c8c8c8;
+  /* page 1 and 2 box heights; Letter is 18 mm shorter, so its flexible boxes give it back */
+  --dnd-top: 31mm;
+  --dnd-weapons: 45mm;
+  --dnd-bottom-row: 80mm;
+  --dnd-training: 37mm;
+  --dnd-appearance: 38mm;
+  --dnd-backstory: 66mm;
+  --dnd-languages: 15mm;
+  --dnd-coins: 17mm;
+  --dnd-cast: 31mm;
+  position: relative;
+  color: var(--dnd-ink);
+  font-family: var(--font-sans);
+  font-size: 8pt;
+  line-height: 1.32;
+  font-variant-numeric: tabular-nums;
+}
+
+.dnd-print[data-paper="letter"] {
+  --dnd-top: 29mm;
+  --dnd-weapons: 40mm;
+  --dnd-bottom-row: 70mm;
+  --dnd-training: 34mm;
+  --dnd-appearance: 34mm;
+  --dnd-backstory: 56mm;
+}
+
+.dnd-print * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.dnd-print :is(ul, ol) {
+  list-style: none;
+}
+
+/* the measuring layer: laid out like the pages, never seen, gone before anything prints */
+.dnd-print-measure {
+  position: absolute;
+  top: 0;
+  left: -200000px;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.dnd-print-label,
+.dnd-print-note,
+.dnd-print-meta {
+  font-size: 7pt;
+  color: var(--dnd-ink-2);
+  font-weight: 400;
+}
+
+.dnd-print-value,
+.dnd-print-strong {
+  font-weight: 700;
+}
+
+.dnd-print-big {
+  font-size: 15pt;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.dnd-print-c {
+  text-align: center;
+}
+
+.dnd-print-dia {
+  display: inline-block;
+  width: 2.3mm;
+  height: 2.3mm;
+  border: 0.7pt solid var(--dnd-ink);
+  transform: rotate(45deg);
+  margin: 0 0.9mm;
+  vertical-align: 0.1mm;
+}
+
+.dnd-print-dia[data-on] {
+  background: var(--dnd-ink);
+}
+
+.dnd-print-check {
+  display: inline-flex;
+  width: 2.7mm;
+  height: 2.7mm;
+  flex: none;
+  border: 0.7pt solid var(--dnd-ink);
+  border-radius: 0.4mm;
+  vertical-align: -0.4mm;
+  margin-right: 0.8mm;
+}
+
+.dnd-print-check svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--dnd-ink);
+  stroke-width: 1.6;
+}
+
+/* ── pages ── */
+.dnd-print-page {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  break-after: page;
+  page-break-after: always;
+  break-inside: avoid;
+}
+
+.dnd-print-page:last-child {
+  break-after: auto;
+  page-break-after: auto;
+}
+
+@media print {
+  html:has(.dnd-print),
+  body:has(.dnd-print) {
+    background: #fff !important;
+  }
+}
+
+@media screen {
+  .dnd-print > .dnd-print-page {
+    /* the paper around the printable area, as the sheet will look */
+    margin: 0 auto calc(20mm + 1.5rem);
+    box-shadow: 0 0 0 10mm #fff, 0 2px 14px 10mm rgb(0 0 0 / 0.18);
+  }
+
+  .dnd-print > .dnd-print-page:first-child {
+    margin-top: 10mm;
+  }
+}
+
+.dnd-print-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4.5mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 4mm;
+  font-size: 7pt;
+  line-height: 1.2;
+  color: var(--dnd-ink-2);
+}
+
+.dnd-print-page-p2 .dnd-print-footer {
+  height: 10.5mm;
+}
+
+.dnd-print-attribution {
+  max-width: 90%;
+}
+
+/* ── boxes and frames ── */
+.dnd-print-region {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  border: 0.9pt solid var(--dnd-ink);
+  border-radius: 2.2mm;
+}
+
+.dnd-print-region > h2 {
+  flex: none;
+  padding: 0.8mm 2mm 0.6mm;
+  border-bottom: 0.5pt solid var(--dnd-ink);
+  font-size: 7.5pt;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/*
+ * A heading with a note (class and subclass, species and lineage) takes its box's width, never its
+ * text's: a long note clips at the box edge instead of widening page 1's right half. The identity
+ * box prints those values in full.
+ */
+.dnd-print-features > h2,
+.dnd-print-traits > h2 {
+  contain: inline-size;
+}
+
+.dnd-print-region > h2 small {
+  margin-left: 1.5mm;
+  font-size: 7pt;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--dnd-ink-2);
+}
+
+.dnd-print-region h3 {
+  font-size: 7pt;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.dnd-print-frame {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  font-size: 7.3pt;
+  line-height: 1.3;
+}
+
+.dnd-print-frames {
+  flex: 1 1 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  gap: 2.5mm;
+  padding: 0.6mm 2mm 1mm;
+}
+
+/*
+ * Two columns of one width: the pager measures a column once and fills both with it, so the rule
+ * between them is drawn on the grid (centred in the gap), not as a border that narrows the second.
+ */
+.dnd-print-frames-two {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 3mm;
+  background: linear-gradient(var(--dnd-faint), var(--dnd-faint)) center / 0.4pt 100% no-repeat content-box;
+}
+
+.dnd-print-probe {
+  position: absolute;
+  visibility: hidden;
+}
+
+/* a frame whose content is followed by lines to write on, down to its foot */
+.dnd-print-fill {
+  display: flex;
+  flex-direction: column;
+}
+
+.dnd-print-fill > .dnd-print-para {
+  flex: none;
+}
+
+.dnd-print-pad {
+  padding: 0 2mm;
+}
+
+/* an entry of a text region: the name line, then its paragraphs */
+.dnd-print-entry > h4 {
+  padding-top: 0.9mm;
+  font-size: 7.6pt;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.dnd-print-entry .dnd-print-meta {
+  margin-left: 1mm;
+}
+
+.dnd-print-entry > p {
+  padding-top: 0.4mm;
+}
+
+.dnd-print-sum {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 0;
+  align-items: baseline;
+  gap: 1mm;
+  padding: 0.5mm 0;
+  border-top: 0.4pt solid var(--dnd-faint);
+  white-space: nowrap;
+  font-size: 7pt;
+  line-height: 1.3;
+}
+
+.dnd-print-sum > b,
+.dnd-print-sum > .dnd-print-meta {
+  flex: none;
+}
+
+.dnd-print-teaser {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--dnd-ink-2);
+}
+
+.dnd-print-go {
+  flex: none;
+  font-weight: 700;
+  font-size: 7pt;
+  white-space: nowrap;
+}
+
+.dnd-print-more {
+  justify-content: flex-end;
+  border-top-color: var(--dnd-ink);
+}
+
+.dnd-print-para {
+  position: relative;
+  padding-top: 0.6mm;
+}
+
+.dnd-print-run {
+  margin-right: 1.2mm;
+  font-size: 7pt;
+  color: var(--dnd-ink-2);
+}
+
+.dnd-print-lines .dnd-print-para {
+  min-height: 4.8mm;
+  border-bottom: 0.5pt solid var(--dnd-rule);
+}
+
+/* row tables: rows and borders that add up (no collapse) */
+.dnd-print-table-frame {
+  flex: 1 1 0;
+  padding: 0 1.8mm 0.6mm;
+}
+
+.dnd-print-rows {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.dnd-print-rows th {
+  padding: 0.6mm 0.8mm 0.3mm;
+  border-bottom: 0.5pt solid var(--dnd-ink);
+  font-size: 7pt;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--dnd-ink-2);
+  text-align: left;
+  vertical-align: bottom;
+}
+
+.dnd-print-rows td {
+  height: 5mm;
+  padding: 0.3mm 0.8mm;
+  border-bottom: 0.4pt solid var(--dnd-rule);
+  font-size: 7.3pt;
+  line-height: 1.25;
+  vertical-align: bottom;
+  overflow-wrap: anywhere;
+}
+
+.dnd-print-rows td + td,
+.dnd-print-rows th + th {
+  border-left: 0.4pt solid var(--dnd-faint);
+}
+
+.dnd-print-rows .dnd-print-marker td {
+  border-bottom: none;
+  font-size: 7pt;
+}
+
+.dnd-print-rows .dnd-print-marker td + td {
+  border-left: none;
+}
+
+.dnd-print-crm {
+  font-size: 7pt;
+  white-space: nowrap;
+}
+
+.dnd-print-crm .dnd-print-dia {
+  width: 1.9mm;
+  height: 1.9mm;
+  margin: 0 0.6mm 0 1mm;
+}
+
+.dnd-print-rows-equipment td {
+  height: 4.6mm;
+}
+
+.dnd-print-rows-index td {
+  height: auto;
+  padding: 0.25mm 0.8mm;
+  font-size: 7pt;
+}
+
+/* ── page 1 ── */
+.dnd-print-p1-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--dnd-top);
+  display: grid;
+  grid-template-columns: 70fr 17fr 19fr 42fr 17fr 17fr;
+  gap: 1.6mm;
+}
+
+.dnd-print-ident {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto 1fr 1fr 1fr;
+  column-gap: 3mm;
+  padding: 1.2mm 2.5mm;
+}
+
+.dnd-print-name {
+  grid-column: 1 / 3;
+  display: flex;
+  align-items: baseline;
+  gap: 1.5mm;
+  border-bottom: 0.5pt solid var(--dnd-ink);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.dnd-print-name-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13pt;
+  font-weight: 700;
+}
+
+.dnd-print-field {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5mm;
+  min-width: 0;
+  border-bottom: 0.5pt solid var(--dnd-rule);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.dnd-print-field .dnd-print-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 8.5pt;
+}
+
+/*
+ * An identity value that does not fit its line (LAYOUT.md §3, 身分): a smaller step (`data-fit`
+ * 1, 2), then two lines at 7pt (`wrap`), else a named continuation pointer and the whole value under
+ * 「身分（續）」 (`cont`). The pager picks the step from the probes the measuring layer holds.
+ */
+.dnd-print-field[data-fit="1"] .dnd-print-value,
+.dnd-print-field[data-fit="cont"] .dnd-print-value,
+.dnd-print-name[data-fit="2"] .dnd-print-name-value,
+.dnd-print-name[data-fit="cont"] .dnd-print-name-value {
+  font-size: 7pt;
+}
+
+.dnd-print-name[data-fit="1"] .dnd-print-name-value {
+  font-size: 10pt;
+}
+
+.dnd-print-ident [data-fit="wrap"] {
+  align-items: flex-end;
+}
+
+.dnd-print-ident [data-fit="wrap"] :is(.dnd-print-value, .dnd-print-name-value),
+.dnd-print-ident-wrap {
+  flex: 1 1 0;
+  font-size: 7pt;
+  line-height: 1.15;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+}
+
+.dnd-print-ident [data-fit="cont"] {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  row-gap: 0;
+}
+
+.dnd-print-ident .dnd-print-name[data-fit="cont"] {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.dnd-print-ident [data-fit="cont"] .dnd-print-go {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  line-height: 1.1;
+}
+
+/* the measuring layer: each value takes its line's width, and holds a probe per step */
+.dnd-print-measure .dnd-print-ident :is(.dnd-print-value, .dnd-print-name-value) {
+  position: relative;
+  flex: 1 1 0;
+}
+
+.dnd-print-ident-probe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  white-space: nowrap;
+}
+
+.dnd-print-ident-probe.dnd-print-ident-wrap {
+  right: 0;
+  white-space: normal;
+}
+
+.dnd-print-field .dnd-print-ident-probe[data-size="0"] {
+  font-size: 8.5pt;
+}
+
+.dnd-print-field .dnd-print-ident-probe[data-size="1"],
+.dnd-print-name .dnd-print-ident-probe[data-size="2"] {
+  font-size: 7pt;
+}
+
+.dnd-print-name .dnd-print-ident-probe[data-size="0"] {
+  font-size: 13pt;
+}
+
+.dnd-print-name .dnd-print-ident-probe[data-size="1"] {
+  font-size: 10pt;
+}
+
+.dnd-print-badge,
+.dnd-print-ac,
+.dnd-print-pb,
+.dnd-print-insp,
+.dnd-print-chip {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.dnd-print-badge .dnd-print-big {
+  font-size: 16pt;
+}
+
+.dnd-print-sep {
+  width: 80%;
+  margin: 1mm 0 0.6mm;
+  border-top: 0.5pt solid var(--dnd-ink);
+}
+
+.dnd-print-ac {
+  border-radius: 2.2mm 2.2mm 8mm 8mm;
+  padding: 0 1mm;
+}
+
+.dnd-print-ac .dnd-print-big {
+  font-size: 18pt;
+}
+
+.dnd-print-ac .dnd-print-note {
+  line-height: 1.15;
+}
+
+.dnd-print-shield {
+  display: flex;
+  align-items: center;
+  gap: 0.4mm;
+  margin-top: 0.4mm;
+}
+
+.dnd-print-hp {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  padding: 1mm 2mm;
+}
+
+.dnd-print-hp > h3 {
+  grid-column: 1 / 3;
+}
+
+.dnd-print-hp-cur {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-right: 1.5mm;
+  border-right: 0.5pt solid var(--dnd-rule);
+}
+
+.dnd-print-hp-cur .dnd-print-big {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dnd-print-hp-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-left: 1.5mm;
+}
+
+.dnd-print-hp-side > div,
+.dnd-print-hd > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 0.5pt solid var(--dnd-rule);
+}
+
+.dnd-print-hd,
+.dnd-print-ds {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1mm 1.6mm;
+}
+
+.dnd-print-ds > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.dnd-print-p1-body {
+  position: absolute;
+  top: calc(var(--dnd-top) + 2mm);
+  left: 0;
+  right: 0;
+  bottom: 5.5mm;
+  display: grid;
+  grid-template-columns: 74fr 114fr;
+  gap: 2mm;
+}
+
+.dnd-print-p1-left {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) var(--dnd-training);
+  gap: 2mm;
+}
+
+.dnd-print-col-a,
+.dnd-print-col-b {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6mm;
+}
+
+.dnd-print-pb {
+  flex: none;
+  height: 13mm;
+}
+
+.dnd-print-pb .dnd-print-big {
+  font-size: 14pt;
+}
+
+.dnd-print-ability {
+  flex: none;
+}
+
+.dnd-print-col-b .dnd-print-ability {
+  flex: 1 1 0;
+}
+
+.dnd-print-ability-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  padding: 0.8mm 2mm 0.5mm;
+  border-bottom: 0.5pt solid var(--dnd-ink);
+}
+
+.dnd-print-ability-head h3 {
+  grid-column: 1 / 3;
+  font-size: 7.5pt;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+
+.dnd-print-mod {
+  width: 11mm;
+  height: 11mm;
+  margin: 0.6mm auto 0.6mm 1.5mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.8pt solid var(--dnd-ink);
+  border-radius: 50%;
+  font-size: 14pt;
+  font-weight: 700;
+}
+
+.dnd-print-score-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dnd-print-score {
+  min-width: 8mm;
+  padding: 0.2mm 1mm;
+  border: 0.6pt solid var(--dnd-ink);
+  border-radius: 1.2mm;
+  text-align: center;
+  font-weight: 700;
+}
+
+.dnd-print-ability ul {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  padding: 0.6mm 1.6mm 1mm;
+}
+
+.dnd-print-ability li {
+  display: grid;
+  grid-template-columns: 3mm 7mm minmax(0, 1fr);
+  align-items: end;
+  gap: 0.6mm;
+  min-height: 4.2mm;
+  white-space: nowrap;
+}
+
+.dnd-print-ability li > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dnd-print-ability .dnd-print-n {
+  border-bottom: 0.5pt solid var(--dnd-rule);
+  text-align: center;
+  font-weight: 700;
+}
+
+.dnd-print-ability .dnd-print-save {
+  font-weight: 700;
+}
+
+.dnd-print-mark {
+  font-size: 7pt;
+}
+
+.dnd-print-insp {
+  flex: none;
+  height: 15mm;
+  gap: 1mm;
+}
+
+.dnd-print-insp .dnd-print-check {
+  width: 4mm;
+  height: 4mm;
+  margin: 0;
+}
+
+.dnd-print-status {
+  flex: 1 1 0;
+}
+
+.dnd-print-status > .dnd-print-frame {
+  flex: 1 1 0;
+  margin: 0 1.8mm 1mm;
+}
+
+/*
+ * Two to a row, each at least half the box; a name longer than that ("Incapacitated") takes the
+ * room it needs and its row, so no name is cut.
+ */
+.dnd-print-conditions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7mm 1mm;
+  padding: 1mm 0 0.6mm;
+  font-size: 7pt;
+  white-space: nowrap;
+}
+
+.dnd-print-conditions > span {
+  flex: none;
+  min-width: calc(50% - 0.5mm);
+}
+
+.dnd-print-status-blanks .dnd-print-line {
+  display: flex;
+  align-items: center;
+  min-height: 4.6mm;
+  border-bottom: 0.5pt solid var(--dnd-rule);
+}
+
+.dnd-print-status-blanks .dnd-print-line .dnd-print-label {
+  margin-right: 1mm;
+}
+
+.dnd-print-training {
+  grid-column: 1 / 3;
+}
+
+.dnd-print-armor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4mm;
+  padding: 1.2mm 2mm 0.4mm;
+  font-size: 7pt;
+}
+
+.dnd-print-armor > .dnd-print-label {
+  margin-right: 0.6mm;
+}
+
+.dnd-print-training > .dnd-print-frame {
+  flex: 1 1 0;
+  margin: 0 2mm 1mm;
+}
+
+.dnd-print-p1-right {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8mm;
+}
+
+.dnd-print-chips {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.6mm;
+  height: 13mm;
+}
+
+.dnd-print-chip > h3 {
+  width: 100%;
+  padding-bottom: 0.3mm;
+  border-bottom: 0.5pt solid var(--dnd-ink);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.dnd-print-chip .dnd-print-big {
+  font-size: 12pt;
+  line-height: 1.2;
+}
+
+.dnd-print-chip .dnd-print-note {
+  line-height: 1;
+}
+
+.dnd-print-weapons {
+  flex: none;
+  height: var(--dnd-weapons);
+}
+
+.dnd-print-features {
+  flex: 1 1 0;
+}
+
+.dnd-print-bottom-row {
+  flex: none;
+  height: var(--dnd-bottom-row);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 2mm;
+}
+
+/* ── page 2 ── */
+.dnd-print-p2-body {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 11.5mm;
+  display: grid;
+  grid-template-columns: 122fr 66fr;
+  gap: 2mm;
+}
+
+.dnd-print-p2-left,
+.dnd-print-p2-right {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8mm;
+}
+
+.dnd-print-p2-cast {
+  flex: none;
+  height: var(--dnd-cast);
+  display: grid;
+  grid-template-columns: 44fr 76fr;
+  gap: 1.8mm;
+}
+
+.dnd-print-cast {
+  display: grid;
+  grid-template-rows: repeat(4, 1fr);
+  padding: 0 2mm 1mm;
+}
+
+.dnd-print-cast > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1mm;
+  border-bottom: 0.5pt solid var(--dnd-rule);
+}
+
+/* a long label ("Spellcasting Modifier") wraps within its row; the value never does */
+.dnd-print-cast .dnd-print-label {
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.dnd-print-cast .dnd-print-value {
+  flex: none;
+  font-size: 10pt;
+  white-space: nowrap;
+}
+
+.dnd-print-cast-ability .dnd-print-value {
+  font-size: 8.5pt;
+}
+
+.dnd-print-slot-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-content: space-evenly;
+  gap: 0.3mm 1.2mm;
+  padding: 0.6mm 2mm 0.6mm;
+}
+
+.dnd-print-slot {
+  display: grid;
+  grid-template-columns: auto 5mm 1fr;
+  gap: 0.8mm;
+  align-items: center;
+  font-size: 7pt;
+  white-space: nowrap;
+}
+
+.dnd-print-slot-total {
+  border-bottom: 0.5pt solid var(--dnd-rule);
+  text-align: center;
+  font-weight: 700;
+}
+
+.dnd-print-slot[data-off] {
+  color: #9a9a9a;
+}
+
+.dnd-print-slot[data-off] .dnd-print-dia {
+  border-color: #9a9a9a;
+}
+
+.dnd-print-pips .dnd-print-dia,
+.dnd-print-pact .dnd-print-dia {
+  width: 1.9mm;
+  height: 1.9mm;
+  margin: 0 0.5mm;
+}
+
+.dnd-print-pact {
+  padding: 0 2mm 0.8mm;
+  font-size: 7pt;
+}
+
+.dnd-print-spelltable,
+.dnd-print-noncaster {
+  flex: 1 1 0;
+}
+
+.dnd-print-appearance {
+  flex: none;
+  height: var(--dnd-appearance);
+}
+
+.dnd-print-appearance-inner {
+  flex: 1 1 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 21mm minmax(0, 1fr);
+  gap: 2mm;
+  padding: 1.2mm 2mm;
+}
+
+.dnd-print-portrait {
+  width: 21mm;
+  height: 26mm;
+  object-fit: cover;
+  border: 0.5pt solid var(--dnd-ink);
+  border-radius: 1mm;
+}
+
+.dnd-print-portrait-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  font-size: 7pt;
+  color: var(--dnd-ink-2);
+}
+
+.dnd-print-backstory {
+  flex: none;
+  height: var(--dnd-backstory);
+}
+
+.dnd-print-backstory > .dnd-print-frame {
+  flex: 1 1 0;
+  margin-top: 0.8mm;
+}
+
+.dnd-print-alignment {
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  gap: 2mm;
+  margin: 0 2mm 1.2mm;
+  padding-top: 0.6mm;
+  border-top: 0.5pt solid var(--dnd-ink);
+}
+
+.dnd-print-languages {
+  flex: none;
+  height: var(--dnd-languages);
+}
+
+.dnd-print-languages > .dnd-print-frame {
+  flex: 1 1 0;
+  margin-top: 0.4mm;
+}
+
+.dnd-print-equipment {
+  flex: 1 1 0;
+}
+
+.dnd-print-equipment-foot {
+  flex: none;
+  padding: 0.6mm 2mm 1.2mm;
+  border-top: 0.5pt solid var(--dnd-ink);
+}
+
+.dnd-print-carry {
+  padding-bottom: 0.6mm;
+  font-size: 7pt;
+  font-weight: 700;
+}
+
+.dnd-print-attune {
+  display: flex;
+  align-items: flex-end;
+  gap: 1mm;
+  min-height: 4.5mm;
+  border-bottom: 0.5pt solid var(--dnd-rule);
+}
+
+.dnd-print-coins {
+  flex: none;
+  height: var(--dnd-coins);
+}
+
+.dnd-print-coin-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1.4mm;
+  padding: 1mm 2mm 1.4mm;
+}
+
+.dnd-print-coin {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 0.6pt solid var(--dnd-ink);
+  border-radius: 1mm;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.dnd-print-coin .dnd-print-label {
+  border-bottom: 0.4pt solid var(--dnd-ink);
+}
+
+.dnd-print-coin .dnd-print-value {
+  font-size: 9pt;
+}
+
+/* page 2's left half for a non-caster: what page 1 continues, then lines for notes */
+.dnd-print-flow-frame {
+  display: flex;
+  flex-direction: column;
+}
+
+.dnd-print-notes-lines {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: 1mm;
+}
+
+.dnd-print-ruled-fill {
+  flex: 1 1 0;
+  min-height: 0;
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(5mm - 0.4pt), var(--dnd-faint) calc(5mm - 0.4pt), var(--dnd-faint) 5mm);
+}
+
+/* ── 續頁 and the spellbook ── */
+.dnd-print-running {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 0.6mm;
+  border-bottom: 0.8pt solid var(--dnd-ink);
+  font-size: 7pt;
+}
+
+.dnd-print-running b {
+  font-size: 9pt;
+}
+
+.dnd-print-flow-body {
+  position: absolute;
+  top: 8mm;
+  left: 0;
+  right: 0;
+  bottom: 6mm;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 6mm;
+}
+
+.dnd-print-flow-body > .dnd-print-frame {
+  font-size: 8pt;
+  line-height: 1.38;
+}
+
+/* the rule between the columns, as on page 1: drawn on the grid so both columns keep one width */
+.dnd-print-flow-body {
+  background: linear-gradient(var(--dnd-faint), var(--dnd-faint)) center / 0.4pt 100% no-repeat;
+}
+
+.dnd-print-flow-body .dnd-print-entry > h4 {
+  font-size: 8.4pt;
+}
+
+.dnd-print-sec {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2mm;
+  padding: 1.2mm 0 0.3mm;
+  border-bottom: 0.8pt solid var(--dnd-ink);
+  font-size: 9pt;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.dnd-print-sec small,
+.dnd-print-level small {
+  font-size: 7pt;
+  font-weight: 400;
+  color: var(--dnd-ink-2);
+}
+
+.dnd-print-noncaster .dnd-print-sec {
+  font-size: 8pt;
+}
+
+.dnd-print-level {
+  padding: 1.2mm 0 0.3mm;
+  border-bottom: 0.8pt solid var(--dnd-ink);
+  font-size: 9pt;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.dnd-print-level small {
+  margin-left: 1.5mm;
+}
+
+.dnd-print-spell > h4 {
+  display: flex;
+  align-items: baseline;
+  gap: 1mm;
+  padding-top: 1.2mm;
+  font-size: 8.4pt;
+  font-weight: 700;
+}
+
+.dnd-print-spell .dnd-print-mark {
+  font-weight: 400;
+}
+
+.dnd-print-tag {
+  padding: 0 0.6mm;
+  border: 0.5pt solid var(--dnd-ink);
+  border-radius: 0.8mm;
+  font-size: 7pt;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.dnd-print-spell > p {
+  padding-top: 0.4mm;
+}
+
+.dnd-print-spell-stats {
+  font-size: 7pt;
+  color: var(--dnd-ink-2);
+}
+
+.dnd-print-spell-stats > span + span::before {
+  content: " · ";
+}
+
+.dnd-print-spell-stats .dnd-print-label {
+  color: var(--dnd-ink);
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "../schemas/roll-macros.schema.json",
+  "defaultSystem": "dnd5e",
+  "defaultTarget": "session",
+  "macros": {
+    "d20": {
+      "params": [{ "name": "mod" }, { "name": "adv", "default": "0" }, { "name": "xn", "default": "0" }, { "name": "xd", "default": "4" }],
+      "body": "if (@xn != 0) { if (@adv > 0) { return roll(\"2d20kh1+{{@mod}}+{{@xn}}d{{@xd}}\"); } elif (@adv < 0) { return roll(\"2d20kl1+{{@mod}}+{{@xn}}d{{@xd}}\"); } else { return roll(\"1d20+{{@mod}}+{{@xn}}d{{@xd}}\"); } } elif (@adv > 0) { return roll(\"2d20kh1+{{@mod}}\"); } elif (@adv < 0) { return roll(\"2d20kl1+{{@mod}}\"); } else { return roll(\"1d20+{{@mod}}\"); }",
+      "label": "{{i18n:macros.d20}}",
+      "bonusDice": { "enabled": true, "min": -1, "max": 1, "param": "adv" }
+    },
+    "abilityScore4d6": {
+      "params": [],
+      "body": "return roll(\"4d6kh3\");",
+      "label": "{{i18n:wizard.macro.abilityScore4d6}}"
+    }
+  }
+}

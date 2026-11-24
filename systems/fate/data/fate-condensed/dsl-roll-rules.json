@@ -1,0 +1,38 @@
+{
+  "$schema": "../schemas/roll-rules.schema.json",
+  "default": "fate",
+  "rules": {
+    "fate": {
+      "type": "roll-over",
+      "dice": "4dF",
+      "modifier": "{{@skill}}",
+      "description": "Fate skill check - 4dF + skill vs target difficulty",
+      "successLevels": [
+        {
+          "id": "success-with-style",
+          "label": "絕妙成功",
+          "condition": "{{@total - @target >= 3}}",
+          "style": "critical"
+        },
+        {
+          "id": "success",
+          "label": "成功",
+          "condition": "{{@total - @target >= 1 && @total - @target < 3}}",
+          "style": "success"
+        },
+        {
+          "id": "tie",
+          "label": "平手",
+          "condition": "{{@total == @target}}",
+          "style": "partial"
+        },
+        {
+          "id": "failure",
+          "label": "失敗",
+          "condition": "{{@total < @target}}",
+          "style": "failure"
+        }
+      ]
+    }
+  }
+}

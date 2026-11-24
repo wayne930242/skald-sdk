@@ -1,0 +1,311 @@
+{
+  "fateRolls": {
+    "chat": {
+      "root": "{skill} #{tag}",
+      "followUp": "{skill}・{effect}・#{tag}",
+      "effect": {
+        "plus2": "援引 +2",
+        "reroll": "援引重擲"
+      }
+    },
+    "outcome": {
+      "fail": "失敗（差 {shifts} 檔次）",
+      "tie": "平手",
+      "success": "成功（{shifts} 檔次）",
+      "style": "絕妙成功（{shifts} 檔次）"
+    },
+    "dice": {
+      "plus": "＋1",
+      "minus": "－1",
+      "blank": "空白",
+      "separator": "、",
+      "label": "骰面：{faces}，合計 {sum}"
+    },
+    "action": {
+      "overcome": "克服",
+      "createAdvantage": "創造優勢",
+      "attack": "攻擊",
+      "defend": "防禦"
+    },
+    "trigger": {
+      "name": "擲 {skill} {rating}"
+    },
+    "options": {
+      "title": "擲骰選項",
+      "subtitle": "{skill} {rating}",
+      "action": "行動",
+      "rules": "{section}規則",
+      "advantage": {
+        "title": "創造優勢的對象",
+        "new": "新形象",
+        "known": "已知形象",
+        "unknown": "未揭露形象"
+      },
+      "opposition": "對抗",
+      "lower": "降低{field}",
+      "raise": "提高{field}",
+      "oppositionHint": "填入難度或對手的防禦總值，預設 +0。",
+      "scale": {
+        "title": "規模差距",
+        "apply": "這一擲比較規模",
+        "selfTier": "我方",
+        "otherTier": "對方",
+        "mode": "採用",
+        "tiers": {
+          "mundane": "世俗",
+          "supernatural": "超自然",
+          "otherworldly": "異界",
+          "legendary": "傳奇",
+          "godlike": "似神"
+        },
+        "modes": {
+          "beforeRoll": "擲骰前每級 +{value}",
+          "afterRoll": "成功後每級 +{value}",
+          "result": "成功時每級 {value} 次免費援引"
+        },
+        "notHigher": "只有規模較高的一方能用規模差距。",
+        "difference": "我方高 {tiers} 級"
+      },
+      "gear": {
+        "weapon": "武器等級",
+        "armor": "目標護甲",
+        "yours": "角色卡上的武器：{rating}"
+      },
+      "stunts": "絕技",
+      "stunt": "絕技",
+      "confirmCondition": "我確認這次符合：{condition}",
+      "confirmFiction": "我確認這次符合絕技的情況",
+      "stuntBlocked": {
+        "used": "這一場次已經用過。",
+        "noSession": "每場次一次的絕技要先開始場次才能用。",
+        "readOnly": "唯讀的角色卡不能記錄絕技的使用。"
+      },
+      "preview": {
+        "title": "擲骰前預覽",
+        "range": "四顆命運骰各種結果，對抗 {opposition}",
+        "cell": "骰子 {dice}，總值 {total}",
+        "outcome": {
+          "fail": "失敗",
+          "tie": "平手",
+          "success": "成功",
+          "style": "絕妙成功"
+        },
+        "note": "擲出四顆命運骰後，總值才會與對抗比較。骰子合計 +0 時："
+      },
+      "cancel": "取消",
+      "roll": "擲骰"
+    },
+    "invoke": {
+      "title": "援引形象",
+      "rules": "援引規則",
+      "subtitle": "選擇能幫上這次{action}的形象。",
+      "free": "免費援引",
+      "noFree": "目前沒有免費援引。",
+      "paid": "我的形象",
+      "paidCost": "每次 −1 命運點",
+      "noAspects": "還沒有形象可以援引。",
+      "hidden": "祕密形象",
+      "boostNote": "推助・用後消失",
+      "freeCount": "免費援引 {count} 次",
+      "refusal": {
+        "readOnly": "唯讀的角色卡不能援引。",
+        "wrongCharacter": "這一擲屬於另一個角色。",
+        "unknownAspect": "這個形象已經不在角色卡上。",
+        "duplicateOperation": "這次援引已經記錄過了。",
+        "boostCannotBePaid": "推助只能免費援引。",
+        "paidRepeat": "這一擲已經花命運點援引過這個形象。",
+        "noFatePoints": "沒有命運點了。",
+        "noFreeInvokes": "沒有免費援引了。",
+        "busy": "上一個動作還在進行中。",
+        "noRoll": "還沒有可以援引的擲骰。",
+        "settled": "這一擲的結果已經確定，不能再援引。",
+        "blocked": "先選擇只記在角色卡上，才能援引。",
+        "stale": "角色卡剛剛有變動，這次援引沒有記錄，也沒有扣點。請再確認一次。",
+        "editMode": "切換到遊玩模式才能援引。"
+      },
+      "original": "原擲骰",
+      "originalLine": "原擲骰・{skill} {rating}",
+      "total": "總值 {total}",
+      "opposition": "對抗 {opposition}",
+      "effect": "援引方式",
+      "effects": {
+        "plus2": "總值 +2",
+        "reroll": "重擲 4 顆骰"
+      },
+      "costPaid": "−1 命運點：命運點 {from} → {to}",
+      "costBoost": "用掉這個推助，它會消失。",
+      "costFree": "免費援引 {from} → {to}",
+      "preview": "援引後預覽",
+      "plus2Line": "{total} ＋ {bonus} ＝ {after}",
+      "rerollLine": "重擲四顆新的命運骰，先前的加值保留，再與同一個對抗比較。",
+      "blocked": {
+        "privateAudience": "原擲骰只讓部分人看到，援引的結果不會送到聊天室。",
+        "notPosted": "無法確認原擲骰已送到聊天室，援引的結果不會送出。",
+        "noBinding": "無法確認原擲骰送到哪張遊戲桌，援引的結果不會送出。",
+        "bindingChanged": "遊戲桌連線或角色已經不同，援引的結果不會送出。"
+      },
+      "keepLocal": "只記在這張角色卡",
+      "noteChat": "確認後會在聊天室送出一則新的擲骰訊息，對象與原擲骰相同；原訊息不會被修改。",
+      "noteLocal": "這次援引只記在角色卡上，不會送到聊天室。",
+      "noteNothingYet": "確認前不會消耗命運點或免費援引。",
+      "cancel": "取消",
+      "confirm": "確認援引",
+      "confirmLocal": "確認援引（只記在角色卡）",
+      "playOnly": "切換到遊玩模式才能援引。"
+    },
+    "tray": {
+      "title": "擲骰盤",
+      "rules": "擲骰結果規則",
+      "last": "最近一次・{skill} {rating}",
+      "empty": "還沒有擲骰。",
+      "noRoller": "這裡無法擲骰。",
+      "gestures": "長按技能可開啟選項。",
+      "helpLabel": "擲骰操作說明",
+      "help": "點技能擲骰，預設為克服、對抗 +0；長按、按右鍵或 Shift+Enter 開啟選項。",
+      "total": "總值",
+      "beyond": {
+        "below": "低於形容詞階梯",
+        "above": "高於形容詞階梯"
+      },
+      "opposition": "對抗 {opposition}",
+      "invokePlus2": "援引形象 +2",
+      "invokeReroll": "重擲",
+      "modifiers": "加值",
+      "scalePending": "規模差距要在擲骰成功後才會加上。",
+      "offers": "可以選擇的結果",
+      "outcomeHelp": "{outcome}怎麼處理",
+      "actionHelp": "{action}的規則",
+      "settled": "已經取得這一擲的獎勵，結果確定。",
+      "readOnly": "唯讀的角色卡可以擲骰，但不能援引或取得結果。",
+      "deliveryChat": "援引會以新的擲骰訊息送到原擲骰的對象。",
+      "deliveryLocal": "這一擲的援引只記在角色卡上。",
+      "deliveryBlocked": {
+        "privateAudience": "原擲骰只讓部分人看到：援引前要先選擇只記在角色卡。",
+        "notPosted": "無法確認原擲骰已送出：援引前要先選擇只記在角色卡。",
+        "noBinding": "無法確認原擲骰的遊戲桌：援引前要先選擇只記在角色卡。",
+        "bindingChanged": "遊戲桌連線已經不同：援引前要先選擇只記在角色卡。"
+      },
+      "nonAtomic": "訊息傳送失敗時，點數不會退還。",
+      "goneAspect": "已移除的形象",
+      "hiddenAspect": "祕密形象",
+      "modifier": {
+        "stunt": "{name} {value}",
+        "stuntFallback": "絕技",
+        "scale": "規模 {value}",
+        "invoke": {
+          "plus2": "援引「{aspect}」+2（{payment}）",
+          "reroll": "援引「{aspect}」重擲（{payment}）"
+        },
+        "payment": {
+          "free": "免費",
+          "paid": "命運點"
+        }
+      },
+      "playOnly": "切換到遊玩模式才能援引、撤銷或取得結果。"
+    },
+    "delivery": {
+      "local": "援引已記在角色卡。",
+      "pending": "援引已記在角色卡，訊息送出中……",
+      "posted": "援引已記在角色卡，訊息已送出。",
+      "rejected": "援引已記在角色卡，但聊天室拒絕了訊息。",
+      "unknown": "援引已記在角色卡，訊息是否送達無法確認，請查看聊天室；不會重送，也不會自動退還。",
+      "reversed": "這次援引已撤銷並退還。",
+      "reverse": "撤銷援引並退還"
+    },
+    "offers": {
+      "fail": "失敗：沒有達成目標",
+      "majorCost": "或付出重大代價後成功",
+      "minorCost": "付出小代價後成功",
+      "success": "成功：達成目標",
+      "deny": "成功防禦",
+      "noAspect": "沒有建立形象",
+      "boost": "取得一個推助",
+      "failWithBoost": "或失敗但取得推助",
+      "successWithBoost": "成功並取得推助",
+      "armorBoost": "護甲擋下傷害：攻擊方取得推助",
+      "enemyFreeInvoke": "對手取得一次免費援引",
+      "enemyMayReveal": "對手可以揭露形象",
+      "freeInvokes": "形象上取得 {count} 次免費援引",
+      "hit": "造成 {shifts} 檔傷害",
+      "hitWithBoost": "或造成 {shifts} 檔傷害並取得推助",
+      "takeHit": "承受 {shifts} 檔傷害"
+    },
+    "claim": {
+      "takeBoost": "取得推助",
+      "takeInvokes": "取得 {count} 次免費援引",
+      "boostText": "推助的內容",
+      "aspectText": "新形象的內容",
+      "which": "放在哪個形象上",
+      "option": "{kind}：{name}",
+      "cancel": "取消",
+      "confirm": "確認"
+    },
+    "table": {
+      "title": "在遊戲桌上援引",
+      "subtitle": "由遊戲桌結算：付點、加值或重擲與聊天訊息一起送出。",
+      "free": "免費援引與推助",
+      "paid": "付一點命運點",
+      "payerWallet": "付款：這個角色的命運點（剩 {count}）",
+      "payerPool": "付款：GM 場景池（剩 {count}）",
+      "noPayer": "沒有可以付款的命運點來源",
+      "group": {
+        "own": "自己的形象與後果",
+        "scene": "場景與區域形象",
+        "others": "其他角色的形象與後果"
+      },
+      "hostile": "敵對援引：對方在場景結束時得到一點命運點",
+      "remaining": "還剩 {count} 次",
+      "boost": "推助・用一次就消失",
+      "paidRepeat": "這一擲已經為這個形象付過點。",
+      "noPoints": "命運點不夠。",
+      "gmAudience": "這是只給 GM 看的擲骰：會讓其他人看出來的付點與公開的免費援引都不能用。",
+      "note": "確認後由遊戲桌一次結算並送出一則新的擲骰訊息，對象與原擲骰相同；原訊息不會被修改。",
+      "unknownAspect": "看不到內容的形象",
+      "delivery": "這一擲在遊戲桌上：援引會與付點一起由遊戲桌結算。",
+      "revisionPosted": "遊戲桌已結算這次援引並送出訊息。",
+      "noClaim": "在遊戲桌上，推助與免費援引由 GM 在場景板發放。",
+      "scaleSkipped": "遊戲桌以擲骰當下的加值計算，擲骰後才套用的規模效果不計入。",
+      "confirmAgain": "再確認一次（用同一筆操作重送，不會重複扣點）",
+      "failure": {
+        "forbidden": "遊戲桌拒絕了：你沒有這個權限。",
+        "not_found": "找不到這一擲或這個形象，可能已經刪除或看不到。",
+        "conflict": "遊戲桌的狀態已經變了（場景結束、結果更新或桌上規則未啟用），沒有扣點。",
+        "invalid": "遊戲桌不接受這次操作（已付過點、點數不足或暗骰限制），沒有扣點。",
+        "unavailable": "連線中斷，結果未確認。可以再確認一次，不會重複扣點。",
+        "audience": "遊戲桌只接受給所有人或給 GM 的擲骰，請改選擲骰對象。",
+        "readOnly": "這張角色卡由遊戲桌管理，但目前連不上遊戲桌：只能檢視，不能擲骰援引。",
+        "busy": "上一個動作還在進行中。",
+        "noRoll": "還沒有可以援引的擲骰。",
+        "settled": "這一擲的結果已經確定。",
+        "editMode": "切換到遊玩模式才能援引。",
+        "abandoned": "已停止等待：如果這一擲其實已送出，聊天室會看到它，但角色卡上不會有這一擲。"
+      },
+      "actions": {
+        "loading": "正在讀取遊戲桌…",
+        "unavailable": "暫時連不上遊戲桌：命運點與援引只能檢視。",
+        "retry": "重新讀取",
+        "scene": "場景 {ordinal}：{title}",
+        "untitled": "未命名",
+        "noScene": "目前沒有進行中的場景",
+        "wallet": "桌上命運點 {count}",
+        "handIn": "交給 GM 場景池",
+        "handInAmount": "點數",
+        "confirming": "確認中…",
+        "failed": {
+          "forbidden": "沒有權限交點。",
+          "not_found": "找不到這個角色的桌上命運點。",
+          "conflict": "桌上狀態已改變，沒有交點。",
+          "invalid": "點數不夠或數量不正確，沒有交點。"
+        },
+        "sceneClosed": "場景 {ordinal}「{title}」已結束：可以在角色卡按「場景結束」清除壓力。",
+        "dismiss": "知道了",
+        "handInRetry": "再確認一次",
+        "handInConfirming": "結果未確認，正在重送同一筆操作…"
+      },
+      "othersAspect": "{name}：{text}",
+      "rootPending": "這一擲是否已送到遊戲桌還不確定。再確認一次會用同一筆操作重送，不會重複擲骰。",
+      "rootConfirm": "再確認一次",
+      "rootAbandon": "不等了"
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "banner": "Edit mode: change ability scores, species, class and other basics",
+  "add": "Add",
+  "addAttack": "Add attack",
+  "done": "Done",
+  "addTo": "Add {list}",
+  "custom": {
+    "link": "Can't find it? Add a custom entry to {list}",
+    "title": "Custom entry: {list}",
+    "editTitle": "Edit {name}",
+    "add": "Add",
+    "save": "Save",
+    "cancel": "Cancel",
+    "nameRequired": "Enter a name.",
+    "added": "Added {name}.",
+    "saved": "Updated {name}.",
+    "srdLanguages": "SRD languages",
+    "attack": "attacks"
+  },
+  "row": {
+    "menu": "Options for {name}",
+    "editText": "Edit text",
+    "editFields": "Edit fields",
+    "delete": "Delete",
+    "deleted": "Deleted {name}",
+    "undo": "Undo",
+    "remove": "Remove {name}"
+  },
+  "text": {
+    "title": "Edit the text of {name}",
+    "srdHint": "The rules text is filled in: trim or reword it as you like.",
+    "loading": "Loading the rules text…",
+    "packBeside": "Content pack text (read-only):",
+    "reset": "Restore",
+    "resetHint": "Clear your own text and show the original",
+    "save": "Save",
+    "cancel": "Cancel",
+    "count": "{count} / {max} characters",
+    "saved": "Updated the text of {name}."
+  },
+  "spells": {
+    "prepare": "Prepare {name}",
+    "prepared": "Prepared",
+    "unprepared": "Not prepared"
+  },
+  "part": {
+    "identity": "Basics",
+    "abilities": "Abilities and saves",
+    "skills": "Skill proficiencies",
+    "combat": "Attack bonuses",
+    "items": "Equipment rows"
+  }
+}
