@@ -2,7 +2,7 @@ import * as v from 'valibot';
 import { GameDataMetaSchema, LocalizableItemSchema } from '../base';
 
 // ============================================================================
-// Avatar Legends Technique
+// Technique (a move a character can learn)
 // ============================================================================
 
 export const TechniqueSchema = v.object({

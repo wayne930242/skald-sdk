@@ -32,9 +32,8 @@ import { Plus, User, X } from "lucide-react";
  * Renders a field for referencing other characters (PC or NPC).
  * Without a scope it is a text input for a name.
  *
- * Used in systems like Avatar Legends for relationships like:
- * - Adamant's "Guide"
- * - Guardian's "Ward"
+ * Used for relationships between characters, such as a mentor or someone a
+ * character protects.
  *
  * With `scope: "table"` (ADR 0014, an organization's investigator members) the value is a list of
  * soft references `{ id, characterId, name }` to the table's characters, which the host supplies

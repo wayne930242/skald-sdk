@@ -2,7 +2,7 @@ import * as v from 'valibot';
 import { GameDataMetaSchema } from '../base';
 
 // ============================================================================
-// Avatar Legends Playbook
+// Playbook (a character archetype with its own moves)
 // ============================================================================
 
 // Legacy format: inline multilang { "en": "...", "zh-TW": "..." }

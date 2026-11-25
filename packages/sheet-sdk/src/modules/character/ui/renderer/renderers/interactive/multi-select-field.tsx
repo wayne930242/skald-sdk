@@ -13,7 +13,7 @@ import { useSchemaI18n } from "@skald/sheet-sdk/lib/i18n/use-schema-i18n";
  * Multi-Select Field Renderer
  *
  * Renders a field that allows selecting multiple options from a list.
- * Used for things like selecting backgrounds in Avatar Legends where you pick 1-2.
+ * Used for things like picking one or two backgrounds from a list.
  *
  * Features:
  * - Configurable min/max selections

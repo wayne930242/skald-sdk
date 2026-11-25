@@ -190,7 +190,7 @@ export interface LoadedSystem {
 export interface SystemGameData {
   /** 技能主檔 */
   skills?: SkillsMaster;
-  /** 招式主檔 (Avatar Legends) */
+  /** 招式主檔 */
   techniques?: TechniquesMaster;
   /** 各時代可用技能 ID 列表 */
   skillsByEra?: Record<string, string[]>;
