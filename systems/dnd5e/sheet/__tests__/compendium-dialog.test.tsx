@@ -24,7 +24,13 @@ vi.mock("../play/edit-messages", async (importOriginal) => ({
   loadEditMessages: async () => ({ edit: {}, play: { damageType: { P: "穿刺" } } }),
 }));
 
+const ash = "paladin/oath-of-ash";
+const devotion = "paladin/oath-of-devotion";
+const ward = `subclassFeature:${ash}/ash-ward-l7`;
 const names = {
+  class: { paladin: "聖騎士" },
+  subclass: { [ash]: "灰燼之誓", [devotion]: "奉獻之誓" },
+  subclassFeature: { [`${ash}/ash-ward-l7`]: "Ash Ward", [`${devotion}/oath-of-devotion-l3`]: "Oath of Devotion" },
   baseItem: { dagger: "匕首", "chain-mail": "鏈甲" },
   item: { elephant: "大象", airship: "飛空艇", rope: "繩索" },
   feat: { alert: "警覺", archery: "箭術", "boon-of-combat-prowess": "戰鬥神威恩賜" },
@@ -32,13 +38,13 @@ const names = {
 const context = {
   locale: "zh-TW",
   names,
-  englishNames: {},
+  englishNames: { subclass: { [ash]: "Oath of Ash" } },
   nameOf: (ref: string) => {
     const [kind, id] = ref.split(":");
     return (names as Record<string, Record<string, string>>)[kind]?.[id] ?? id;
   },
   gameSpells: new Map(),
-  packRefs: new Set(),
+  packRefs: new Set([`subclass:${ash}`, ward]),
   packSupplier: () => undefined,
   packText: null,
   token: (value: unknown) => String(value),
@@ -46,7 +52,7 @@ const context = {
 
 const system = {
   config: { id: "dnd5e-2024" },
-  schema: { fields: { equipment: { id: "equipment", type: "list", rowTemplate: { children: [] } }, feats: { id: "feats", type: "list", rowTemplate: { children: [] } } } },
+  schema: { fields: { features: { id: "features", type: "list", rowTemplate: { children: [] } }, equipment: { id: "equipment", type: "list", rowTemplate: { children: [] } }, feats: { id: "feats", type: "list", rowTemplate: { children: [] } } } },
   gameData: { weapons, feats },
 } as unknown as LoadedSystem;
 
@@ -70,6 +76,25 @@ async function open() {
 const listed = () => [...document.querySelectorAll("[data-compendium-ref]")].map((row) => row.getAttribute("data-compendium-ref"));
 
 describe("compendium (P6, S13)", () => {
+  it.skipIf(zhWithheld("messages/zh-TW.json"))("orders subclass features by level and searches both subclass names", async () => {
+    const { data } = await open();
+    const tab = screen.getByRole("tab", { name: "特性" });
+    fireEvent.mouseDown(tab);
+    fireEvent.click(tab);
+    expect(listed()).toEqual([`subclassFeature:${devotion}/oath-of-devotion-l3`, ward]);
+    expect([...document.querySelectorAll("[data-feature-subclass]")].map(el => el.textContent)).toEqual(["奉獻之誓", "灰燼之誓"]);
+    for (const value of ["oath of ash", "灰燼"]) {
+      fireEvent.change(screen.getByRole("textbox"), { target: { value } });
+      expect(listed()).toEqual([ward]);
+    }
+    const row = document.querySelector<HTMLElement>(`[data-compendium-ref="${ward}"]`)!;
+    expect(row.querySelector("[data-feature-class]")).toHaveTextContent("聖騎士");
+    expect(row.querySelector("[data-feature-level]")).toHaveTextContent("7");
+    expect(row.querySelector("[data-pack-badge]")).toBeInTheDocument();
+    fireEvent.click(within(row).getByRole("button", { name: "加入" }));
+    expect(data().features).toEqual([expect.objectContaining({ ref: ward, level: 7 })]);
+  });
+
   it.skipIf(zhWithheld("messages/zh-TW.json"))("lists no mounts or vehicles as equipment, and filters by category", async () => {
     await open();
     fireEvent.mouseDown(screen.getByRole("tab", { name: "裝備" }));

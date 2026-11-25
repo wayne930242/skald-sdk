@@ -168,3 +168,24 @@ it("blocks a built-in clash before saving and shows the store's item limit", asy
   expect(await screen.findByText(m.error.limitItems)).toBeTruthy();
   expect(store.snapshot().items).toHaveLength(0);
 });
+it("lists a subclass's feature rows under it and keeps other feature rows in their own section", async () => {
+  const store = createMemoryHomebrewStore();
+  const p = await store.defaultPack();
+  if (!p.ok) throw Error(p.error);
+  const save = (kind: "subclass" | "subclassFeature", id: string, name: string) =>
+    store.saveItem(p.value.id, {
+      kind,
+      key: id,
+      payload: { entry: { kind, id, ref: `${kind}:${id}`, name, source: "homebrew", entries: [], meta: {} } },
+    } as never);
+  await save("subclass", "paladin/oath-of-ash", "Oath of Ash");
+  await save("subclassFeature", "paladin/oath-of-ash/ash-ward-l7", "Ash Ward");
+  await save("subclassFeature", "paladin/oath-of-devotion/extra-l7", "Extra Vow");
+  mount(store);
+  const subclass = await screen.findByRole("button", { name: "Oath of Ash" });
+  expect(subclass.parentElement!.textContent).toContain("1 feature");
+  expect(screen.queryByRole("button", { name: "Ash Ward" })).toBeNull();
+  const orphan = screen.getByRole("button", { name: "Extra Vow" });
+  expect(orphan.closest("section")!.querySelector("h3")!.textContent).toBe("subclassFeature");
+  expect(subclass.closest("section")!.querySelector("h3")!.textContent).toBe(m.kind.subclass);
+});

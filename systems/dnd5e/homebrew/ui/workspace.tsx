@@ -22,6 +22,12 @@ import {
 import { formKindOf } from "../domain/forms";
 import { TransferSlot } from "./transfer-slot";
 import { ItemEditor } from "./item-editor";
+import { SubclassEditor } from "./subclass-editor";
+import { subclassCodec } from "../domain/subclass";
+
+type EditorKind = HomebrewFormKind | "subclass";
+/** Kinds with an editor, in list order. */
+const EDITOR_KINDS: readonly EditorKind[] = [...HOMEBREW_FORM_KINDS, "subclass"];
 
 async function load(store: DndHomebrewStore) {
   if ((await store.owner()) !== "account") return { error: "signIn" } as const;
@@ -70,7 +76,7 @@ function AccountWorkspace({
   const [editorGeneration, resetEditor] = useState(0);
   const [packId, setPack] = useState("");
   const [selection, select] = useState<{
-    kind: HomebrewFormKind;
+    kind: EditorKind;
     id?: string;
   } | null>(null);
   const [query, setQuery] = useState("");
@@ -126,6 +132,10 @@ function AccountWorkspace({
   const pack = packs.find((p) => p.id === packId) ?? packs[0];
   const rows = pack ? data.items[pack.id] : [];
   const selected = rows.find((r) => r.id === selection?.id);
+  const subclassKeys = new Set(rows.filter((r) => r.kind === "subclass").map((r) => r.key));
+  /** A feature row of a subclass in this pack is listed under it, not on its own. */
+  const grouped = (r: HomebrewItemRecord) =>
+    r.kind === "subclassFeature" && subclassKeys.has(r.key.split("/").slice(0, 2).join("/"));
   const rowName = (r: HomebrewItemRecord) =>
     (zh && r.payload.zhTW?.name) || r.payload.entry?.name || r.key;
   const open = (id: string) => {
@@ -268,17 +278,17 @@ function AccountWorkspace({
               onChange={(e) => setQuery(e.target.value)}
             />
             {[
-              ...new Set([...HOMEBREW_FORM_KINDS, ...rows.map((r) => r.kind)]),
+              ...new Set([...EDITOR_KINDS, ...rows.filter((r) => !grouped(r)).map((r) => r.kind)]),
             ].map((kind) => (
               <section key={kind} className="space-y-1">
                 <h3 className="font-medium">
                   {t.has(`kind.${kind}`) ? t(`kind.${kind}`) : kind}
                 </h3>
-                {HOMEBREW_FORM_KINDS.includes(kind as HomebrewFormKind) && (
+                {EDITOR_KINDS.includes(kind as EditorKind) && (
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => select({ kind: kind as HomebrewFormKind })}
+                    onClick={() => select({ kind: kind as EditorKind })}
                   >
                     {t("add", { field: t(`kind.${kind}`) })}
                   </Button>
@@ -287,13 +297,15 @@ function AccountWorkspace({
                   .filter(
                     (r) =>
                       r.kind === kind &&
+                      !grouped(r) &&
                       [r.payload.entry?.name, r.payload.zhTW?.name, r.key].some(
                         (n) =>
                           n?.toLowerCase().includes(query.trim().toLowerCase()),
                       ),
                   )
                   .map((r) => {
-                    const k = formKindOf(r.payload);
+                    const features = r.kind === "subclass" ? subclassCodec.rowsOf(r.key, rows) : [];
+                    const k: EditorKind | null = r.kind === "subclass" ? "subclass" : formKindOf(r.payload);
                     return (
                       <div
                         key={r.id}
@@ -305,17 +317,28 @@ function AccountWorkspace({
                         >
                           {rowName(r)}
                         </button>
+                        {r.kind === "subclass" && (
+                          <span className="ml-1 mr-auto text-xs text-muted-foreground" data-feature-count>
+                            {t("subclass.features", { count: features.length })}
+                          </span>
+                        )}
                         <Button
                           size="sm"
                           variant="ghost"
                           onClick={() => {
-                            if (
-                              window.confirm(t("confirm", { name: rowName(r) }))
-                            )
-                              void run(
-                                () => store.deleteItem(r.id),
-                                () => select(null),
-                              );
+                            const message =
+                              r.kind === "subclass"
+                                ? t("subclass.confirmDelete", { name: rowName(r), count: features.length })
+                                : t("confirm", { name: rowName(r) });
+                            if (window.confirm(message))
+                              void run(async () => {
+                                // Features first: a stopped delete leaves the subclass row listed, so deleting again finishes.
+                                for (const f of features) {
+                                  const gone = await store.deleteItem(f.id);
+                                  if (!gone.ok) return gone;
+                                }
+                                return store.deleteItem(r.id);
+                              }, () => select(null));
                           }}
                         >
                           {t("delete")}
@@ -326,7 +349,19 @@ function AccountWorkspace({
               </section>
             ))}
           </aside>
-          {selection && (!selection.id || selected) && (
+          {selection?.kind === "subclass" && (!selection.id || selected) && (
+            <SubclassEditor
+              key={`${editorGeneration}/${pack.id}/subclass/${selected?.id ?? "new"}`}
+              row={selected}
+              pack={pack}
+              rows={rows}
+              allRows={Object.values(data.items).flat()}
+              store={store}
+              run={run}
+              reload={() => select(null)}
+            />
+          )}
+          {selection && selection.kind !== "subclass" && (!selection.id || selected) && (
             <ItemEditor
               key={`${editorGeneration}/${pack.id}/${selection.kind}/${selected?.id ?? "new"}`}
               kind={selection.kind}

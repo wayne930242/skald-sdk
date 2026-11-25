@@ -39,7 +39,15 @@ A file-based pack is not:
 
 ## Write homebrew in Skald
 
-Sign in and open the [D&D 2024 homebrew editor](https://skald.tw/en/sheets/dnd5e-2024/homebrew). Unlike a pack you load from Drive, a homebrew pack holds your own content in your Skald account. Guests cannot create packs. Name a pack, then add a feat, spell, magic item, species or background. You can keep up to 20 named packs; together they can hold up to 300 entries and 1 MB per account.
+Sign in and open the [D&D 2024 homebrew editor](https://skald.tw/en/sheets/dnd5e-2024/homebrew). Unlike a pack you load from Drive, a homebrew pack holds your own content in your Skald account. Guests cannot create packs. Name a pack, then add a feat, spell, magic item, species, background or subclass. You can keep up to 20 named packs; together they can hold up to 300 entries and 1 MB per account.
+
+A subclass belongs to the class you pick when you create it, and the class cannot change after the first save. Each feature sits at a level where that class gains subclass features: 3, 7, 15 and 20 for the Paladin. Moving a saved feature to another level saves it as a new feature; sheets that added the old one keep it.
+
+If the class or the subclass casts spells, you can list subclass spells that a character always has prepared from a given class level. A Fighter or Rogue subclass can cast spells as a third caster. Pick the spellcasting ability and the class whose spell list it borrows; cantrip and prepared spell counts by level are optional. Spell slots come from the SRD 5.2.1 multiclass spellcaster table at one third of the class level, rounded up, so a level 7 character reads the level 3 row. Skald labels the resulting table as derived, not SRD text.
+
+Each feature is one entry toward the 300-entry limit. The subclass itself, its opening feature at the first subclass level, and its spells and spellcasting features, when present, are one entry each.
+
+On a sheet, type the subclass name in the subclass field, then add its features from the Features tab of the compendium. The compendium shows each feature's class, level and subclass.
 
 Enable a pack in the content pack panel to use it on a sheet. Adding an entry copies its text onto the sheet. If you bring the character to a table, members of that table can read the text in the table copy. Editing the original does not rewrite the sheet: choose **Update to latest** on the sheet row when you want the new version.
 

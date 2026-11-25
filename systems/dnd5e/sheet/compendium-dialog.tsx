@@ -124,6 +124,8 @@ interface Candidate {
   classId?: string;
   /** A class or subclass feature's level, from its id (`-l4`). */
   featureLevel?: number;
+  subclassName?: string;
+  subclassEnglish?: string;
 }
 
 export function CompendiumDialog(props: Parameters<typeof CompendiumDialogBody>[0]) {
@@ -201,7 +203,9 @@ function CompendiumDialogBody({
         if (singles.has(id)) continue;
         const ref = `${kind}:${id}`;
         const spell = kind === "spell" ? context.gameSpells.get(id) : undefined;
+        const subclassId = kind === "subclassFeature" ? id.split("/").slice(0, 2).join("/") : undefined;
         out.push({
+          ...(subclassId && { subclassName: context.nameOf(`subclass:${subclassId}`), subclassEnglish: context.englishNames.subclass?.[subclassId] }),
           ref,
           name: context.nameOf(ref),
           english: context.englishNames[kind]?.[id] ?? id,
@@ -211,13 +215,16 @@ function CompendiumDialogBody({
         });
       }
     }
+    if (tab === "features") return out.sort((a, b) => (a.featureLevel ?? 0) - (b.featureLevel ?? 0)
+      || (a.subclassName ?? "").localeCompare(b.subclassName ?? "", context.locale)
+      || a.name.localeCompare(b.name, context.locale));
     return out.sort((a, b) => (a.level ?? 0) - (b.level ?? 0) || a.name.localeCompare(b.name, context.locale));
   }, [context, tab]);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return candidates.filter((candidate) => {
-      if (needle && !candidate.name.toLowerCase().includes(needle) && !candidate.english.toLowerCase().includes(needle)) return false;
+      if (needle && ![candidate.name, candidate.english, candidate.subclassName, candidate.subclassEnglish].some((label) => label?.toLowerCase().includes(needle))) return false;
       if (tab === "spells" && level !== ALL && candidate.level !== Number(level)) return false;
       if (tab === "equipment") {
         // Magic items have their own tab: the equipment tab lists the corpus's mundane items and pack items.
@@ -376,6 +383,7 @@ function CompendiumDialogBody({
                       // F012: the same feature name recurs across classes and levels.
                       <>
                         <Badge variant="outline" className="max-w-full whitespace-normal text-2xs wrap-anywhere" data-feature-class>{context.nameOf(`class:${candidate.classId}`)}</Badge>
+                        {candidate.subclassName && <Badge variant="outline" className="max-w-full whitespace-normal text-2xs wrap-anywhere" data-feature-subclass>{candidate.subclassName}</Badge>}
                         {candidate.featureLevel !== undefined && (
                           <Badge variant="outline" className="text-2xs" data-feature-level>{tUi("compendium.featureLevel", { level: candidate.featureLevel })}</Badge>
                         )}

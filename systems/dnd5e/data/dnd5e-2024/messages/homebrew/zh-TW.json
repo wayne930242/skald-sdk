@@ -31,7 +31,8 @@
       "spell": "Spell",
       "item": "Magic item",
       "species": "Species",
-      "background": "Background"
+      "background": "Background",
+      "subclass": "Subclass"
     },
     "transfer": {
       "import": "Import a content pack",
@@ -217,6 +218,65 @@
       "sorcerer": "Sorcerer",
       "warlock": "Warlock",
       "wizard": "Wizard"
+    },
+    "subclass": {
+      "parent": "Parent class",
+      "pickParent": "Choose a class",
+      "parentFixed": "The parent class is fixed once saved.",
+      "level": "Level {level}",
+      "addFeature": "Add feature",
+      "featureLevel": "Feature level",
+      "featureNameZh": "Feature name (Chinese)",
+      "featureNameEn": "Feature name (English)",
+      "featureTextZh": "Feature text (Chinese)",
+      "featureTextEn": "Feature text (English)",
+      "relevel": "Changing the level of a saved feature saves it as a new feature; sheets keep the old copy.",
+      "spells": "Subclass spells (always prepared)",
+      "spellRef": "Spell at level {level}",
+      "addSpell": "Add spell",
+      "maxSpell": "Highest spell level at class level {level}: {max}",
+      "casting": "Subclass spellcasting (one-third caster, derived)",
+      "ability": "Spellcasting ability",
+      "list": "Spell list",
+      "castingTextZh": "Spellcasting text (Chinese)",
+      "castingTextEn": "Spellcasting text (English)",
+      "cantrips": "Cantrips known",
+      "prepared": "Prepared spells",
+      "addBreakpoint": "Add level",
+      "fromLevel": "From level",
+      "value": "Number",
+      "derivedNote": "Derived values, not SRD: slots use the SRD 5.2.1 multiclass spellcaster table at one-third of the class level, rounded up.",
+      "slotLevel": "Level {n}",
+      "classLevel": "Class level",
+      "features": "{count, plural, one {# feature} other {# features}}",
+      "partial": "Part of the subclass was saved. Press save again to finish.",
+      "confirmDelete": "Delete “{name}” and its {count} feature rows? This cannot be undone.",
+      "abilityName": {
+        "int": "Intelligence",
+        "wis": "Wisdom",
+        "cha": "Charisma"
+      },
+      "generated": {
+        "features": "Features",
+        "spellsName": "{sub} Spells",
+        "alwaysPrepared": "When you reach a {class} level specified in the {sub} Spells table, you thereafter always have the listed spells prepared.",
+        "classLevel": "{class} Level",
+        "spells": "Spells",
+        "castingName": "{sub} Spellcasting",
+        "castingRule": "You prepare spells from the {list} spell list; {ability} is your spellcasting ability for them.",
+        "derived": "The spell slots below are derived from the SRD 5.2.1 multiclass spellcaster table (one-third of your {class} level, rounded up); they are not SRD content.",
+        "cantrips": "Cantrips",
+        "prepared": "Prepared Spells"
+      },
+      "issue": {
+        "parent": "Parent class",
+        "features": "Number of features (40 at most)",
+        "text": "Text length",
+        "feature": "Feature name or level",
+        "spellcasting": "Subclass spellcasting",
+        "breakpoints": "Cantrip or prepared levels",
+        "spells": "Subclass spells"
+      }
     }
   }
 }
