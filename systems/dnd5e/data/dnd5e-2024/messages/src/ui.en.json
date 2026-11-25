@@ -314,6 +314,7 @@
     "loading": "Loading…",
     "notFound": "This entry is not in the built-in rules.",
     "englishBadge": "English",
+    "featureOption": "{feature}: {option}",
     "packBadge": "Content pack",
     "rowText": "Saved text",
     "characterEntries": "On this character",
@@ -387,7 +388,10 @@
       "gear": "Gear"
     },
     "addAttack": "Add as attack",
-    "addedAttack": "{name} added to attacks."
+    "addedAttack": "{name} added to attacks.",
+    "alreadyAdded": "Added",
+    "alreadyOnSheet": "{name} is already on the sheet.",
+    "castAs": "Spellcasting class for {name}"
   },
   "pack": {
     "wizardNotice": "Content packs in use: {packs}.",

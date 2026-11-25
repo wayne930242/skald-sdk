@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { use, useMemo, useState } from "react";
 import { Minus, Plus, Search } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ import { cn } from "@skald/sheet-sdk/lib/utils";
 import { SHOP_CATEGORIES, shopCategory, type Catalog, type CatalogItem, type ShopCategory } from "../economy/catalog";
 import { COINS, purseOf, totalCp } from "../economy/coins";
 import { linkAttack } from "../economy/equip";
+import { shopMagicNames } from "../economy/shop-names";
 import { cartCost, purchase, shopItems } from "../economy/shop";
 import { usePlay } from "./play-context";
 import { text, weaponAttackRow, weaponsByRef } from "./play-model";
@@ -35,6 +36,7 @@ export function ShopDialog({ catalog, start, onClose }: { catalog: Catalog; star
   const tEconomy = useTranslations("economy");
   const tDamage = useTranslations("play.damageType");
   const locale = useLocale();
+  const magicNames = use(shopMagicNames(locale));
   const price = usePrice();
   const gp = useGp();
   const { values, update, write, reference, schema, system } = usePlay();
@@ -47,9 +49,9 @@ export function ShopDialog({ catalog, start, onClose }: { catalog: Catalog; star
   const items = useMemo(() => {
     const order = new Map(SHOP_CATEGORIES.map((value, index) => [value, index]));
     return shopItems(catalog)
-      .map((item) => ({ item, category: shopCategory(item), name: reference.nameOf(item.ref), english: englishName(reference.englishNames, item) }))
+      .map((item) => ({ item, category: shopCategory(item), ...(magicNames.get(item.ref) ?? { name: reference.nameOf(item.ref), english: englishName(reference.englishNames, item) }) }))
       .sort((a, b) => order.get(a.category)! - order.get(b.category)! || a.name.localeCompare(b.name, locale));
-  }, [catalog, locale, reference]);
+  }, [catalog, locale, magicNames, reference]);
   const shown = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return items.filter((entry) => (category === ALL || entry.category === category)

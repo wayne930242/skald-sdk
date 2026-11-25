@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { entriesToText, type EntriesTextOptions } from "../../reference/entries-to-text";
 import { stampOf } from "../../homebrew/domain/rows";
+import { withRowOption } from "../level-up/option-row";
 import { slugId, splitRef } from "../../reference/tags";
 import type { ReferenceContextValue } from "../use-reference-context";
 import { usePlay } from "./play-context";
@@ -180,8 +181,9 @@ export function useSpellFacts(ref: string): SpellFacts | null {
 }
 
 /**
- * The name a built-in row takes from the catalog, in the viewer's locale; null when the row's own
- * `name` shows (a pack or custom row, or a ref the catalog does not name).
+ * The name a built-in row takes from the catalog, in the viewer's locale, with its picked option
+ * (`option-row.ts`); null when the row's own `name` shows (a pack or custom row, or a ref the
+ * catalog does not name).
  */
 export function catalogName(context: ReferenceContextValue, row: Record<string, unknown>): string | null {
   const ref = text(row.ref);
@@ -195,7 +197,8 @@ export function catalogName(context: ReferenceContextValue, row: Record<string, 
   }
   const parsed = splitRef(ref);
   const known = parsed && (context.names[parsed.kind]?.[parsed.id] ?? context.englishNames[parsed.kind]?.[parsed.id]);
-  return known ? context.nameOf(ref) : null;
+  // A named choice's pick (Hunter's Prey: Colossus Slayer) follows the catalog name (UAT F005).
+  return known ? withRowOption(context.token, context.nameOf(ref), row) : null;
 }
 
 /**

@@ -7,6 +7,7 @@ export {
   levelUpPlan,
   offeredFeatures,
   sheetRefs,
+  slotsFor,
   LEVEL_UP_RULES,
   type ClassInfo,
   type ClassInfoEntry,

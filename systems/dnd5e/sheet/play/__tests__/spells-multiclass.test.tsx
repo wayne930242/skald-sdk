@@ -1,4 +1,4 @@
-import { act, fireEvent, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, screen, within } from "@testing-library/react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { zhWithheld } from "../../../__tests__/zh-withheld";
 import type { CompendiumStart } from "../../compendium-rows";
@@ -78,7 +78,15 @@ describe("per-class spellcasting (CLASS-IMPL §7.5 M5)", () => {
     await openTab("法術");
     fireEvent.click(document.querySelector('[data-add-list="spells"]') as HTMLElement);
     const spellStart = openCompendium.mock.calls.at(-1)?.[2] as CompendiumStart;
-    expect(spellStart).toEqual({ tab: "spells", classIds: ["cleric", "wizard"], castingClassOf: { cleric: "", wizard: "wizard" } });
+    expect(spellStart).toEqual({
+      tab: "spells",
+      classIds: ["cleric", "wizard"],
+      castingClassOf: { cleric: "", wizard: "wizard" },
+      spellClasses: [
+        { castingClass: "", list: "cleric", name: "牧師" },
+        { castingClass: "wizard", list: "wizard", name: "法師" },
+      ],
+    });
     await openTab("特性");
     fireEvent.click(document.querySelector('[data-add-list="features"]') as HTMLElement);
     expect(openCompendium.mock.calls.at(-1)?.[2]).toEqual({ tab: "features", classIds: ["cleric", "wizard"] });
@@ -92,5 +100,24 @@ describe("per-class spellcasting (CLASS-IMPL §7.5 M5)", () => {
     expect(document.querySelector("[data-play-casting-class]")).toBeNull();
     fireEvent.click(document.querySelector('[data-add-list="spells"]') as HTMLElement);
     expect(openCompendium.mock.calls.at(-1)?.[2]).toEqual({ tab: "spells", classId: "wizard" });
+  });
+
+  it.skipIf(zhWithheld("messages/play/zh-TW.json"))("a single-class third caster rolls the subclass bonus it shows, on Spells and Combat (UAT F009)", async () => {
+    // Fighter 3 (Spell Blade), INT 16, proficiency +2: shows and rolls +5, not the stored flat +2.
+    const blade = {
+      level: 3, classId: "fighter", className: "Fighter", subclass: "Spell Blade", spellAbility: "none", int: 16, spellAttack: 2,
+      features: [{ id: "f_sc", ref: "subclassFeature:fighter/spell-blade/spellcasting-l3", name: "Spellcasting", level: 3 }],
+      spells: [{ ...fireBolt, castingClass: "" }],
+    };
+    for (const tab of ["法術", "戰鬥"]) {
+      cleanup();
+      await mountDnd(harness, { extra: blade });
+      await openTab(tab);
+      const attack = screen.getAllByRole("button", { name: /火焰箭.*\+5$/ })[0]!;
+      roll.executeRoll.mockClear();
+      await act(async () => fireEvent.click(attack));
+      const [, context] = roll.executeRoll.mock.calls[0] as unknown as [unknown, Record<string, unknown>];
+      expect(context.spellAttack).toBe(5);
+    }
   });
 });

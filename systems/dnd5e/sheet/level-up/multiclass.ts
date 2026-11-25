@@ -1,7 +1,9 @@
 import { progressionAt } from "../../reference/class-progression";
 import { combinedPact, combinedSlots, type CasterKind, type MulticlassRules } from "../../reference/multiclass";
+import { thirdCasterSlots } from "../../homebrew/domain/subclass/slots";
 import { SKILLS } from "../play/play-model";
-import { slotsFrom, type ClassInfo, type LevelUpFeature, type LevelUpSubclass, type SlotsOffer } from "./plan";
+import type { ClassInfo, LevelUpFeature, LevelUpSubclass } from "./class-data";
+import { slotsFrom, type SlotsOffer } from "./slots";
 
 /**
  * The multiclass parts of a level-up plan (CLASS-IMPL §7.4): combined spell slots over every sheet
@@ -56,7 +58,8 @@ function combined(classes: PlanClass[]): { slots: number[] | null; pact: { slots
 export function combinedSlotsOffer(data: Record<string, unknown>, before: PlanClass[], after: PlanClass[]): SlotsOffer | null {
   const from = combined(before);
   const to = combined(after);
-  return slotsFrom(data, from.slots, to.slots, from.pact, to.pact);
+  const legacy = before.some((entry) => entry.info?.casting == null && entry.subclass?.casting === "third" && entry.level >= 3);
+  return slotsFrom(data, from.slots, to.slots, from.pact, to.pact, legacy);
 }
 
 /** What a new class gives as a multiclass, minus what the sheet already has; never saving throws. */
@@ -97,4 +100,14 @@ export function unarmoredOffer(data: Record<string, unknown>, value: "barbarian"
   if (!value) return null;
   const current = typeof data.unarmoredDefense === "string" ? data.unarmoredDefense : "";
   return { value, settable: current === "" || current === "none" };
+}
+
+/**
+ * A class without Spellcasting whose subclass casts as a third caster (its own Spellcasting feature): the
+ * subclass's slots from class level `from` to `to` (none below level 3), else null.
+ */
+export function thirdSlotsOffer(data: Record<string, unknown>, info: ClassInfo, subclass: LevelUpSubclass, from: number, to: number): SlotsOffer | null {
+  if (info.casting !== null || subclass.casting !== "third") return null;
+  const at = (level: number) => (level >= 3 ? thirdCasterSlots(level) : null);
+  return slotsFrom(data, at(from), at(to), null, null, from >= 3);
 }

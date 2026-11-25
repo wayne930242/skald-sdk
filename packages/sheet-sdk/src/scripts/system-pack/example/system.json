@@ -1,0 +1,9 @@
+{
+  "id": "lantern-bearers",
+  "name": "提燈人",
+  "version": "1.0.0",
+  "description": "Skald 的範例系統擴充包：三個屬性、一顆 2d6，帶著提燈走進黑暗。",
+  "category": "other",
+  "locale": "zh-TW",
+  "notice": "提燈人由 Skald 撰寫，以 CC0 1.0 釋出到公有領域。"
+}

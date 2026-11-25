@@ -16,6 +16,7 @@
     "dev": "bun run --filter=@skald/previewer dev",
     "build": "bun run --filter=@skald/previewer build",
     "pack": "bun systems/dnd5e/content-pack/open/cli.ts",
+    "system-pack": "bun packages/sheet-sdk/src/scripts/system-pack/cli.ts",
     "check:packs": "bun scripts/check-pack-files.ts"
   },
   "overrides": {

@@ -2,6 +2,7 @@ import { entryOf, newHomebrewId, pair, textEntries } from "../forms/common";
 import type { HomebrewItemInput } from "../types";
 import { issues, type SubclassForm, type SubclassContext, type Localized } from "./form";
 import { thirdCasterSlots } from "./slots";
+import { fillSpaced } from "../spacing";
 export function toRows(f: SubclassForm, c: SubclassContext): HomebrewItemInput[] {
   const errors = issues(f, c.parent);
   if (errors.length) throw Error(errors.join(", "));
@@ -12,16 +13,12 @@ export function toRows(f: SubclassForm, c: SubclassContext): HomebrewItemInput[]
   const name = pair(f.nameEn, f.nameZh),
     desc = textEntries(f.textEn, f.textZh);
   const label = (l: "en" | "zh", k: keyof typeof c.labels.en) =>
-    c.labels[l][k].replace(
-      /\{(class|sub|ability|list)\}/g,
-      (_, v: string) =>
-        ({
-          class: c.parent.name[l],
-          sub: name[l],
-          ability: sc ? c.abilityNames[sc.ability][l] : "",
-          list: sc ? c.classNames[sc.list][l] : "",
-        })[v]!,
-    );
+    fillSpaced(c.labels[l][k], {
+      class: c.parent.name[l],
+      sub: name[l],
+      ability: sc ? c.abilityNames[sc.ability][l] : "",
+      list: sc ? c.classNames[sc.list][l] : "",
+    }, !c.legacyText);
   function row(
     id: string,
     n: Localized,
@@ -91,7 +88,8 @@ export function toRows(f: SubclassForm, c: SubclassContext): HomebrewItemInput[]
             ...[sc.cantrips, sc.prepared]
               .filter((x) => x.length)
               .map((col) => col.filter((x) => x.level <= level).at(-1)?.value ?? 0),
-            ...thirdCasterSlots(level),
+            // No slot of that level: "—", as the editor's derived table shows it (v4.152.0 wrote 0).
+            ...thirdCasterSlots(level).map((n) => n || (c.legacyText ? 0 : "—")),
           ].map(String);
         }),
       },

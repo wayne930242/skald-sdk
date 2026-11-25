@@ -184,7 +184,7 @@ describe("Exhaustion (A2-08)", () => {
   it.skipIf(zhWithheld("messages/play/zh-TW.json"))("sets the level from the chip", async () => {
     await mount({ ...cleric, exhaustion: 1, conditions: ["exhaustion"] });
     fireEvent.click(view().querySelector("[data-play-exhaustion]") as HTMLElement);
-    fireEvent.click(await screen.findByRole("button", { name: "力竭3級" }));
+    fireEvent.click(await screen.findByRole("button", { name: "力竭 3 級" }));
     expect(saved.data.exhaustion).toBe(3);
   });
 });

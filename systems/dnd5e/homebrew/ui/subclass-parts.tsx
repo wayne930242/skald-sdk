@@ -3,7 +3,17 @@ import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@skald/sheet-sdk/components/ui/button";
 import { Input } from "@skald/sheet-sdk/components/ui/input";
 import { Textarea } from "@skald/sheet-sdk/components/ui/textarea";
-import { thirdCasterSlots, type Breakpoint, type SubclassForm, type SubclassParent } from "../domain/subclass";
+import {
+  maxSpellLevel,
+  spellFits,
+  spellLevels,
+  spellListOf,
+  spellProblems,
+  thirdCasterSlots,
+  type Breakpoint,
+  type SubclassForm,
+  type SubclassParent,
+} from "../domain/subclass";
 import type { SubclassCatalog } from "./subclass-context";
 
 type Parts = { form: SubclassForm; set(patch: Partial<SubclassForm>): void; parent: SubclassParent; catalog: SubclassCatalog };
@@ -47,7 +57,7 @@ export function FeatureSections({ form, set, parent }: Omit<Parts, "catalog">) {
                 <select
                   className="rounded border bg-background p-1"
                   value={f.level}
-                  onChange={(e) => update(i, { level: Number(e.target.value) })}
+                  onChange={(e) => update(i, { level: Number(e.target.value), draftId: undefined })}
                 >
                   {levels.map((l) => (
                     <option key={l} value={l}>
@@ -81,25 +91,22 @@ export function FeatureSections({ form, set, parent }: Omit<Parts, "catalog">) {
   ));
 }
 
-export function spellLevels(parent: SubclassParent, form: SubclassForm): number[] {
-  if (form.spellcasting) return [3, 7, 13, 19];
-  if (parent.caster === "half") return [3, 5, 9, 13, 17];
-  return parent.caster === "none" ? [] : [3, 5, 7, 9];
-}
-function maxSpellLevel(form: SubclassForm, parent: SubclassParent, level: number) {
-  if (form.spellcasting) return Math.ceil(level / 6);
-  if (parent.caster === "half") return Math.min(5, Math.ceil(level / 4));
-  return Math.min(parent.caster === "pact" ? 5 : 9, Math.ceil(level / 2));
-}
-
 export function SpellRows({ form, set, parent, catalog }: Parts) {
   const t = useTranslations("homebrew.subclass");
   const zh = useLocale() === "zh-TW";
   const [drafts, setDrafts] = useState<Record<number, string>>({});
+  const [otherLists, setOtherLists] = useState(false);
   const levels = spellLevels(parent, form);
   if (!levels.length) return null;
-  const name = (ref: string) => catalog.spells[ref]?.[zh ? "zh" : "en"] ?? ref;
-  const byLabel = new Map(Object.entries(catalog.spells).map(([ref, n]) => [n[zh ? "zh" : "en"], ref]));
+  const l = zh ? "zh" : "en";
+  const name = (ref: string) => catalog.spells[ref]?.[l] ?? ref;
+  const byLabel = new Map(Object.entries(catalog.spells).map(([ref, n]) => [n[l], ref]));
+  // A third caster's own list is a hard choice; a parent's list only narrows the suggestions by default.
+  const list = spellListOf(form, parent);
+  const strictList = Boolean(form.spellcasting);
+  const filterList = list && (strictList || !otherLists) ? list : undefined;
+  const problems = new Map(spellProblems(form, parent, (ref) => catalog.spellInfo[ref]).map((p) => [`${p.level}/${p.ref}`, p]));
+  const listName = list ? (catalog.classNames[list] ?? catalog.parents.find((p) => p.id === list)?.name)?.[l] ?? list : "";
   const setRefs = (level: number, refs: string[]) =>
     set({
       spells: [...form.spells.filter((s) => s.level !== level), ...(refs.length ? [{ level, refs }] : [])].sort(
@@ -109,23 +116,42 @@ export function SpellRows({ form, set, parent, catalog }: Parts) {
   return (
     <fieldset className="space-y-2 rounded border p-3" data-subclass-spells>
       <legend className="font-medium">{t("spells")}</legend>
-      <datalist id="subclass-spells">
-        {Object.entries(catalog.spells).map(([ref, n]) => (
-          <option key={ref} value={zh ? n.zh : n.en} />
-        ))}
-      </datalist>
+      {list && (
+        <p className="text-xs text-muted-foreground" data-spell-list={list}>
+          {t("spellListNote", { list: listName })}
+        </p>
+      )}
+      {list && !strictList && (
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={otherLists} onChange={(e) => setOtherLists(e.target.checked)} />
+          {t("spellOtherLists")}
+        </label>
+      )}
       {levels.map((level) => {
         const refs = form.spells.find((s) => s.level === level)?.refs ?? [];
         const draft = drafts[level] ?? "";
         const ref = catalog.spells[draft] ? draft : byLabel.get(draft);
+        const max = maxSpellLevel(form, parent, level);
+        const info = ref ? catalog.spellInfo[ref] : undefined;
+        const misfit = info && !spellFits(info, max);
+        const suggestions = Object.keys(catalog.spells).filter((r) => {
+          const spell = catalog.spellInfo[r];
+          return spell && spellFits(spell, max) && (!filterList || spell.classes.includes(filterList)) && !refs.includes(r);
+        });
         return (
-          <div key={level} className="space-y-1">
+          <div key={level} className="space-y-1" data-spell-row={level}>
+            <datalist id={`subclass-spells-${level}`}>
+              {suggestions.map((r) => (
+                <option key={r} value={name(r)} />
+              ))}
+            </datalist>
             <div className="flex flex-wrap items-end gap-2">
               <label className="min-w-0 grow text-sm">
                 {t("spellRef", { level })}
                 <Input
-                  list="subclass-spells"
+                  list={`subclass-spells-${level}`}
                   value={draft}
+                  aria-invalid={misfit || undefined}
                   onChange={(e) => setDrafts({ ...drafts, [level]: e.target.value })}
                 />
               </label>
@@ -133,7 +159,7 @@ export function SpellRows({ form, set, parent, catalog }: Parts) {
                 type="button"
                 size="sm"
                 variant="outline"
-                disabled={!ref || refs.includes(ref) || refs.length >= 10}
+                disabled={!ref || misfit || refs.includes(ref) || refs.length >= 10}
                 onClick={() => {
                   setRefs(level, [...refs, ref!]);
                   setDrafts({ ...drafts, [level]: "" });
@@ -142,17 +168,38 @@ export function SpellRows({ form, set, parent, catalog }: Parts) {
                 {t("addSpell")}
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {t("maxSpell", { level, max: maxSpellLevel(form, parent, level) })}
-            </p>
+            <p className="text-xs text-muted-foreground">{t("maxSpell", { level, max })}</p>
+            {misfit && (
+              <p className="text-xs text-destructive" role="alert">
+                {info.level < 1
+                  ? t("spellCantrip", { spell: name(ref!) })
+                  : t("spellTooHigh", { spell: name(ref!), spellLevel: info.level, max })}
+              </p>
+            )}
             <ul className="flex flex-wrap gap-1">
-              {refs.map((r) => (
-                <li key={r}>
-                  <Button type="button" size="sm" variant="secondary" onClick={() => setRefs(level, refs.filter((x) => x !== r))}>
-                    {name(r)} ×
-                  </Button>
-                </li>
-              ))}
+              {refs.map((r) => {
+                const problem = problems.get(`${level}/${r}`);
+                return (
+                  <li key={r} data-spell-problem={problem?.reason}>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={problem ? "destructive" : "secondary"}
+                      aria-label={t("removeSpell", { spell: name(r) })}
+                      onClick={() => setRefs(level, refs.filter((x) => x !== r))}
+                    >
+                      {name(r)} ×
+                    </Button>
+                    {problem && (
+                      <span className="ml-1 text-xs text-destructive">
+                        {problem.reason === "cantrip"
+                          ? t("spellCantrip", { spell: name(r) })
+                          : t("spellTooHigh", { spell: name(r), spellLevel: problem.spellLevel, max: problem.max })}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         );

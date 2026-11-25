@@ -1,0 +1,37 @@
+{
+  "$schema": "../../../data/schemas/schema.schema.json",
+  "id": "lantern-bearers",
+  "name": "提燈人",
+  "version": "1.0.0",
+  "language": "zh-TW",
+  "fields": {
+    "name": { "id": "name", "type": "text", "label": "名字" },
+    "origin": { "id": "origin", "type": "text", "label": "出身" },
+    "might": {
+      "id": "might",
+      "type": "number",
+      "label": "力量",
+      "icon": "game:biceps",
+      "defaultValue": 0,
+      "roll": { "expression": "2d6+{{@might}}" }
+    },
+    "grace": {
+      "id": "grace",
+      "type": "number",
+      "label": "靈巧",
+      "icon": "game:sprint",
+      "defaultValue": 0,
+      "roll": { "expression": "2d6+{{@grace}}" }
+    },
+    "wits": {
+      "id": "wits",
+      "type": "number",
+      "label": "機智",
+      "icon": "game:brain",
+      "defaultValue": 0,
+      "roll": { "expression": "2d6+{{@wits}}" }
+    },
+    "oil": { "id": "oil", "type": "number", "label": "燈油", "icon": "game:lantern-flame", "defaultValue": 3 },
+    "gear": { "id": "gear", "type": "text", "label": "裝備", "icon": "game:swap-bag" }
+  }
+}

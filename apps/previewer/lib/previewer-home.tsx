@@ -29,6 +29,7 @@ export function PreviewerHome() {
           </li>
         ))}
       </ul>
+      <Link className="underline" href={`/${locale}/pack`}>{t("systemPack.title")}</Link>
       <p className="text-sm text-muted-foreground">{t("unavailable")}</p>
     </main>
   );

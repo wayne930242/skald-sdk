@@ -118,9 +118,11 @@ describe("use a hit die", () => {
       );
     });
     await screen.findByRole("tab", { name: "戰鬥" });
-    expect(screen.getAllByText("d10 5/5 · d6 2/2").length).toBeGreaterThan(0);
+    // UAT m16: one compact chip per die size, its pool inside it.
+    const chips = [...document.querySelectorAll("[data-hit-die]")].map((chip) => chip.getAttribute("aria-label"));
+    expect(chips).toEqual(["使用生命骰 d10 5/5", "使用生命骰 d6 2/2"]);
 
-    fireEvent.click(screen.getByRole("button", { name: "使用生命骰 d6" }));
+    fireEvent.click(screen.getByRole("button", { name: /^使用生命骰 d6/ }));
     await act(async () => pending.resolve({ rolled: 3 }));
 
     expect(saved.data.hp).toEqual({ current: 13 });

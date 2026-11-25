@@ -17,6 +17,7 @@
  */
 
 import { hitPoints, num, rows, text, type CharacterPatch, type CharacterValues } from "./values";
+import { className, subclassName, type SheetNames } from "./sheet-names";
 
 export interface SheetClass {
   classId: string;
@@ -177,36 +178,69 @@ export function longRestClassPatch(values: CharacterValues): CharacterPatch {
 
 /**
  * The identity class line. Single class: "<className> · <subclass>" as before. Several:
- * "Fighter 5 · Champion / Wizard 2" (`labels.level` formats the class level).
+ * "Fighter 5 · Champion / Wizard 2" (`labels.level` formats the class level). `names` resolves
+ * built-in classes and subclasses in the viewer's locale (UAT M10); `subclasses: false` leaves the
+ * subclasses out (the print's class box, whose subclass box lists them: `subclassLine`).
  */
-export function classLine(values: CharacterValues, labels: { separator: string; level(n: number): string }): string {
+export function classLine(
+  values: CharacterValues,
+  labels: { separator: string; level(n: number): string },
+  names?: SheetNames,
+  { subclasses = true }: { subclasses?: boolean } = {},
+): string {
   const join = (name: string, subclass: string) =>
-    [name, subclass].map((part) => part.trim()).filter(Boolean).join(" · ");
-  if (multiclassRows(values).length === 0) return join(text(values.className), text(values.subclass));
-  return sheetClasses(values)
-    .map((sheetClass) => join(`${sheetClass.name.trim()} ${labels.level(sheetClass.level)}`.trim(), sheetClass.subclass))
+    [name, subclasses ? subclass : ""].map((part) => part.trim()).filter(Boolean).join(" · ");
+  const classes = sheetClasses(values);
+  if (multiclassRows(values).length === 0) {
+    const start = classes[0];
+    return join(className(start.classId, start.name, names), subclassName(values, start.classId, start.subclass, names));
+  }
+  return classes
+    .map((sheetClass) =>
+      join(`${className(sheetClass.classId, sheetClass.name, names).trim()} ${labels.level(sheetClass.level)}`.trim(), subclassName(values, sheetClass.classId, sheetClass.subclass, names)),
+    )
     .filter(Boolean)
     .join(labels.separator);
+}
+
+/** Every class's subclass in sheet order, in the viewer's locale, joined by `separator` (blank ones left out). */
+export function subclassLine(values: CharacterValues, separator: string, names?: SheetNames): string {
+  return sheetClasses(values)
+    .map((sheetClass) => subclassName(values, sheetClass.classId, sheetClass.subclass, names).trim())
+    .filter(Boolean)
+    .join(separator);
 }
 
 /**
  * Spellcasting numbers of one class. `""` = the starting class: the sheet's `spellMod`,
  * `spellSaveDc` and `spellAttack` (overrides kept). A row's `classId`: its own ability, DC
- * 8 + mod + proficiency, attack mod + proficiency. Null when that class casts nothing or no row
- * has that class.
+ * 8 + mod + proficiency, attack mod + proficiency. `granted`: the ability a subclass casts with
+ * (a subclass with its own Spellcasting feature), used when the class itself casts nothing; the starting class then computes its
+ * numbers as a row does, since the sheet's `spell*` formulas read the class's own ability. Null
+ * when that class casts nothing or no row has that class.
  */
 export function castingOf(
   values: CharacterValues,
   castingClass: string,
+  granted?: string | null,
 ): { ability: string; mod: number; dc: number; attack: number } | null {
+  let ability: string;
   if (castingClass === "") {
-    const ability = text(values.spellAbility);
-    if (!SPELL_ABILITIES.has(ability)) return null;
-    return { ability, mod: num(values.spellMod), dc: num(values.spellSaveDc), attack: num(values.spellAttack) };
+    ability = text(values.spellAbility);
+    if (SPELL_ABILITIES.has(ability)) {
+      return { ability, mod: num(values.spellMod), dc: num(values.spellSaveDc), attack: num(values.spellAttack) };
+    }
+    if (!granted || !SPELL_ABILITIES.has(granted)) return null;
+    ability = granted;
+  } else {
+    const row = multiclassRows(values).find((candidate) => text(candidate.classId) === castingClass);
+    if (!row) return null;
+    ability = text(row.spellAbility);
+    if (!SPELL_ABILITIES.has(ability)) {
+      if (!granted || !SPELL_ABILITIES.has(granted)) return null;
+      ability = granted;
+    }
   }
-  const row = multiclassRows(values).find((candidate) => text(candidate.classId) === castingClass);
-  const ability = text(row?.spellAbility);
-  if (!row || !SPELL_ABILITIES.has(ability)) return null;
   const mod = num(values[`${ability}Mod`], Math.floor((num(values[ability], 10) - 10) / 2));
   const prof = num(values.profBonus, 2 + Math.floor((Math.max(1, totalLevel(values)) - 1) / 4));
   return { ability, mod, dc: 8 + mod + prof, attack: mod + prof };

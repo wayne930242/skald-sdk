@@ -1,5 +1,5 @@
 import { loadEnglishCorpus, type CorpusEntry } from "../../../reference/load-corpus";
-import { classInfoOf, type ClassInfo } from "../plan";
+import { classInfoOf, type ClassInfo, type ClassInfoEntry } from "../plan";
 
 export const CLASS_IDS = [
   "barbarian", "bard", "cleric", "druid", "fighter", "monk", "paladin", "ranger", "rogue", "sorcerer", "warlock", "wizard",
@@ -12,8 +12,8 @@ export async function builtinClassEntry(id: string): Promise<CorpusEntry> {
   return entry;
 }
 
-/** A built-in class's helper data from the corpus, as the dialog's loader would assemble it. */
-export async function builtinClassInfo(id: string): Promise<ClassInfo> {
+/** A built-in class's helper data from the corpus, as the dialog's loader would assemble it; `extra` entries (a pack's) after. */
+export async function builtinClassInfo(id: string, extra: ClassInfoEntry[] = []): Promise<ClassInfo> {
   const [entry, features, subclasses, subclassFeatures] = await Promise.all([
     builtinClassEntry(id),
     loadEnglishCorpus(`classFeature-${id}`),
@@ -25,7 +25,7 @@ export async function builtinClassInfo(id: string): Promise<ClassInfo> {
     blocks: entry,
     meta: entry.meta,
     name: entry.name,
-    entries: [...Object.values(features ?? {}), ...Object.values(subclasses ?? {}), ...Object.values(subclassFeatures ?? {})],
+    entries: [...Object.values(features ?? {}), ...Object.values(subclasses ?? {}), ...Object.values(subclassFeatures ?? {}), ...extra],
   });
 }
 

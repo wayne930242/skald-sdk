@@ -7,17 +7,20 @@ import {
   OctagonXIcon,
   TriangleAlertIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 import { cn } from "@skald/sheet-sdk/lib/utils";
 
-const Toaster = ({ className, ...props }: ToasterProps) => {
+const Toaster = ({ className, toastOptions, ...props }: ToasterProps) => {
+  const t = useTranslations("common");
   const { theme = "system" } = useTheme();
 
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className={cn("toaster group print:hidden", className)}
+      toastOptions={{ closeButtonAriaLabel: t("closeToast"), ...toastOptions }}
       icons={{
         success: <CircleCheckIcon className="size-4" />,
         info: <InfoIcon className="size-4" />,

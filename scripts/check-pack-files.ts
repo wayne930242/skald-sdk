@@ -1,10 +1,13 @@
 /**
- * `bun scripts/check-pack-files.ts`: fails when the repository holds a content pack file other than
- * the documented example. Content packs carry text that each player keeps for themselves; they never
- * belong in this repository, not even in a test (docs/content-packs.md, CONTRIBUTING.md).
+ * `bun scripts/check-pack-files.ts`: fails when the repository holds a content pack or system pack
+ * file other than the documented example. Content packs carry text that each player keeps for
+ * themselves, and system packs a game its owner runs only at their own tables; neither belongs in
+ * this repository, not even in a test (docs/content-packs.md, CONTRIBUTING.md).
  *
  * A pack file is a `.json` file whose `$schema` is a Skald pack format (`skald/pack/v<N>` or
- * `skald/content-pack/v<N>`).
+ * `skald/content-pack/v<N>`), or whose `schema` is `skald/system-pack/v<N>`. The example system
+ * pack (`packages/sheet-sdk/src/scripts/system-pack/example/`) is an authoring folder, not a built
+ * file, so it needs no exception; its tests build their packs in a temporary folder.
  */
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -13,7 +16,7 @@ import path from "node:path";
 export const ALLOWED_PACK_FILES = ["systems/dnd5e/content-pack/open/example/lantern-table.pack.json"];
 
 const SKIPPED_DIRECTORIES = new Set([".git", "node_modules", ".next", ".turbo", "coverage"]);
-const PACK_SCHEMA = /"\$schema"\s*:\s*"skald\/(?:content-)?pack\/v\d+"/;
+const PACK_SCHEMA = /"\$schema"\s*:\s*"skald\/(?:content-)?pack\/v\d+"|"\$?schema"\s*:\s*"skald\/system-pack\/v\d+"/;
 
 export function findPackFiles(root: string): string[] {
   const found: string[] = [];
@@ -34,9 +37,9 @@ export function findPackFiles(root: string): string[] {
 if (import.meta.main) {
   const found = findPackFiles(path.resolve(import.meta.dirname, ".."));
   if (found.length > 0) {
-    console.error("Content pack files do not belong in this repository (see docs/content-packs.md):");
+    console.error("Pack files do not belong in this repository (see docs/content-packs.md):");
     for (const file of found) console.error(`  ${file}`);
     process.exit(1);
   }
-  console.log("check:packs: no content pack files besides the example");
+  console.log("check:packs: no pack files besides the example");
 }

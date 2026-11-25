@@ -15,6 +15,7 @@ import type { CharacterPatch } from "./play-model";
 import { CompactVitals, VitalsBar } from "./vitals-bar";
 import { AbilityGrid, SkillList } from "./abilities-panel";
 import { CharacterTab } from "./character-tab";
+import { ClassHeader } from "./class-header";
 import { CombatTab, FeaturesTab, ItemsTab, SpellsTab } from "./lazy-tabs";
 import { loadPlayMessages } from "./play-messages";
 import { ZhFallbackNotice } from "../zh-fallback-notice";
@@ -63,6 +64,30 @@ function useContainerWide(): [React.RefObject<HTMLDivElement | null>, boolean | 
   return [ref, wide];
 }
 
+/**
+ * Whether the page has scrolled past `ref` (a marker just above the sticky bar): the bar is then
+ * stuck at the top. Off without IntersectionObserver (tests, old browsers) or when not `enabled`.
+ */
+function useScrolledPast(ref: React.RefObject<HTMLElement | null>, enabled: boolean): boolean {
+  const [past, setPast] = useState(false);
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!enabled || !element || typeof IntersectionObserver === "undefined") return;
+    // The host's own sticky header covers the top of the viewport: the bar sticks below it.
+    const top = Number.parseFloat(getComputedStyle(element).getPropertyValue("--sheet-sticky-top")) || 0;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[entries.length - 1];
+        if (entry) setPast(!entry.isIntersecting && entry.boundingClientRect.top < (entry.rootBounds?.top ?? top));
+      },
+      { rootMargin: `${-top}px 0px 0px 0px` },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref, enabled]);
+  return enabled && past;
+}
+
 const TAB_LIST = "h-auto w-full justify-start gap-1 rounded-none border-b border-border bg-transparent p-0";
 const TAB_TRIGGER =
   "relative h-11 flex-none rounded-none border-0 bg-transparent px-4 text-base text-muted-foreground shadow-none data-[state=active]:bg-transparent data-[state=active]:font-semibold data-[state=active]:text-foreground data-[state=active]:shadow-none dark:data-[state=active]:bg-transparent dark:data-[state=active]:border-0 after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full data-[state=active]:after:bg-accent";
@@ -74,6 +99,8 @@ function PlayLayout() {
   // The starting shop (plan-uat2 §3.5): a new character opens on 物品, whose tab opens the shop.
   const [tab, setTab] = useState<Tab>(() => (editable && values.startingShop === true ? "items" : "character"));
   const stickyRef = useRef<HTMLDivElement | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const scrolled = useScrolledPast(sentinelRef, wide === false);
   const panelsRef = useRef<HTMLDivElement | null>(null);
   const tabsRef = useRef<HTMLDivElement | null>(null);
   // A new tab starts at its top: when the page was scrolled past it, bring it back under the bar.
@@ -131,6 +158,7 @@ function PlayLayout() {
     <div ref={ref} className="@container shell-wrap space-y-2 pb-8 pt-2" data-dnd-play-view data-layout={wide === null ? "pending" : wide ? "wide" : "compact"}>
       <EditSlot part="banner" />
       <ZhFallbackNotice />
+      <ClassHeader />
       {wide === null ? null : wide ? (
         <>
           <div ref={stickyRef} className="sticky top-[var(--sheet-sticky-top,0px)] z-20 -mx-1 bg-background/95 px-1 pb-3 pt-1 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -149,8 +177,11 @@ function PlayLayout() {
         </>
       ) : (
         <Tabs value={shown} onValueChange={changeTab} className="gap-3">
-          <div ref={stickyRef} className="sticky top-[var(--sheet-sticky-top,0px)] z-20 -mx-2 space-y-1 bg-background/95 px-2 pt-1 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-            <CompactVitals />
+          {/* Out of flow at the bar's place (no gap): scrolling past it means the bar is stuck. */}
+          <div ref={sentinelRef} aria-hidden className="pointer-events-none absolute size-px" />
+          {/* UAT m24: an opaque bar (no content shows through the tabs), its vitals condensed once the page scrolls. */}
+          <div ref={stickyRef} className="sticky top-[var(--sheet-sticky-top,0px)] z-20 -mx-2 space-y-1 bg-background px-2 pt-1">
+            <CompactVitals condensed={scrolled} />
             {list}
           </div>
           {panels}

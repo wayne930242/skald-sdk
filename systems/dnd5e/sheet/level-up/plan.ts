@@ -1,187 +1,34 @@
-import { progressionAt, progressionOf, type ClassBlocksSource, type ClassProgression } from "../../reference/class-progression";
-import { casterKindOf, multiclassRulesOf, prerequisites, type CasterKind, type MulticlassRules, type Prerequisite } from "../../reference/multiclass";
+import { progressionAt } from "../../reference/class-progression";
+import { multiclassRulesOf, prerequisites, type Prerequisite } from "../../reference/multiclass";
 import { classIssues, sheetClasses, type ClassIssue, type SheetClass } from "../play/class-model";
 import { ABILITIES, type Ability } from "../play/play-model";
-import { combinedSlotsOffer, extraAttackStacks, gainsOffer, unarmoredOffer, type GainsOffer, type PlanClass } from "./multiclass";
+import type { ClassInfo, ClassOrigin, LevelUpFeature, LevelUpSubclass } from "./class-data";
+import { combinedSlotsOffer, extraAttackStacks, gainsOffer, thirdSlotsOffer, unarmoredOffer, type GainsOffer, type PlanClass } from "./multiclass";
+import { LEVEL_UP_RULES } from "./rules";
+import { slotsFrom, type SlotsOffer } from "./slots";
 
 /**
  * The level-up helper's offer (phase 2b §4.1): what raising a D&D 2024 character one level gives,
  * for a built-in, Drive-pack or homebrew class alike. Pure: the caller loads the class.
  */
 
-/** The helper's rules, kept in one place (boss defaults, CLASS-IMPL §4 and §6). */
-export const LEVEL_UP_RULES = {
-  maxLevel: 20,
-  /** One level per run; the dialog offers 「繼續升級」 after apply. */
-  levelsPerRun: 1,
-  /** Multiclass (CLASS-IMPL §7.4): advance any sheet class or add one; `level` stays the total. */
-  multiclass: true,
-  /** An ability score improvement never raises a score above this. */
-  abilityCap: 20,
-  /** Points of an ability score improvement: +2 to one or +1 to two. */
-  asiPoints: 2,
-  /** A rolled hit point result is stored as its difference from the average here (open question 2). */
-  hpRollField: "hpMaxMisc",
-  asiFeatRef: "feat:ability-score-improvement",
-} as const;
-
-/** A class or subclass feature entry (`classFeature:<c>/<slug>-l<N>`, `subclassFeature:<c>/<sub>/<slug>-l<N>`). */
-export interface LevelUpFeature {
-  ref: string;
-  /** Localized name, the row's name. */
-  name: string;
-  level: number;
-}
-
-export interface LevelUpSubclass {
-  /** `subclass:<c>/<sub>` */
-  ref: string;
-  /** `<c>/<sub>` */
-  id: string;
-  /** Localized name, written to the sheet's `subclass`. */
-  name: string;
-  /** Every name the sheet's `subclass` text may hold (English and localized). */
-  names: string[];
-  features: LevelUpFeature[];
-  /** A homebrew subclass that makes a third caster (`meta.spellcasting.progression: "third"`). */
-  casting?: "third";
-}
-
-export type ClassOrigin = "srd" | "pack" | "custom";
-
-/** A class as the helper reads it: its progression and the entries of its features and subclasses. */
-export interface ClassInfo {
-  id: string;
-  progression: ClassProgression | null;
-  /** Every class feature of the class, any level. */
-  features: LevelUpFeature[];
-  subclasses: LevelUpSubclass[];
-  /** The class id whose spell list it uses (a borrowed list), default its own. */
-  spellList?: string;
-  /** Localized class name (a new `multiclass` row's `name`); default the id. */
-  name: string;
-  origin: ClassOrigin;
-  /** Hit Point Die faces (`meta.hitDie`), default 8. */
-  hitDie: number;
-  primaryAbility: Ability[];
-  /** Caster kind for combined slots: `meta.spellcasting.progression`, else read from the table (pact / slots → full). */
-  casting: CasterKind | null;
-  /** `meta.spellcasting.ability`, else `"none"`. */
-  spellAbility: string;
-  /** Prerequisite and gained proficiencies as a multiclass (`multiclassRulesOf`). */
-  multiclass: MulticlassRules;
-  /** The class's Unarmored Defense (`meta.unarmoredDefense`), when it has one. */
-  unarmoredDefense: "barbarian" | "monk" | null;
-}
-
-/** An entry the builder reads: corpus, pack or homebrew, any kind (the others are ignored). */
-export interface ClassInfoEntry {
-  ref: string;
-  name: string;
-  meta?: Record<string, unknown>;
-}
-
-export interface ClassInfoInput {
-  id: string;
-  /** The class entry (English blocks), or null when only its features are known. */
-  blocks: ClassBlocksSource | null;
-  /** Class features, subclasses and subclass features, built-in first: the first entry of a ref wins. */
-  entries: Iterable<ClassInfoEntry>;
-  /** The localized name of an entry; default its English name. */
-  localize?: (ref: string, english: string) => string;
-  spellList?: string;
-  /** The class entry's `meta` (hit die, spellcasting, multiclass, primary ability). */
-  meta?: Record<string, unknown>;
-  /** The class's localized name; default its id. */
-  name?: string;
-  origin?: ClassOrigin;
-}
-
-/** The level of a feature id (`-l<N>`), else its `meta.level`. */
-export function featureLevel(entry: ClassInfoEntry): number | null {
-  const match = /-l(\d+)$/.exec(entry.ref);
-  const level = match ? Number(match[1]) : entry.meta?.level;
-  return typeof level === "number" && Number.isInteger(level) && level >= 1 && level <= LEVEL_UP_RULES.maxLevel ? level : null;
-}
-
-/** A class's helper data from loaded entries (corpus parts, a pack's entries, homebrew rows). */
-export function classInfoOf(input: ClassInfoInput): ClassInfo {
-  const { id } = input;
-  const localize = input.localize ?? ((_: string, english: string) => english);
-  const seen = new Set<string>();
-  const features: LevelUpFeature[] = [];
-  const subclasses = new Map<string, LevelUpSubclass>();
-  const subclassFeatures: Array<{ subclass: string; feature: LevelUpFeature }> = [];
-  for (const entry of input.entries) {
-    if (seen.has(entry.ref)) continue;
-    seen.add(entry.ref);
-    const colon = entry.ref.indexOf(":");
-    const kind = entry.ref.slice(0, colon);
-    const path = colon > 0 ? entry.ref.slice(colon + 1) : "";
-    const parts = path.split("/");
-    if (parts[0] !== id) continue;
-    const name = localize(entry.ref, entry.name);
-    if (kind === "classFeature" && parts.length === 2) {
-      const level = featureLevel(entry);
-      if (level !== null) features.push({ ref: entry.ref, name, level });
-    } else if (kind === "subclass" && parts.length === 2) {
-      const third = casterKindOf(undefined, entry.meta) === "third";
-      subclasses.set(path, { ref: entry.ref, id: path, name, names: [...new Set([entry.name, name])], features: [], ...(third ? { casting: "third" as const } : {}) });
-    } else if (kind === "subclassFeature" && parts.length === 3) {
-      const level = featureLevel(entry);
-      if (level !== null) subclassFeatures.push({ subclass: `${parts[0]}/${parts[1]}`, feature: { ref: entry.ref, name, level } });
-    }
-  }
-  for (const { subclass, feature } of subclassFeatures) subclasses.get(subclass)?.features.push(feature);
-  const byLevel = (a: LevelUpFeature, b: LevelUpFeature) => a.level - b.level;
-  features.sort(byLevel);
-  for (const subclass of subclasses.values()) subclass.features.sort(byLevel);
-  const progression = input.blocks ? progressionOf(input.blocks) : null;
-  const meta = input.meta;
-  const casting = isRecord(meta?.spellcasting) ? meta.spellcasting : null;
-  const tableKind: CasterKind | null = progression?.levels.some((row) => row.pact)
-    ? "pact"
-    : progression?.levels.some((row) => row.slots?.some((count) => count > 0))
-      ? "full"
-      : null;
-  const primary = Array.isArray(meta?.primaryAbility) ? meta.primaryAbility : [];
-  const unarmored = meta?.unarmoredDefense;
-  return {
-    id,
-    progression,
-    features,
-    subclasses: [...subclasses.values()],
-    ...(input.spellList ? { spellList: input.spellList } : {}),
-    name: input.name ?? id,
-    origin: input.origin ?? "srd",
-    hitDie: typeof meta?.hitDie === "number" && meta.hitDie > 0 ? meta.hitDie : 8,
-    primaryAbility: ABILITIES.filter((ability) => primary.includes(ability)),
-    casting: casterKindOf(meta) ?? tableKind,
-    spellAbility: typeof casting?.ability === "string" && casting.ability ? casting.ability : "none",
-    multiclass: multiclassRulesOf(id, meta),
-    unarmoredDefense: unarmored === "barbarian" || unarmored === "monk" ? unarmored : null,
-  };
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
+export { LEVEL_UP_RULES } from "./rules";
+export { slotsDefaultOn, slotsFrom, type SlotsOffer } from "./slots";
+export {
+  classInfoOf,
+  featureLevel,
+  type ClassInfo,
+  type ClassInfoEntry,
+  type ClassInfoInput,
+  type ClassOrigin,
+  type FeatureChoice,
+  type LevelUpFeature,
+  type LevelUpSubclass,
+} from "./class-data";
 
 export interface LevelUpFeatureOffer extends LevelUpFeature {
   /** `<c>-subclass-l<N>` / `subclass-feature-l<N>`: hidden when the subclass's own features are offered. */
   placeholder: boolean;
-}
-
-export interface SlotsOffer {
-  /** The class table at the current level and the target level, spell levels 1–9. */
-  before: number[];
-  after: number[];
-  pact?: { before: { slots: number; level: number }; after: { slots: number; level: number } };
-  /** The sheet's totals now. */
-  sheet: { slots: number[]; pact: { slots: number; level: number } };
-  /** The sheet's totals equal the table at the current level: the checkbox starts on. */
-  matches: boolean;
-  changed: boolean;
 }
 
 export interface CountChange {
@@ -227,6 +74,11 @@ export interface LevelUpPlan {
   asi: null | { feature: string; abilities: Record<Ability, number>; cap: number; points: number; featRef: string; featName: string };
   epicBoon: boolean;
   slots: SlotsOffer | null;
+  /**
+   * The slots offer when the player picks a subclass that casts (a third caster, one with its own
+   * Spellcasting feature), by subclass ref: it replaces `slots` while that subclass is picked (`slotsFor`).
+   */
+  slotsBySubclass?: Record<string, SlotsOffer | null>;
   spells: null | {
     cantrips?: CountChange;
     prepared?: CountChange;
@@ -328,35 +180,17 @@ function slotsOffer(data: Record<string, unknown>, info: ClassInfo, from: number
   return slotsFrom(data, before.slots ?? null, after.slots ?? null, after.pact ? before.pact ?? { slots: 0, level: 0 } : null, after.pact ?? null);
 }
 
-/** A slots offer from the before / after totals (null = none of that kind); null when neither kind exists. */
-export function slotsFrom(
-  data: Record<string, unknown>,
-  beforeSlots: readonly number[] | null,
-  afterSlots: readonly number[] | null,
-  beforePact: { slots: number; level: number } | null,
-  afterPact: { slots: number; level: number } | null,
-): SlotsOffer | null {
-  if (!beforeSlots && !afterSlots && !beforePact && !afterPact) return null;
-  const zero = Array.from({ length: 9 }, () => 0);
-  const fill = (slots: readonly number[] | null) => zero.map((_, index) => slots?.[index] ?? 0);
-  const sheet = {
-    slots: zero.map((_, index) => num(data[`slot${index + 1}Total`])),
-    pact: { slots: num(data.pactSlots), level: num(data.pactSlotLevel) },
-  };
-  const out: SlotsOffer = { before: fill(beforeSlots), after: fill(afterSlots), sheet, matches: false, changed: false };
-  if (beforePact || afterPact) out.pact = { before: beforePact ?? { slots: 0, level: 0 }, after: afterPact ?? { slots: 0, level: 0 } };
-  const same = (a: readonly number[], b: readonly number[]) => a.every((value, index) => value === b[index]);
-  const samePact = (a: { slots: number; level: number }, b: { slots: number; level: number }) => a.slots === b.slots && a.level === b.level;
-  out.matches = same(sheet.slots, out.before) && (!out.pact || samePact(sheet.pact, out.pact.before));
-  out.changed = !same(out.before, out.after) || (out.pact !== undefined && !samePact(out.pact.before, out.pact.after));
-  return out;
-}
+/** Spell row sources that are not the class's own (`spells.source`). */
+const NOT_CLASS_SPELL: ReadonlySet<string> = new Set(["magic-initiate", "species"]);
 
 function spellsOffer(data: Record<string, unknown>, info: ClassInfo, from: number, to: number, castingClass?: string): LevelUpPlan["spells"] {
   const before = rowAt(info, from);
   const after = rowAt(info, to);
   if (!before || !after || (after.cantrips === undefined && after.prepared === undefined)) return null;
-  const spells = rowsOf(data.spells).filter((row) => castingClass === undefined || (typeof row.castingClass === "string" ? row.castingClass : "") === castingClass);
+  // The class's own spells (UAT m14): a background or species spell (Magic Initiate) is not one, and on a multiclass sheet only this class's count.
+  const spells = rowsOf(data.spells).filter(
+    (row) => !NOT_CLASS_SPELL.has(typeof row.source === "string" ? row.source : "") && (castingClass === undefined || (typeof row.castingClass === "string" ? row.castingClass : "") === castingClass),
+  );
   const out: NonNullable<LevelUpPlan["spells"]> = {
     sheet: {
       cantrips: spells.filter((row) => num(row.level) === 0).length,
@@ -402,7 +236,7 @@ function classOffer(data: Record<string, unknown>, info: ClassInfo | null, from:
   if (!info) return plan;
   const onSheet = sheetRefs(data);
   plan.features = info.features
-    .filter((feature) => feature.level === to && !onSheet.has(feature.ref))
+    .filter((feature) => feature.level === to && !onSheet.has(feature.ref) && !feature.optionOf)
     .map((feature) => ({ ...feature, placeholder: isPlaceholder(info.id, feature.ref) }));
 
   const placeholderLevels = info.features.filter((feature) => leafOf(feature.ref).startsWith(`${info.id}-subclass-`)).map((feature) => feature.level);
@@ -412,12 +246,12 @@ function classOffer(data: Record<string, unknown>, info: ClassInfo | null, from:
   plan.subclass.known = known;
   plan.subclass.firstLevel = firstLevel;
   if (known) {
-    plan.subclass.offers[known.ref] = known.features.filter((feature) => feature.level === to && !onSheet.has(feature.ref));
+    plan.subclass.offers[known.ref] = known.features.filter((feature) => feature.level === to && !onSheet.has(feature.ref) && !feature.optionOf);
   } else if (firstLevel !== null && to >= firstLevel) {
     plan.subclass.choose = true;
     plan.subclass.options = info.subclasses;
     for (const option of info.subclasses) {
-      plan.subclass.offers[option.ref] = option.features.filter((feature) => feature.level <= to && !onSheet.has(feature.ref));
+      plan.subclass.offers[option.ref] = option.features.filter((feature) => feature.level <= to && !onSheet.has(feature.ref) && !feature.optionOf);
     }
   }
 
@@ -433,7 +267,11 @@ function classOffer(data: Record<string, unknown>, info: ClassInfo | null, from:
     };
   }
   plan.epicBoon = info.features.some((feature) => feature.ref === `classFeature:${info.id}/epic-boon-l${to}`);
-  plan.slots = slotsOffer(data, info, from, to);
+  plan.slots = slotsOffer(data, info, from, to) ?? (known ? thirdSlotsOffer(data, info, known, from, to) : null);
+  for (const option of plan.subclass.options) {
+    // A subclass picked in this run casts only after it: before, the class had none of its slots (from 0).
+    if (option.casting === "third" && info.casting === null) (plan.slotsBySubclass ??= {})[option.ref] = thirdSlotsOffer(data, info, option, 0, to);
+  }
   plan.spells = spellsOffer(data, info, from, to, castingClass);
   plan.columns = columnChanges(info, from, to);
   return plan;
@@ -504,8 +342,22 @@ function multiclassPlan(input: LevelUpInput, character: number): LevelUpPlan {
   plan.issues = [];
   plan.slotsUnknown = after.some((entry) => entry.info === null);
   plan.slots = plan.slotsUnknown ? null : combinedSlotsOffer(data, before, after);
+  // A picked subclass that casts changes the target's caster kind: the combined slots with it.
+  const targetIndex = target.kind === "add" ? after.length - 1 : sheet.findIndex((sheetClass) => sheetClass.classId === target.classId);
+  if (plan.slotsBySubclass) {
+    plan.slotsBySubclass = Object.fromEntries(
+      plan.subclass.options
+        .filter((option) => Object.hasOwn(plan.slotsBySubclass ?? {}, option.ref))
+        .map((option) => [option.ref, plan.slotsUnknown ? null : combinedSlotsOffer(data, before, after.map((entry, index) => (index === targetIndex ? { ...entry, subclass: option } : entry)))]),
+    );
+  }
   plan.extraAttackStacks = info ? extraAttackStacks(data, info.id, plan.features) : [];
   return plan;
+}
+
+/** The slots offer with `subclassRef` as the picked subclass (a third caster's own), else the plan's. */
+export function slotsFor(plan: LevelUpPlan, subclassRef: string | null): SlotsOffer | null {
+  return subclassRef && plan.slotsBySubclass && Object.hasOwn(plan.slotsBySubclass, subclassRef) ? plan.slotsBySubclass[subclassRef] : plan.slots;
 }
 
 /**

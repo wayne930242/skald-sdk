@@ -1,0 +1,5 @@
+[
+  { "id": "miner", "label": "礦工", "summary": "熟悉坑道，力量 +1。" },
+  { "id": "scribe", "label": "抄寫員", "summary": "讀得懂舊文字，機智 +1。" },
+  { "id": "runner", "label": "信差", "summary": "跑得比誰都快，靈巧 +1。" }
+]

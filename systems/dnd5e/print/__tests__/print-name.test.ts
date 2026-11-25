@@ -28,6 +28,8 @@ const rows: Array<Record<string, unknown>> = [
   { name: "", ref: "feat:made-up-feat", origin: "custom" },
   { name: "Saved trait", ref: "species:made-up", id: "species:made-up#darkvision" },
   { name: "Saved trait", ref: "species:made-up", id: "species:made-up#unknown" },
+  { name: "Saved: Pick", ref: "feat:made-up-feat", option: "Pick", optionName: "虛構選項" },
+  { name: "Saved: Pick", ref: "feat:made-up-feat", origin: "custom", option: "Pick" },
 ];
 
 describe("printName", () => {

@@ -6,6 +6,7 @@
 import { namedIssues, type FormIssue, type TextForm } from "../forms/common";
 import type { EquipmentLine } from "../forms/background";
 import { ABILITIES, type Ability } from "../forms/spell";
+import type { LegacyAware } from "../read-back";
 import type { HomebrewRefContext } from "../wizard-items";
 import { SKILL_FIELDS } from "../wizard-items";
 import type { MulticlassRules } from "../../../reference/multiclass";
@@ -108,7 +109,8 @@ export type ClassLabels = Record<
   string
 >;
 
-export interface ClassContext {
+/** `legacy`, `legacyText`: the v4.152.0 regeneration of the read-back (`../read-back.ts`). */
+export interface ClassContext extends LegacyAware<ClassLabels> {
   labels: { en: ClassLabels; zh: ClassLabels };
   /** Built-in classes by id. */
   builtin: Readonly<Record<string, BuiltinClassChassis>>;

@@ -1,6 +1,6 @@
 {
   "title": "Level up",
-  "description": "One level per run: check the choices, then apply.",
+  "description": "Level up one level at a time. Review the choices, then apply.",
   "classLabel": "Class",
   "classLine": "{name} {from} → {to}",
   "classFallback": "Class",
@@ -8,16 +8,23 @@
   "noClass": "Class data not found: only the level and hit points change.",
   "hp": {
     "title": "Hit points",
-    "average": "Average: {value} + Constitution modifier",
+    "average": "Average",
     "roll": "Roll",
     "rollButton": "Roll d{faces}",
     "result": "Hit die result",
-    "delta": "The difference from the average goes to Max HP other bonus: {delta}",
-    "invalid": "Enter a result from 1 to {faces}."
+    "invalid": "Enter a result from 1 to {faces}.",
+    "gainAverage": "This level: {total} HP ({value} {sign} Con {con})",
+    "gainRoll": "This level: {total} HP (rolled {roll} {sign} Con {con})",
+    "plus": "+",
+    "minus": "−"
   },
   "features": {
     "title": "New features",
-    "none": "No new class features at this level."
+    "none": "No new class features at this level.",
+    "choose": "{name}: choose one",
+    "later": "Choose later",
+    "featLater": "Choose later in the library",
+    "optionRow": "{feature}: {option}"
   },
   "subclass": {
     "title": "Subclass",
@@ -41,6 +48,7 @@
     "title": "Spell slots",
     "apply": "Update the spell slot totals",
     "differs": "Your spell slots differ from the class table.",
+    "unset": "Your spell slots are not set yet; they will be set from the class table.",
     "level": "Level {level}: {from} → {to}",
     "pact": "Pact slots: {from} → {to}, slot level {fromLevel} → {toLevel}"
   },
@@ -68,13 +76,24 @@
     "continue": "Continue to level {level}",
     "feats": "Pick a feat",
     "epicBoon": "Pick an Epic Boon",
-    "spells": "Add spells"
+    "spells": "Add spells",
+    "undo": "Undo last level up",
+    "undoGone": "A newer level up came after this one, so it can no longer be undone.",
+    "newClass": "New class: {name}",
+    "features": "New features: {items}",
+    "subclass": "Subclass: {name}",
+    "asi": "Ability scores: {items}",
+    "score": "{ability} {from} → {to}",
+    "featRows": "Feats: {items}",
+    "slots": "Spell slots updated",
+    "changes": "What changed",
+    "fightingStyle": "Pick a Fighting Style feat"
   },
   "multiclass": {
     "addOption": "Add a class…",
     "pickTitle": "Choose a class to add",
     "pickNone": "No other class to add.",
-    "prerequisite": "Needs {ability} 13 (now {have})",
+    "prerequisite": "Needs {abilities} (now {have})",
     "abilityOr": " or ",
     "scoreSeparator": "/",
     "prerequisiteMet": "Meets the ability requirement",
@@ -100,10 +119,22 @@
     "extraAttack": "Extra Attack does not stack",
     "unarmored": {
       "set": "Set Unarmored Defense: {name}",
-      "note": "Armor Class uses one method only; Unarmored Defense stays as it is."
+      "note": "Armor Class uses one method only; Unarmored Defense stays as it is.",
+      "title": "Armor Class"
     },
     "slotsUnknown": "A class has no data; adjust spell slots yourself.",
     "rowField": "{name}'s {field}",
-    "keptRow": "{name} (a class row edited since; total level and HP adjustment kept with it)"
+    "keptRow": "{name} (a class row edited since; total level and HP adjustment kept with it)",
+    "change": "Change",
+    "blocked": {
+      "pick": "Choose a class to add first."
+    },
+    "prerequisiteScore": "{ability} {need}"
+  },
+  "blocked": {
+    "issues": "Fix the sheet's classes in edit mode before applying.",
+    "prerequisites": "The ability requirement is not met: tick “The DM allows it” to apply.",
+    "hp": "Roll the hit die or enter the result to apply.",
+    "asi": "{left} ability score points left to assign."
   }
 }

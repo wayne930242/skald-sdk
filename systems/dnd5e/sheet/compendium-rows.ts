@@ -4,6 +4,9 @@ import { PACK_LIMITS } from "../content-pack/domain/limits";
 import { packSnapshotBytes } from "../content-pack/domain/overlay";
 import type { ListField } from "@skald/types/schema";
 import type { GameSpell, ReferenceContextValue } from "./use-reference-context";
+import type { PresentRefs } from "./compendium-present";
+
+export { ONCE_LISTS, presenceKey, presentRefs, spellKey } from "./compendium-present";
 
 /** The four lists the compendium appends to (design §3.6); each tab is named after its list field. */
 export type CompendiumTab = "spells" | "feats" | "equipment" | "features";
@@ -28,7 +31,34 @@ export interface CompendiumStart {
   classIds?: string[];
   /** 法術 on a multiclass sheet: a filtered list id → the `castingClass` a spell added from it gets. */
   castingClassOf?: Record<string, string>;
+  /**
+   * 法術 on a multiclass sheet: every class, in sheet order, with the spell list it casts from and
+   * its name. A spell on one class's list is added as that class's (`castingClass`); on several,
+   * the row asks which (UAT M5).
+   */
+  spellClasses?: Array<{ castingClass: string; list: string; name: string }>;
+  /** The presence keys on each list (`presentRefs`; a spell's names its caster, F003): such a row shows 已加入 and is not added again (UAT M6). */
+  present?: PresentRefs;
   intent?: "attack";
+}
+
+/**
+ * The casting classes a spell can be added under: those whose list (`spellClasses[].list`) holds it
+ * (`spellLists`, the game data's `classes`), narrowed to `filter`'s list when one class list is
+ * filtered. Empty on a single-class sheet or when no class's list holds it.
+ */
+export function spellCastersFor(
+  start: CompendiumStart | undefined,
+  spellLists: readonly string[] | undefined,
+  filter?: string,
+): Array<{ castingClass: string; name: string }> {
+  const lists = new Set(spellLists ?? []);
+  const seen = new Set<string>();
+  return (start?.spellClasses ?? []).filter((entry) => {
+    if (!lists.has(entry.list) || (filter !== undefined && entry.list !== filter) || seen.has(entry.castingClass)) return false;
+    seen.add(entry.castingClass);
+    return true;
+  });
 }
 
 export function newEntryId(prefix: string): string {

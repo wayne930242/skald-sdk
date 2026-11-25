@@ -7,6 +7,8 @@ export interface SubclassParent {
   subclassLevels: number[];
   caster: "full" | "half" | "pact" | "none";
   thirdCaster: boolean;
+  /** The class's spell list (a class id): its own, or the built-in list a homebrew class borrows. */
+  list?: string;
 }
 export function subclassLevelsOf(classId: string, ids: Iterable<string>): number[] {
   const levels = new Set<number>();
@@ -34,6 +36,7 @@ export function builtinParents(
       subclassLevels: subclassLevelsOf(id, ids(id)),
       caster: casterOf(spellcasting?.progression),
       thirdCaster: id === "fighter" || id === "rogue",
+      ...(spellcasting?.progression ? { list: id } : {}),
     }))
     .filter((p) => p.subclassLevels.length);
 }
@@ -43,7 +46,8 @@ export function homebrewParents(rows: readonly HomebrewItemRecord[]): SubclassPa
     .filter((r) => r.kind === "class" && r.payload.entry)
     .map(({ key: id, payload }) => {
       const sc = payload.entry?.meta?.spellcasting;
-      const caster = casterOf(sc && typeof sc === "object" && "progression" in sc ? sc.progression : undefined);
+      const casting = sc && typeof sc === "object" ? (sc as { progression?: unknown; list?: unknown }) : {};
+      const caster = casterOf(casting.progression);
       const en = payload.entry!.name;
       return {
         id,
@@ -52,6 +56,7 @@ export function homebrewParents(rows: readonly HomebrewItemRecord[]): SubclassPa
         subclassLevels: subclassLevelsOf(id, ids),
         caster,
         thirdCaster: caster === "none",
+        ...(caster !== "none" ? { list: typeof casting.list === "string" && casting.list ? casting.list : id } : {}),
       };
     })
     .filter((p) => p.subclassLevels.length);

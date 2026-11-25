@@ -68,6 +68,8 @@ export interface ReferenceContextValue {
   packText: PackTextIndex | null;
   /** The spell list a pack (Drive or homebrew) class borrows (`meta.spellcasting.list`), when it has one. */
   packSpellListOf?: (classId: string) => string | undefined;
+  /** The `meta` of an enabled pack's (Drive or homebrew) entry by ref, when a pack supplies it. */
+  packMetaOf?: (ref: string) => unknown;
   renderContext: Omit<EntriesRenderContext, "onOpenRef">;
 }
 
@@ -258,6 +260,7 @@ export function useReferenceContext(
         const list = meta && typeof meta === "object" && meta.spellcasting && typeof meta.spellcasting === "object" ? meta.spellcasting.list : undefined;
         return typeof list === "string" && list ? list : undefined;
       },
+      packMetaOf: (ref) => pack?.entries.find((entry) => entry.ref === (aliases[ref] ?? ref))?.meta,
       renderContext: {
         resolveRef,
         label,

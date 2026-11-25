@@ -26,6 +26,23 @@ Open [localhost:3100/en](http://localhost:3100/en) or [localhost:3100/zh-TW](htt
 The previewer has play, edit, and print modes, and saves character edits in the browser.
 See the [previewer guide](apps/previewer/README.md) for direct links and what to check before opening a pull request.
 
+## Preview a system pack
+
+Build the bundled [Lantern Bearers example](packages/sheet-sdk/src/scripts/system-pack/example/) and check the resulting file:
+
+```sh
+bun run system-pack build packages/sheet-sdk/src/scripts/system-pack/example --out lantern.json
+bun run system-pack check lantern.json
+bun run dev
+```
+
+1. Open [the local pack preview](http://localhost:3100/en/pack) and choose `lantern.json`.
+2. In Edit, change the character name. Switch to Play and roll an attribute; check the result in the roll log.
+3. Open Rules reference. Read a section, then open an entry from its collection. Search for `燈油` and open a result.
+4. Open Print and check the edited name. Reload the page: the file and the character edits are gone.
+
+The character creation wizard runs only on the site. See the [system pack guide](docs/system-packs.md) and [authoring reference (繁體中文)](docs/system-packs.zh-TW.md).
+
 ## Screenshots
 
 ![D&D 2024 table, GM view: table info, character cards, chat and dice](docs/screenshots/en/table-gm.webp)

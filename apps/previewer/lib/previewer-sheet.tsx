@@ -85,7 +85,7 @@ const characterName = (data: CharacterData) =>
  * in React state and in localStorage. Remounted (by key) when another character is loaded, so
  * the adapter's hooks start over with it.
  */
-function SheetBody({
+export function SheetBody({
   preview,
   slug,
   mode,
@@ -113,8 +113,8 @@ function SheetBody({
     const next = typeof updater === "function" ? updater(dataRef.current) : updater;
     dataRef.current = next;
     setDataState(next);
-    storeCharacter(slug, next);
-  }, [slug]);
+    if (system.runtime?.builtinTemplate) storeCharacter(slug, next);
+  }, [slug, system]);
   const setField = useCallback(
     (path: string, value: unknown) =>
       setData((prev) => setByPath(prev, path, typeof value === "function" ? (value as (current: unknown) => unknown)(getByPath(prev, path)) : value)),

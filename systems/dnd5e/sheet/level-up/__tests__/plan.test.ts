@@ -5,6 +5,18 @@ import { builtinClassInfo, sheet } from "./class-info";
 const refs = (features: ReadonlyArray<{ ref: string }>) => features.map((feature) => feature.ref).sort();
 
 describe("levelUpPlan (phase 2b §4.1)", () => {
+  it("counts only the class's own spells: a background or species spell is not a Ranger spell (UAT m14)", async () => {
+    const ranger = await builtinClassInfo("ranger");
+    const spells = [
+      { id: "s1", name: "Cure Wounds", level: 1, prepared: true, source: "class" },
+      { id: "s2", name: "Bless", level: 1, prepared: true, source: "magic-initiate" },
+      { id: "s3", name: "Guidance", level: 0, source: "magic-initiate" },
+      { id: "s4", name: "Hunter's Mark", level: 1, prepared: true, source: "other" },
+    ];
+    const plan = levelUpPlan({ data: sheet("ranger", 1, { hitDieFaces: 10, spells }), classInfo: ranger })!;
+    expect(plan.spells).toMatchObject({ prepared: { before: 2, after: 3 }, sheet: { cantrips: 0, prepared: 2 } });
+  });
+
   it("Paladin 2→3: class features, the subclass picker, Oath of Devotion's level 3 features, slots and prepared", async () => {
     const info = await builtinClassInfo("paladin");
     const plan = levelUpPlan({ data: sheet("paladin", 2, { hitDieFaces: 10, slot1Total: 2 }), classInfo: info })!;

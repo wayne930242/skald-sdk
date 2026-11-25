@@ -9,7 +9,7 @@ import { Input } from "@skald/sheet-sdk/components/ui/input";
 import { Label } from "@skald/sheet-sdk/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@skald/sheet-sdk/components/ui/radio-group";
 import { ABILITIES, type Ability } from "../play/play-model";
-import type { LevelUpFeature, LevelUpPlan } from "./plan";
+import type { LevelUpFeature, LevelUpPlan, SlotsOffer } from "./plan";
 
 /** The level-up dialog's sections (phase 2b §4.1), one per part of the offer. */
 
@@ -25,52 +25,68 @@ export function Section({ title, children, ...props }: { title: string; children
   );
 }
 
-function Choice({ id, value, label }: { id: string; value: string; label: string }) {
+function Choice({ id, value, label, description }: { id: string; value: string; label: string; description?: string }) {
+  const described = description ? `${id}-description` : undefined;
   return (
-    <div className="flex min-h-9 items-center gap-2">
-      <RadioGroupItem value={value} id={id} />
-      <Label htmlFor={id} className="font-normal">{label}</Label>
+    <div className="flex min-h-9 items-start gap-2 py-1">
+      <RadioGroupItem value={value} id={id} className="mt-0.5" aria-describedby={described} />
+      <div className="min-w-0">
+        <Label htmlFor={id} className="font-normal">{label}</Label>
+        {description && <p id={described} className="text-xs text-muted-foreground" data-level-up-choice-description>{description}</p>}
+      </div>
     </div>
   );
 }
 
-/** 平均 (nothing written: the formula adds it) or 擲骰 (a d{faces} button or a typed result). */
-export function HpSection({ plan, draft, onChange, onRoll }: { plan: LevelUpPlan; draft: HpDraft; onChange: (draft: HpDraft) => void; onRoll: () => void }) {
+/**
+ * This level's hit point gain: the die's average or the roll plus the Constitution modifier
+ * (UAT m6, m7), null while a roll has no valid result.
+ */
+export function hpGainText(
+  t: (key: "gainAverage" | "gainRoll" | "plus" | "minus", values?: Record<string, string | number>) => string,
+  die: { average: number } | { roll: number } | null,
+  conMod: number,
+): string | null {
+  if (!die) return null;
+  const base = "roll" in die ? die.roll : die.average;
+  const values = { total: signed(base + conMod), sign: conMod < 0 ? t("minus") : t("plus"), con: Math.abs(conMod) };
+  return "roll" in die ? t("gainRoll", { ...values, roll: die.roll }) : t("gainAverage", { ...values, value: die.average });
+}
+
+/** 平均 (nothing written: the formula adds it) or 擲骰 (a d{faces} button or a typed result), with the gain. */
+export function HpSection({ plan, gain, draft, onChange, onRoll }: { plan: LevelUpPlan; gain: string | null; draft: HpDraft; onChange: (draft: HpDraft) => void; onRoll: () => void }) {
   const t = useTranslations("levelUp.hp");
-  const { faces, average } = plan.hp;
+  const { faces } = plan.hp;
   const result = draft.mode === "roll" ? Number(draft.result) : NaN;
   const valid = Number.isInteger(result) && result >= 1 && result <= faces;
   return (
     <Section title={t("title")} data-level-up-hp>
       <RadioGroup value={draft.mode} onValueChange={(mode) => onChange(mode === "roll" ? { mode: "roll", result: "" } : { mode: "average" })}>
-        <Choice id="level-up-hp-average" value="average" label={t("average", { value: average })} />
+        <Choice id="level-up-hp-average" value="average" label={t("average")} />
         <Choice id="level-up-hp-roll" value="roll" label={t("roll")} />
       </RadioGroup>
       {draft.mode === "roll" && (
-        <div className="space-y-1 pl-6">
-          <div className="flex flex-wrap items-center gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={onRoll}>
-              <Dices className="size-4" aria-hidden />
-              {t("rollButton", { faces })}
-            </Button>
-            <Input
-              type="number"
-              inputMode="numeric"
-              min={1}
-              max={faces}
-              value={draft.result}
-              onChange={(event) => onChange({ mode: "roll", result: event.target.value })}
-              aria-label={t("result")}
-              className="w-20"
-            />
-          </div>
-          {draft.result !== "" && (
-            <p className="text-sm text-muted-foreground" role={valid ? undefined : "alert"}>
-              {valid ? t("delta", { delta: signed(result - average) }) : t("invalid", { faces })}
-            </p>
-          )}
+        <div className="flex flex-wrap items-center gap-2 pl-6">
+          <Button type="button" variant="outline" size="sm" onClick={onRoll}>
+            <Dices className="size-4" aria-hidden />
+            {t("rollButton", { faces })}
+          </Button>
+          <Input
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={faces}
+            value={draft.result}
+            onChange={(event) => onChange({ mode: "roll", result: event.target.value })}
+            aria-label={t("result")}
+            className="w-20"
+          />
         </div>
       )}
+      {draft.mode === "roll" && draft.result !== "" && !valid && (
+        <p className="pl-6 text-sm text-destructive" role="alert">{t("invalid", { faces })}</p>
+      )}
+      {gain && <p className="text-sm font-medium tabular-nums" data-level-up-hp-gain>{gain}</p>}
     </Section>
   );
 }
@@ -79,18 +95,28 @@ export function signed(value: number): string {
   return value > 0 ? `+${value}` : String(value);
 }
 
-/** The features a run adds, each a checkbox, checked by default. */
+export type OptionPick = { ref?: string; name: string };
+
+/** The features a run adds, each a checkbox, checked by default; a feature that is a choice gets its options. */
 export function FeaturesSection({
   features,
   unchecked,
   onToggle,
   notes = {},
+  picks = {},
+  onPick = () => {},
+  feats = [],
 }: {
   features: LevelUpFeature[];
   unchecked: ReadonlySet<string>;
   onToggle: (ref: string) => void;
   /** A note beside a feature (「額外攻擊不疊加」). */
   notes?: Readonly<Record<string, string>>;
+  /** The picked option of each feature that is a choice (UAT M4). */
+  picks?: Readonly<Record<string, OptionPick | undefined>>;
+  onPick?: (ref: string, pick: OptionPick | null) => void;
+  /** The feats a `feat` choice offers (Fighting Style feats). */
+  feats?: ReadonlyArray<{ ref: string; name: string }>;
 }) {
   const t = useTranslations("levelUp.features");
   return (
@@ -101,11 +127,17 @@ export function FeaturesSection({
         <ul className="space-y-1">
           {features.map((feature) => {
             const id = `level-up-feature-${feature.ref}`;
+            const checked = !unchecked.has(feature.ref);
             return (
-              <li key={feature.ref} className="flex min-h-9 items-center gap-2" data-level-up-feature={feature.ref}>
-                <Checkbox id={id} checked={!unchecked.has(feature.ref)} onCheckedChange={() => onToggle(feature.ref)} />
-                <Label htmlFor={id} className="font-normal">{feature.name}</Label>
-                {notes[feature.ref] && <span className="text-xs text-muted-foreground" data-level-up-feature-note>{notes[feature.ref]}</span>}
+              <li key={feature.ref} data-level-up-feature={feature.ref}>
+                <div className="flex min-h-9 items-center gap-2">
+                  <Checkbox id={id} checked={checked} onCheckedChange={() => onToggle(feature.ref)} />
+                  <Label htmlFor={id} className="font-normal">{feature.name}</Label>
+                  {notes[feature.ref] && <span className="text-xs text-muted-foreground" data-level-up-feature-note>{notes[feature.ref]}</span>}
+                </div>
+                {feature.choice && checked && (
+                  <FeatureChoiceGroup feature={feature} pick={picks[feature.ref]} onPick={(pick) => onPick(feature.ref, pick)} feats={feats} />
+                )}
               </li>
             );
           })}
@@ -115,10 +147,44 @@ export function FeaturesSection({
   );
 }
 
+/** One feature's options as a radio group, with 稍後再選 (稍後在資料庫選 for a feat). */
+function FeatureChoiceGroup({ feature, pick, onPick, feats }: { feature: LevelUpFeature; pick: OptionPick | undefined; onPick: (pick: OptionPick | null) => void; feats: ReadonlyArray<{ ref: string; name: string }> }) {
+  const t = useTranslations("levelUp.features");
+  const choice = feature.choice;
+  if (!choice) return null;
+  const LATER = "";
+  const named = (names: readonly string[]) => names.map((name) => ({ value: `named:${name}`, pick: { name } }));
+  // A Fighting Style: a feat, or an option the feature names instead (Ranger's Druidic Warrior, UAT F006).
+  const options: Array<{ value: string; pick: OptionPick }> =
+    choice.kind === "feature"
+      ? choice.options.map((option) => ({ value: option.ref, pick: { ref: option.ref, name: option.name } }))
+      : choice.kind === "feat"
+        ? [...feats.map((feat) => ({ value: feat.ref, pick: { ref: feat.ref, name: feat.name } })), ...named(choice.alternatives?.options ?? [])]
+        : named(choice.options);
+  const value = pick ? (pick.ref ?? `named:${pick.name}`) : LATER;
+  const key = (suffix: string) => `level-up-option-${feature.ref}-${suffix}`;
+  return (
+    <RadioGroup
+      className="gap-0 pb-1 pl-6"
+      value={value}
+      onValueChange={(next) => onPick(options.find((option) => option.value === next)?.pick ?? null)}
+      aria-label={t("choose", { name: feature.name })}
+      data-level-up-feature-choice={choice.kind}
+    >
+      {options.map((option) => (
+        <Choice key={option.value} id={key(option.value)} value={option.value} label={option.pick.name} />
+      ))}
+      <Choice id={key("later")} value={LATER} label={choice.kind === "feat" ? t("featLater") : t("later")} />
+    </RadioGroup>
+  );
+}
+
 /** The known subclass, or the picker of the class's subclasses with 「稍後再選」. */
 export function SubclassSection({ plan, picked, onPick }: { plan: LevelUpPlan; picked: string | null; onPick: (ref: string | null) => void }) {
   const t = useTranslations("levelUp.subclass");
   const { known, choose, options } = plan.subclass;
+  // A known subclass with nothing new at this level needs no card (UAT m9).
+  if (known && (plan.subclass.offers[known.ref] ?? []).length === 0) return null;
   if (known) {
     return (
       <Section title={t("title")} data-level-up-subclass>
@@ -133,7 +199,7 @@ export function SubclassSection({ plan, picked, onPick }: { plan: LevelUpPlan; p
       {options.length === 0 && <p className="text-sm text-muted-foreground">{t("none")}</p>}
       <RadioGroup value={picked ?? LATER} onValueChange={(value) => onPick(value === LATER ? null : value)}>
         {options.map((option) => (
-          <Choice key={option.ref} id={`level-up-subclass-${option.ref}`} value={option.ref} label={option.name} />
+          <Choice key={option.ref} id={`level-up-subclass-${option.ref}`} value={option.ref} label={option.name} description={option.summary} />
         ))}
         <Choice id="level-up-subclass-later" value={LATER} label={t("later")} />
       </RadioGroup>
@@ -158,49 +224,51 @@ export function AsiSection({ plan, draft, onChange }: { plan: LevelUpPlan; draft
     <Section title={t("title")} data-level-up-asi>
       <RadioGroup value={draft.kind} onValueChange={(kind) => onChange(kind === "abilities" ? { kind, increases: {} } : { kind: kind as "feat" | "later" })}>
         <Choice id="level-up-asi-abilities" value="abilities" label={t("abilities")} />
+        {/* The ± grid sits under its own option, not after the last one (UAT m9). */}
+        {draft.kind === "abilities" && (
+          <div className="space-y-1 pb-1 pl-6" data-level-up-asi-grid>
+            <p className="text-xs text-muted-foreground" data-level-up-asi-points>{t("points", { used, total: asi.points })}</p>
+            <ul className="grid gap-1 sm:grid-cols-2">
+              {ABILITIES.map((ability) => {
+                const from = asi.abilities[ability];
+                const added = increases[ability] ?? 0;
+                const to = Math.min(asi.cap, from + added);
+                const name = tAbility(ability);
+                const canAdd = used < asi.points && added < asi.points && from + added < asi.cap;
+                return (
+                  <li key={ability} className="flex items-center justify-between gap-2" data-level-up-ability={ability}>
+                    <span className="text-sm">
+                      {name} <span className="tabular-nums text-muted-foreground">{t("score", { from, to })}</span>
+                    </span>
+                    <span className="flex gap-1">
+                      <Button type="button" variant="outline" size="icon" className="size-8" disabled={added === 0} onClick={() => step(ability, -1)} aria-label={t("decrease", { ability: name })}>
+                        <Minus className="size-4" aria-hidden />
+                      </Button>
+                      <Button type="button" variant="outline" size="icon" className="size-8" disabled={!canAdd} onClick={() => step(ability, 1)} aria-label={t("increase", { ability: name })}>
+                        <Plus className="size-4" aria-hidden />
+                      </Button>
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
         <Choice id="level-up-asi-feat" value="feat" label={t("feat")} />
+        {draft.kind === "feat" && <p className="pb-1 pl-6 text-sm text-muted-foreground">{t("featHint")}</p>}
         <Choice id="level-up-asi-later" value="later" label={t("later")} />
       </RadioGroup>
-      {draft.kind === "abilities" && (
-        <div className="space-y-1 pl-6">
-          <p className="text-xs text-muted-foreground" data-level-up-asi-points>{t("points", { used, total: asi.points })}</p>
-          <ul className="grid gap-1 sm:grid-cols-2">
-            {ABILITIES.map((ability) => {
-              const from = asi.abilities[ability];
-              const added = increases[ability] ?? 0;
-              const to = Math.min(asi.cap, from + added);
-              const name = tAbility(ability);
-              const canAdd = used < asi.points && added < asi.points && from + added < asi.cap;
-              return (
-                <li key={ability} className="flex items-center justify-between gap-2" data-level-up-ability={ability}>
-                  <span className="text-sm">
-                    {name} <span className="tabular-nums text-muted-foreground">{t("score", { from, to })}</span>
-                  </span>
-                  <span className="flex gap-1">
-                    <Button type="button" variant="outline" size="icon" className="size-8" disabled={added === 0} onClick={() => step(ability, -1)} aria-label={t("decrease", { ability: name })}>
-                      <Minus className="size-4" aria-hidden />
-                    </Button>
-                    <Button type="button" variant="outline" size="icon" className="size-8" disabled={!canAdd} onClick={() => step(ability, 1)} aria-label={t("increase", { ability: name })}>
-                      <Plus className="size-4" aria-hidden />
-                    </Button>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
-      {draft.kind === "feat" && <p className="pl-6 text-sm text-muted-foreground">{t("featHint")}</p>}
     </Section>
   );
 }
 
-/** The new slot totals: a checkbox, on when the sheet matches the class table now. */
-export function SlotsSection({ plan, apply, onApply }: { plan: LevelUpPlan; apply: boolean; onApply: (apply: boolean) => void }) {
+/** The new slot totals: a checkbox, on when the sheet matches the class table now or holds no slots yet. */
+export function SlotsSection({ slots, apply, onApply }: { slots: SlotsOffer | null; apply: boolean; onApply: (apply: boolean) => void }) {
   const t = useTranslations("levelUp.slots");
-  const slots = plan.slots;
   if (!slots || !slots.changed) return null;
-  const lines = slots.after.flatMap((after, index) => (after !== slots.before[index] ? [t("level", { level: index + 1, from: slots.before[index], to: after })] : []));
+  const tableLines = slots.after.flatMap((after, index) => (after !== slots.before[index] ? [t("level", { level: index + 1, from: slots.before[index], to: after })] : []));
+  // A repair with an unchanged table (UAT F002): the sheet's totals to the target's.
+  const lines = tableLines.length > 0 ? tableLines : slots.after.flatMap((after, index) => (after !== slots.sheet.slots[index] ? [t("level", { level: index + 1, from: slots.sheet.slots[index], to: after })] : []));
   const pact = slots.pact;
   if (pact && (pact.before.slots !== pact.after.slots || pact.before.level !== pact.after.level)) {
     lines.push(t("pact", { from: pact.before.slots, to: pact.after.slots, fromLevel: pact.before.level, toLevel: pact.after.level }));
@@ -210,7 +278,11 @@ export function SlotsSection({ plan, apply, onApply }: { plan: LevelUpPlan; appl
       <ul className="text-sm tabular-nums">
         {lines.map((line) => <li key={line}>{line}</li>)}
       </ul>
-      {!slots.matches && <p className="text-sm text-muted-foreground" data-level-up-slots-differ>{t("differs")}</p>}
+      {slots.unset ? (
+        <p className="text-sm text-muted-foreground" data-level-up-slots-unset>{t("unset")}</p>
+      ) : (
+        !slots.matches && <p className="text-sm text-muted-foreground" data-level-up-slots-differ>{t("differs")}</p>
+      )}
       <div className="flex min-h-9 items-center gap-2">
         <Checkbox id="level-up-slots" checked={apply} onCheckedChange={(value) => onApply(value === true)} />
         <Label htmlFor="level-up-slots" className="font-normal">{t("apply")}</Label>

@@ -314,6 +314,7 @@
     "loading": "載入中…",
     "notFound": "內建規則沒有此項目。",
     "englishBadge": "英文",
+    "featureOption": "{feature}：{option}",
     "packBadge": "內容包",
     "rowText": "已儲存的文字",
     "characterEntries": "這個角色的項目",
@@ -387,7 +388,10 @@
       "gear": "冒險裝備"
     },
     "addAttack": "加為攻擊",
-    "addedAttack": "{name}已加入攻擊。"
+    "addedAttack": "{name}已加入攻擊。",
+    "alreadyAdded": "已加入",
+    "alreadyOnSheet": "{name}已在角色卡上。",
+    "castAs": "{name}的施法職業"
   },
   "pack": {
     "wizardNotice": "使用中的內容包：{packs}。",

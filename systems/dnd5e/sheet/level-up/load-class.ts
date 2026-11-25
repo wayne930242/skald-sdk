@@ -1,6 +1,7 @@
 import type { EffectivePacks, PackEntry } from "../../content-pack/domain/types";
 import { loadEnglishCorpus, type CorpusEntry } from "../../reference/load-corpus";
 import type { ReferenceSources } from "../../reference/sources";
+import { namedOptionsIn, taglineOf } from "./options";
 import { classInfoOf, type ClassInfo, type ClassInfoEntry } from "./plan";
 
 /**
@@ -97,7 +98,39 @@ export async function loadClass(input: LoadClassInput): Promise<LoadedClass | nu
     name: localName && localName !== classId ? localName : builtin?.name ?? pack.classEntry?.name ?? classId,
     origin: builtin ? "srd" : "pack",
   });
-  return { info, columnLabels: blocks ? await localColumnLabels(input, blocks) : {} };
+  const [columnLabels] = await Promise.all([blocks ? localColumnLabels(input, blocks) : Promise.resolve({}), localizeTexts(input, info)]);
+  return { info, columnLabels };
+}
+
+/**
+ * The option names written inside a feature (Hunter's Prey, Ranger's Druidic Warrior) and each subclass's one-line summary
+ * in the locale: read from the localized blocks, which keep the English blocks' shape. English or
+ * a missing translation keeps the English text.
+ */
+async function localizeTexts(input: LoadClassInput, info: ClassInfo): Promise<void> {
+  if (input.locale === "en") return;
+  const blocksOf = async (ref: string) => {
+    const resolved = await input.sources.resolve(ref, input.locale).catch(() => null);
+    return resolved ? resolved.blocks.map((entry) => entry.block) : null;
+  };
+  const features = [...info.features, ...info.subclasses.flatMap((subclass) => subclass.features)];
+  await Promise.all([
+    ...features.map(async (feature) => {
+      const choice = feature.choice;
+      const named = choice?.kind === "named" ? choice : choice?.kind === "feat" ? choice.alternatives : undefined;
+      if (!choice || choice.kind === "feature" || !named) return;
+      const blocks = await blocksOf(feature.ref);
+      const names = blocks ? namedOptionsIn(blocks, named) : null;
+      if (!names) return;
+      feature.choice = choice.kind === "feat" ? { ...choice, alternatives: { ...named, options: names } } : { ...choice, options: names };
+    }),
+    ...info.subclasses.map(async (subclass) => {
+      if (!subclass.summaryRef) return;
+      const blocks = await blocksOf(subclass.summaryRef);
+      const summary = blocks ? taglineOf(blocks) : undefined;
+      if (summary) subclass.summary = summary;
+    }),
+  ]);
 }
 
 /**

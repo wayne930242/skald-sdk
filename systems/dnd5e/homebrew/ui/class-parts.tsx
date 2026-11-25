@@ -4,6 +4,8 @@ import { Input } from "@skald/sheet-sdk/components/ui/input";
 import { CLASS_LIMITS, HIT_DICE, type ClassForm, type ClassMulticlassForm, type Progression } from "../domain/class";
 import type { ClassCatalog } from "./class-context";
 import { TextBox } from "./subclass-parts";
+import { ColumnsEditor } from "./class-columns";
+import { ItemPicker, RefLists, ToolChips } from "./ref-picker";
 
 type Parts = { form: ClassForm; set(patch: Partial<ClassForm>): void; catalog: ClassCatalog };
 type Option = { value: string; label: string };
@@ -54,8 +56,6 @@ function Num({ label, value, change, min = 0, max }: { label: string; value: num
   );
 }
 
-const refs = (text: string) => text.split(",").map((s) => s.trim()).filter(Boolean);
-
 function useNames(catalog: ClassCatalog) {
   const zh = useLocale() === "zh-TW";
   const l = zh ? "zh" : "en";
@@ -96,18 +96,19 @@ export function ChassisStep({ form, set, catalog }: Parts) {
         </label>
       </div>
       {from !== "any" && <Checks legend={t("skillList")} options={skills} value={from} change={(v) => set({ skillChoice: { ...form.skillChoice, from: v } })} />}
-      <TextBox label={t("toolGrants")} value={form.toolGrants.join(", ")} change={(v) => set({ toolGrants: refs(v) })} />
+      <RefLists catalog={catalog} />
+      <ToolChips label={t("toolGrants")} catalog={catalog} value={form.toolGrants} change={(toolGrants) => set({ toolGrants })} />
       <div className="grid gap-3 sm:grid-cols-2">
         <TextBox label={t("toolCategory")} value={choice?.category ?? ""} change={(category) => set({ toolChoice: category ? { category, count: choice?.count ?? 1 } : null })} />
         {choice && <Num label={t("toolCount")} value={choice.count} min={1} change={(count) => set({ toolChoice: { ...choice, count } })} />}
       </div>
-      <Equipment form={form} set={set} />
+      <Equipment form={form} set={set} catalog={catalog} />
       <Multiclass form={form} set={set} catalog={catalog} />
     </div>
   );
 }
 
-function Equipment({ form, set }: Omit<Parts, "catalog">) {
+function Equipment({ form, set, catalog }: Parts) {
   const t = useTranslations("homebrew.class");
   const tb = useTranslations("homebrew");
   const options = form.startingEquipment;
@@ -125,7 +126,8 @@ function Equipment({ form, set }: Omit<Parts, "catalog">) {
           </div>
           {o.items.map((item, k) => (
             <div key={k} className="grid gap-2 sm:grid-cols-[2fr_2fr_1fr_auto]">
-              <TextBox label={t("itemRef")} value={item.ref} change={(ref) => put(i, { ...o, items: o.items.map((x, j) => (j === k ? { ...x, ref } : x)) })} />
+              <ItemPicker label={t("itemRef")} catalog={catalog} value={item.ref} custom={item.displayName}
+                change={(next) => put(i, { ...o, items: o.items.map((x, j) => (j === k ? { ...x, ...next } : x)) })} />
               <TextBox label={t("itemName")} value={item.displayName}
                 change={(displayName) => put(i, { ...o, items: o.items.map((x, j) => (j === k ? { ...x, displayName } : x)) })} />
               <Num label={t("qty")} value={item.qty} min={1} change={(qty) => put(i, { ...o, items: o.items.map((x, j) => (j === k ? { ...x, qty } : x)) })} />
@@ -177,7 +179,7 @@ function Multiclass({ form, set, catalog }: Parts) {
           change={(v) => put({ skills: v === "none" ? null : { count: skills?.count ?? 1, from: v === "any" ? "any" : own === "any" ? "any" : [...own] } })} />
         {skills && <Num label={t("mcSkills")} value={skills.count} min={1} max={4} change={(count) => put({ skills: { ...skills, count } })} />}
       </div>
-      <TextBox label={t("mcToolGrant")} value={tools?.grant?.join(", ") ?? ""} change={(v) => putTools({ ...tools, grant: refs(v) })} />
+      <ToolChips label={t("mcToolGrant")} catalog={catalog} value={tools?.grant ?? []} change={(grant) => putTools({ ...tools, grant })} />
       <div className="grid gap-3 sm:grid-cols-2">
         <TextBox label={t("mcToolCategory")} value={tools?.choice?.category ?? ""}
           change={(category) => {
@@ -227,11 +229,8 @@ export function CastingStep({ form, set, catalog }: Parts) {
 
 export function LadderStep({ form, set, catalog }: Parts) {
   const t = useTranslations("homebrew.class");
-  const tb = useTranslations("homebrew");
   const names = useNames(catalog);
   const builtin = catalog.context.builtin;
-  const putColumn = (i: number, next: ClassForm["columns"][number] | null) =>
-    set({ columns: next ? form.columns.map((c, j) => (j === i ? next : c)) : form.columns.filter((_, j) => j !== i) });
   return (
     <div className="space-y-4" data-class-step="ladder">
       <div className="grid gap-3 sm:grid-cols-2">
@@ -250,30 +249,7 @@ export function LadderStep({ form, set, catalog }: Parts) {
           {t("extraAttack")}
         </label>
       </div>
-      <fieldset className="space-y-2">
-        <legend className="font-medium">{t("columns")}</legend>
-        {form.columns.map((col, i) => (
-          <div key={i} className="space-y-2 rounded border p-2" data-class-column={i}>
-            <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
-              <TextBox label={t("columnNameZh")} value={col.nameZh} change={(nameZh) => putColumn(i, { ...col, nameZh })} />
-              <TextBox label={t("columnNameEn")} value={col.nameEn} change={(nameEn) => putColumn(i, { ...col, nameEn })} />
-              <Button type="button" size="sm" variant="ghost" className="self-end" onClick={() => putColumn(i, null)}>{tb("remove")}</Button>
-            </div>
-            <div className="grid grid-cols-4 gap-1 sm:grid-cols-10">
-              {col.values.map((v, k) => (
-                <Input key={k} aria-label={t("columnCell", { column: col.nameZh || col.nameEn || String(i + 1), level: k + 1 })} value={v}
-                  maxLength={CLASS_LIMITS.cell} onChange={(e) => putColumn(i, { ...col, values: col.values.map((x, j) => (j === k ? e.target.value : x)) })} />
-              ))}
-            </div>
-          </div>
-        ))}
-        {form.columns.length < CLASS_LIMITS.columns && (
-          <Button type="button" size="sm" variant="outline"
-            onClick={() => set({ columns: [...form.columns, { nameEn: "", nameZh: "", values: Array.from({ length: 20 }, () => "") }] })}>
-            {t("addColumn")}
-          </Button>
-        )}
-      </fieldset>
+      <ColumnsEditor form={form} set={set} />
     </div>
   );
 }

@@ -41,7 +41,8 @@ describe("D&D print model: the official sheet's regions", () => {
     // Wizard 3 (d6) / Fighter 2 (d10) at level 5; one Fighter die spent.
     const multiclass = [{ id: "class-1", classId: "fighter", ref: "class:fighter", origin: "srd", name: "戰士", subclass: "", level: 2, hitDie: 10, hitDiceSpent: 1, spellAbility: "none" }];
     const print = model("wizard", false, { multiclass, hitDiceSpent: 0 });
-    expect(print.identity).toMatchObject({ className: "法師 3 · 塑能師 / 戰士 2", subclass: "", level: 5 });
+    // UAT m17: the class box lists the classes, the subclass box each class's subclass.
+    expect(print.identity).toMatchObject({ className: "法師 3 / 戰士 2", subclass: "塑能師", level: 5 });
     expect(print.hitDicePools).toEqual([
       { faces: 6, max: 3, spent: 0 },
       { faces: 10, max: 2, spent: 1 },

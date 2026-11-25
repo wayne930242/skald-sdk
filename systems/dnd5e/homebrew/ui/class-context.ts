@@ -4,7 +4,7 @@ import { builtinChassis, type BuiltinClassChassis, type ClassContext, type Class
 import type { HomebrewItemRecord } from "../domain/types";
 import { refContext, SKILL_FIELDS } from "../domain/wizard-items";
 import { backgroundRefs } from "./background-refs";
-import { namesOf } from "./subclass-context";
+import { legacyWording, localizedTerms, namesOf, termsOf, type RawLegacy } from "./subclass-context";
 
 /** What the class editor needs: the generator context plus localized names for its pickers. */
 export interface ClassCatalog {
@@ -13,6 +13,8 @@ export interface ClassCatalog {
   ids: string[];
   abilityNames: Record<string, Localized>;
   skillNames: Record<string, Localized>;
+  /** Items and base items (built-in and the user's homebrew) the equipment and tool pickers offer; `tool`: a tool kind. */
+  items: Array<{ ref: string; name: Localized; tool: boolean }>;
 }
 
 async function labelsOf(locale: "en" | "zh-TW") {
@@ -23,14 +25,14 @@ async function labelsOf(locale: "en" | "zh-TW") {
   ).default;
   // Raw: the domain generator fills the `{class}`-style placeholders itself.
   const raw = createTranslator({ locale, messages, namespace: "homebrew" }).raw as (key: string) => unknown;
-  return { labels: raw("class.generated") as ClassLabels, options: raw("option") as Record<string, string> };
+  return { labels: raw("class.generated") as ClassLabels, legacy: raw("class.generatedLegacy") as RawLegacy };
 }
 
 const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"];
 
 /** Load the built-in classes (corpus tables and feature ids), labels and refs, only when a class editor opens. */
 export async function loadClassCatalog(rows: readonly HomebrewItemRecord[]): Promise<ClassCatalog> {
-  const [{ default: classes }, corpus, en, zh, enLabels, zhLabels, refs] = await Promise.all([
+  const [{ default: classes }, corpus, en, zh, enLabels, zhLabels, refs, enTerms, zhTerms] = await Promise.all([
     import("@skald/system-dnd5e/data/dnd5e-2024/game/classes.json"),
     loadEnglishCorpus("class"),
     namesOf("en"),
@@ -38,6 +40,8 @@ export async function loadClassCatalog(rows: readonly HomebrewItemRecord[]): Pro
     labelsOf("en"),
     labelsOf("zh-TW"),
     backgroundRefs([...rows]),
+    termsOf("en"),
+    termsOf("zh-TW"),
   ]);
   if (!corpus) throw new Error("Missing class corpus");
   const ids = classes.map((c) => c.id);
@@ -54,16 +58,24 @@ export async function loadClassCatalog(rows: readonly HomebrewItemRecord[]): Pro
     en: en[kind]?.[id] ?? id,
     zh: zh[kind]?.[id] ?? en[kind]?.[id] ?? id,
   });
-  const abilityNames = Object.fromEntries(ABILITIES.map((a) => [a, { en: enLabels.options[a], zh: zhLabels.options[a] }]));
-  const skillNames = Object.fromEntries(
-    Object.keys(SKILL_FIELDS).map((id) => [id, { en: enLabels.options[id] ?? id, zh: zhLabels.options[id] ?? id }]),
-  );
+  // The sheet's and the wizard's terms, so the editor names Wisdom and Perception as they do.
+  const abilityNames = localizedTerms(ABILITIES, enTerms.ability, zhTerms.ability);
+  const skillNames = localizedTerms(Object.keys(SKILL_FIELDS), enTerms.skill, zhTerms.skill, (id) => SKILL_FIELDS[id]);
+  const TOOL_TYPES = ["AT", "T", "GS", "INS"];
+  const items = [...refs.values()].flatMap((info) => {
+    const [kind, id] = info.ref.split(":");
+    if (kind !== "item" && kind !== "baseItem") return [];
+    const local = info.builtin ? zh[kind]?.[id] : undefined;
+    return [{ ref: info.ref, name: { en: info.name, zh: local ?? info.name }, tool: TOOL_TYPES.includes(String(info.meta.type)) }];
+  });
   return {
     ids,
     abilityNames,
     skillNames,
+    items,
     context: {
       labels: { en: enLabels.labels, zh: zhLabels.labels },
+      legacy: legacyWording<ClassLabels>(enLabels.legacy, zhLabels.legacy),
       builtin,
       refs: refContext(refs.values()),
       abilityNames,

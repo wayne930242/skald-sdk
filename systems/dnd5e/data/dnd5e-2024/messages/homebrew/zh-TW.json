@@ -29,7 +29,7 @@
     "kind": {
       "feat": "Feat",
       "spell": "Spell",
-      "item": "Magic item",
+      "item": "Magic Item",
       "species": "Species",
       "background": "Background",
       "subclass": "Subclass",
@@ -64,10 +64,10 @@
     "field": {
       "id": "Entry ID (optional)",
       "name": "Name",
-      "nameEn": "English name",
-      "nameZh": "Traditional Chinese name",
-      "textEn": "English description",
-      "textZh": "Traditional Chinese description",
+      "nameEn": "Name (English)",
+      "nameZh": "Name (Chinese)",
+      "textEn": "Description (English)",
+      "textZh": "Description (Chinese)",
       "category": "Category",
       "repeatable": "Repeatable",
       "rarity": "Rarity",
@@ -94,7 +94,7 @@
       "somatic": "Somatic",
       "material": "Material",
       "materialEn": "Material description (English)",
-      "materialZh": "Material description (Traditional Chinese)",
+      "materialZh": "Material description (Chinese)",
       "concentration": "Concentration",
       "ritual": "Ritual",
       "castingNumber": "Casting time",
@@ -106,7 +106,7 @@
       "durationAmount": "Duration Amount",
       "durationUnit": "Duration Unit",
       "higherEn": "At higher levels (English)",
-      "higherZh": "At higher levels (Traditional Chinese)",
+      "higherZh": "At higher levels (Chinese)",
       "damageDice": "Damage Dice",
       "damageType": "Damage Type",
       "damageDiceHigher": "Additional damage dice per level",
@@ -187,14 +187,14 @@
       "permanent": "Permanent",
       "round": "Round",
       "day": "Day",
-      "str": "Str",
-      "dex": "Dex",
-      "con": "Con",
-      "int": "Int",
-      "wis": "Wis",
-      "cha": "Cha",
+      "str": "Strength",
+      "dex": "Dexterity",
+      "con": "Constitution",
+      "int": "Intelligence",
+      "wis": "Wisdom",
+      "cha": "Charisma",
       "acrobatics": "Acrobatics",
-      "animal-handling": "Animal handling",
+      "animal-handling": "Animal Handling",
       "arcana": "Arcana",
       "athletics": "Athletics",
       "deception": "Deception",
@@ -208,7 +208,7 @@
       "performance": "Performance",
       "persuasion": "Persuasion",
       "religion": "Religion",
-      "sleight-of-hand": "Sleight of hand",
+      "sleight-of-hand": "Sleight of Hand",
       "stealth": "Stealth",
       "survival": "Survival",
       "bard": "Bard",
@@ -229,8 +229,8 @@
       "featureLevel": "Feature level",
       "featureNameZh": "Feature name (Chinese)",
       "featureNameEn": "Feature name (English)",
-      "featureTextZh": "Feature text (Chinese)",
-      "featureTextEn": "Feature text (English)",
+      "featureTextZh": "Feature description (Chinese)",
+      "featureTextEn": "Feature description (English)",
       "relevel": "Changing the level of a saved feature saves it as a new feature; sheets keep the old copy.",
       "spells": "Subclass spells (always prepared)",
       "spellRef": "Spell at level {level}",
@@ -239,8 +239,8 @@
       "casting": "Subclass spellcasting (one-third caster, derived)",
       "ability": "Spellcasting ability",
       "list": "Spell list",
-      "castingTextZh": "Spellcasting text (Chinese)",
-      "castingTextEn": "Spellcasting text (English)",
+      "castingTextZh": "Spellcasting description (Chinese)",
+      "castingTextEn": "Spellcasting description (English)",
       "cantrips": "Cantrips known",
       "prepared": "Prepared spells",
       "addBreakpoint": "Add level",
@@ -249,14 +249,9 @@
       "derivedNote": "Derived values, not SRD: slots use the SRD 5.2.1 multiclass spellcaster table at one-third of the class level, rounded up.",
       "slotLevel": "Level {n}",
       "classLevel": "Class level",
-      "features": "{count, plural, one {# feature} other {# features}}",
+      "features": "Subclass and {count, plural, one {# feature} other {# features}}: {total} entries",
       "partial": "Part of the subclass was saved. Press save again to finish.",
       "confirmDelete": "Delete “{name}” and its {count} feature rows? This cannot be undone.",
-      "abilityName": {
-        "int": "Intelligence",
-        "wis": "Wisdom",
-        "cha": "Charisma"
-      },
       "generated": {
         "features": "Features",
         "spellsName": "{sub} Spells",
@@ -269,6 +264,15 @@
         "cantrips": "Cantrips",
         "prepared": "Prepared Spells"
       },
+      "generatedLegacy": {
+        "alwaysPrepared": "When you reach a {class} level specified in the {sub} Spells table, you thereafter always have the listed spells prepared.",
+        "prepared": "Prepared Spells",
+        "ability": {
+          "int": "Intelligence",
+          "wis": "Wisdom",
+          "cha": "Charisma"
+        }
+      },
       "issue": {
         "parent": "Parent class",
         "features": "Number of features (40 at most)",
@@ -276,7 +280,23 @@
         "feature": "Feature name or level",
         "spellcasting": "Subclass spellcasting",
         "breakpoints": "Cantrip or prepared levels",
-        "spells": "Subclass spells"
+        "spells": "Subclass spells",
+        "spellLevel": "Subclass spell levels"
+      },
+      "spellListNote": "Suggestions list {list} spells the class can cast at each level.",
+      "spellOtherLists": "Also suggest spells from other lists",
+      "spellTooHigh": "{spell} is a level {spellLevel} spell; the class casts up to level {max} here.",
+      "spellCantrip": "{spell} is a cantrip and cannot be a subclass spell.",
+      "removeSpell": "Remove {spell}",
+      "reparent": "Its parent class was deleted. Choose a parent class again.",
+      "move": {
+        "title": "Move to {parent}? These parts do not fit it:",
+        "casting": "Remove the subclass spellcasting ({parent} is not a third caster).",
+        "spells": "Remove the spells at class level {level}: {spells}",
+        "feature": "Move {feature} from level {from} to level {to}",
+        "separator": ", ",
+        "restore": "Nothing changes until you confirm. Choosing a class that fits them again brings them back.",
+        "confirm": "Move and adjust"
       }
     },
     "class": {
@@ -307,7 +327,7 @@
       "skillCount": "Skills to choose",
       "skillAny": "Any skill",
       "skillList": "Skill list",
-      "toolGrants": "Tool proficiencies (refs, comma separated)",
+      "toolGrants": "Tool proficiencies",
       "toolChoice": "Tool choice",
       "toolCategory": "Tool category",
       "toolCount": "Number of tools",
@@ -322,12 +342,12 @@
       "gp": "Gold (GP)",
       "addOption": "Add option",
       "addItem": "Add item",
-      "itemRef": "Item ref",
-      "itemName": "Display name",
+      "itemRef": "Item",
+      "itemName": "Display name (optional)",
       "qty": "Quantity",
       "multiclass": "Multiclass",
       "mcRequires": "Requires 13 in",
-      "mcRequiresNote": "None checked means the primary abilities.",
+      "mcRequiresNote": "If none are checked, the primary abilities apply.",
       "mcMode": "Requirement",
       "mcModeOption": {
         "all": "All of them",
@@ -342,7 +362,7 @@
         "any": "Any skill",
         "class": "This class's skill list"
       },
-      "mcToolGrant": "Tools gained (refs, comma separated)",
+      "mcToolGrant": "Tool proficiencies gained",
       "mcToolCategory": "Tool choice category",
       "mcToolCount": "Tools to choose",
       "castingKind": "Spellcasting",
@@ -353,7 +373,7 @@
         "pact": "Pact Magic"
       },
       "castingAbility": "Spellcasting ability",
-      "countsLike": "Cantrip and prepared counts like",
+      "countsLike": "Cantrips and prepared spells: same as",
       "list": "Spell list",
       "ownList": "Own list",
       "borrow": "Borrow: {class}",
@@ -364,7 +384,7 @@
         "rogue": "Like the Rogue (adds 10)"
       },
       "subclassLike": "Subclass levels",
-      "subclassLikeOption": "Like {class}: {levels}",
+      "subclassLikeOption": "Like the {class}: {levels}",
       "extraAttack": "Extra Attack at level 5",
       "mastery": "Weapon Mastery",
       "masteryOption": {
@@ -384,9 +404,8 @@
       "table": "Progression table",
       "progress": "Saved {done} of {total} rows",
       "partial": "Part of the class was saved. Press save again to finish.",
-      "features": "{count, plural, one {# feature} other {# features}}",
+      "features": "Class and {count, plural, one {# feature} other {# features}}: {total} entries",
       "confirmDelete": "Delete “{name}” and its {count} feature rows? This cannot be undone.",
-      "confirmDeleteSubclasses": "Delete “{name}” and its {count} feature rows? These subclasses stay, without their class: {subclasses}. This cannot be undone.",
       "issue": {
         "id": "Class id (not a built-in class)",
         "hitDie": "Hit die",
@@ -398,7 +417,7 @@
         "unarmoredDefense": "Unarmored Defense",
         "equipment": "Starting equipment",
         "casting": "Spellcasting",
-        "countsLike": "Cantrip and prepared counts",
+        "countsLike": "Cantrips and prepared spells",
         "list": "Spell list",
         "asi": "Ability Score Improvement levels",
         "subclassLike": "Subclass levels",
@@ -437,7 +456,45 @@
         "extraAttackText": "You can attack twice instead of once whenever you take the Attack action on your turn.",
         "epicBoonName": "Epic Boon",
         "epicBoonText": "Choose an Epic Boon feat, or a different feat whose prerequisites you meet."
-      }
-    }
+      },
+      "generatedLegacy": {
+        "spellcastingText": "You cast spells with {ability} from the {list} spell list.",
+        "pactMagicText": "You cast spells with {ability} through pact magic, from the {list} spell list.",
+        "ability": {
+          "str": "Str",
+          "dex": "Dex",
+          "con": "Con",
+          "int": "Int",
+          "wis": "Wis",
+          "cha": "Cha"
+        }
+      },
+      "columnLevels": "{column}: values for levels 1–20",
+      "columnLevel": "Lv. {level}",
+      "fillAll": "Fill all levels",
+      "fillValue": "Value for every level",
+      "keepSubclasses": "These subclasses stay, without a parent class; open one to choose a new parent:",
+      "tableShort": {
+        "level": "Lv.",
+        "proficiency": "PB",
+        "features": "Features",
+        "cantrips": "Cantrips",
+        "prepared": "Prepared",
+        "weaponMastery": "Mastery",
+        "slots": "Slots",
+        "slotLevel": "Slot Lv.",
+        "slotGroup": "Spell Slots"
+      },
+      "tableScroll": "← Swipe to see the whole table →",
+      "tablePending": "Fill in the required fields to see the progression table.",
+      "addTool": "Add tool",
+      "removeRef": "Remove {name}",
+      "toolSearch": "Search {field}",
+      "toolHint": "Pick a tool from the list, or type one that is not listed."
+    },
+    "usageNote": "Each feature of a class or subclass counts as its own entry.",
+    "deleteTitle": "Delete “{name}”",
+    "deleting": "Deleting…",
+    "cancel": "Cancel"
   }
 }

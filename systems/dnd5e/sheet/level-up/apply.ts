@@ -6,7 +6,8 @@ import { PACK_ORIGIN } from "@skald/sheet-sdk/modules/character/pack-text";
 import { classDerivedPatch } from "../play/class-model";
 import { ABILITIES, featSheetPatch, type Ability } from "../play/play-model";
 import { newEntryId } from "../compendium-rows";
-import { LEVEL_UP_RULES, offeredFeatures, sheetRefs, type LevelUpPlan } from "./plan";
+import { optionFields } from "./option-row";
+import { LEVEL_UP_RULES, offeredFeatures, sheetRefs, slotsDefaultOn, slotsFor, type LevelUpPlan } from "./plan";
 
 /**
  * Applying a level-up offer (phase 2b §4.3): one new data object, and a targeted undo of exactly
@@ -29,7 +30,7 @@ export interface LevelUpChoices {
   subclass?: string | null;
   /** Required when the plan has an ASI; absent = decide later (nothing written). */
   asi?: AsiChoice | null;
-  /** Write the new slot totals; default: the plan's `slots.matches`. */
+  /** Write the new slot totals; default: `slotsDefaultOn` of the offer (`slotsFor` the picked subclass). */
   slots?: boolean;
   /** Features that start unchecked (`plan.extraAttackStacks`) the player checked anyway. */
   checked?: readonly string[];
@@ -44,6 +45,14 @@ export interface LevelUpChoices {
   };
   /** Add: set the new class's Unarmored Defense when settable; default true. */
   unarmoredDefense?: boolean;
+  /**
+   * The picked option of each offered feature that is a choice (`LevelUpFeature.choice`), by the
+   * feature's ref; absent = 稍後再選. A `feature` option by its ref, a `feat` by its ref and name, a
+   * `named` option (or a feat choice's alternative) by its name.
+   */
+  options?: Readonly<Record<string, { ref?: string; name: string }>>;
+  /** The row name of a feature with a named option picked; default "Feature: Option". */
+  optionRowName?: (feature: string, option: string) => string;
 }
 
 /**
@@ -83,7 +92,7 @@ export interface LevelUpUndo {
 
 /** What to open after apply: the feats tab (another feat, an epic boon), the spells tab (new counts). */
 export interface LevelUpFollowUp {
-  feats?: "general" | "epicBoon";
+  feats?: "general" | "epicBoon" | "fightingStyle";
   /** `castingClass` on a multiclass run: rows added from the spells tab get it (`""` = the starting class). */
   spells?: { list: string; castingClass?: string };
 }
@@ -171,10 +180,10 @@ export function applyLevelUp(
     else undo.rows.push({ list, id, field, before: current[field], written: value });
   };
   let copied = false;
-  const append = (tab: "features" | "feats", ref: string, name: string) => {
+  const append = (tab: "features" | "feats", ref: string, name: string, extra?: Record<string, unknown>) => {
     const built = buildRow(tab, ref, name);
     if (!built) return;
-    addRow(built.list, built.row);
+    addRow(built.list, extra ? { ...built.row, ...extra } : built.row);
     copied ||= copiesText(built.row);
   };
 
@@ -206,10 +215,36 @@ export function applyLevelUp(
   const checked = new Set(choices.checked ?? []);
   for (const ref of plan.extraAttackStacks ?? []) if (!checked.has(ref)) unchecked.add(ref);
   const onSheet = sheetRefs(data);
+  const rowName = choices.optionRowName ?? ((feature: string, option: string) => `${feature}: ${option}`);
   for (const feature of offeredFeatures(plan, pickedSubclass?.ref ?? plan.subclass.known?.ref ?? null)) {
     if (unchecked.has(feature.ref) || onSheet.has(feature.ref)) continue;
     onSheet.add(feature.ref);
+    const choice = feature.choice;
+    const option = choice ? choices.options?.[feature.ref] : undefined;
+    // A named option: of a `named` choice, or one a Fighting Style names instead of a feat (UAT F006).
+    const named = choice?.kind === "named" ? choice : choice?.kind === "feat" && !option?.ref ? choice.alternatives : undefined;
+    if (named && option) {
+      const index = named.options.indexOf(option.name);
+      if (index < 0) throw new RangeError(`Not an option of ${feature.ref}: ${option.name}`);
+      // The pick also as row fields: a built-in row shows its catalog name, which would hide it in the name.
+      append("features", feature.ref, rowName(feature.name, option.name), optionFields(named.ids[index] ?? option.name, option.name));
+      continue;
+    }
     append("features", feature.ref, feature.name);
+    if (choice?.kind === "feature" && option) {
+      const picked = choice.options.find((candidate) => candidate.ref === option.ref);
+      if (!picked) throw new RangeError(`Not an option of ${feature.ref}: ${option.ref}`);
+      if (!onSheet.has(picked.ref)) append("features", picked.ref, picked.name);
+      onSheet.add(picked.ref);
+    } else if (choice?.kind === "feat") {
+      if (option?.ref?.startsWith("feat:")) {
+        if (!onSheet.has(option.ref)) append("feats", option.ref, option.name);
+        onSheet.add(option.ref);
+        for (const [field, value] of Object.entries(featSheetPatch(option.ref) ?? {})) write(field, value);
+      } else {
+        followUp.feats ??= choice.category;
+      }
+    }
   }
 
   if (plan.asi && choices.asi?.kind === "abilities") {
@@ -244,13 +279,14 @@ export function applyLevelUp(
   }
   if (plan.unarmoredDefense?.settable && choices.unarmoredDefense !== false) write("unarmoredDefense", plan.unarmoredDefense.value);
 
-  if (plan.slots && plan.slots.changed && (choices.slots ?? plan.slots.matches)) {
-    plan.slots.after.forEach((total, index) => {
+  const slots = slotsFor(plan, pickedSubclass?.ref ?? null);
+  if (slots && slots.changed && (choices.slots ?? slotsDefaultOn(slots))) {
+    slots.after.forEach((total, index) => {
       if (num(data[`slot${index + 1}Total`]) !== total) write(`slot${index + 1}Total`, total);
     });
-    if (plan.slots.pact) {
-      if (num(data.pactSlots) !== plan.slots.pact.after.slots) write("pactSlots", plan.slots.pact.after.slots);
-      if (num(data.pactSlotLevel) !== plan.slots.pact.after.level) write("pactSlotLevel", plan.slots.pact.after.level);
+    if (slots.pact) {
+      if (num(data.pactSlots) !== slots.pact.after.slots) write("pactSlots", slots.pact.after.slots);
+      if (num(data.pactSlotLevel) !== slots.pact.after.level) write("pactSlotLevel", slots.pact.after.level);
     }
   }
 

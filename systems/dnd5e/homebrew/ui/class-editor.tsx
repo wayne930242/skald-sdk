@@ -4,14 +4,16 @@ import { Button } from "@skald/sheet-sdk/components/ui/button";
 import { loadBuiltinIdentity, loadOpenPackSchemaCheck } from "../../content-pack/open/load";
 import { nameKey } from "../../content-pack/domain/identity";
 import { assembleOpenPack } from "../domain/assemble";
-import { classCodec, generatedFeatures, type ClassForm, type ClassLabels, type GeneratedFeature } from "../domain/class";
+import { classCodec, EN_TABLE_LABELS, generatedFeatures, type ClassForm, type ClassLabels, type GeneratedFeature } from "../domain/class";
 import { newHomebrewId } from "../domain/forms";
 import { HOMEBREW_LIMITS } from "../domain/limits";
+import { fillSpaced } from "../domain/spacing";
 import type { HomebrewItemInput, HomebrewItemRecord, HomebrewPackRecord } from "../domain/types";
 import type { DndHomebrewStore, HomebrewResult } from "../store-port";
 import { loadClassCatalog, type ClassCatalog } from "./class-context";
 import { CastingStep, ChassisStep, FeatureSteps, LadderStep } from "./class-parts";
-import { ClassPreview } from "./class-table";
+import { ClassTable, GeneratedFeatures } from "./class-table";
+import { EditorHeading } from "./editor-heading";
 import { ImportedBlocks } from "./imported-blocks";
 import { TextBox } from "./subclass-parts";
 
@@ -93,7 +95,7 @@ function ClassFormView({ row, rows, pack, store, run, reload, catalog, initial }
   const className = { en: draft.nameEn.trim() || draft.nameZh.trim(), zh: draft.nameZh.trim() || draft.nameEn.trim() };
   const generated = generatedFeatures(form, ctx).map((g) => ({
     level: g.level,
-    name: ctx.labels[zh ? "zh" : "en"][NAME_LABEL[g.generated]].replace(/\{class\}/g, className[zh ? "zh" : "en"]),
+    name: fillSpaced(ctx.labels[zh ? "zh" : "en"][NAME_LABEL[g.generated]], { class: className[zh ? "zh" : "en"] }),
   }));
   const issueName = (x: string) => (t.has(`class.issue.${x}`) ? t(`class.issue.${x}`) : t.has(`field.${x}`) ? t(`field.${x}`) : x);
 
@@ -158,48 +160,66 @@ function ClassFormView({ row, rows, pack, store, run, reload, catalog, initial }
         void run(save);
       }}
     >
-      <h3 className="font-heading text-xl">{t("kind.class")}</h3>
-      {!owned && (
-        <label className="block space-y-1 text-sm">
-          <span>{t("class.copyFrom")}</span>
-          <select
-            className="block w-full rounded border bg-background p-2"
-            defaultValue=""
-            onChange={(e) => {
-              const from = e.target.value;
-              const base = from ? classCodec.copyFrom(from, ctx.builtin) : classCodec.empty();
-              const { id: _id, nameEn, nameZh, textEn, textZh, features } = draft;
-              set({ ...base, id: draft.id, nameEn, nameZh, textEn, textZh, features });
-            }}
-          >
-            <option value="">{t("class.copyNone")}</option>
-            {catalog.ids.map((c) => (
-              <option key={c} value={c}>
-                {ctx.classNames[c]?.[zh ? "zh" : "en"] ?? c}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
-      {!owned && <p className="text-sm text-muted-foreground">{t("class.copyNote")}</p>}
-      <div className="grid gap-3 sm:grid-cols-2">
-        <TextBox label={t("field.nameZh")} value={draft.nameZh} change={(nameZh) => set({ nameZh })} />
-        <TextBox label={t("field.nameEn")} value={draft.nameEn} change={(nameEn) => set({ nameEn })} />
-        <TextBox long label={t("field.textZh")} value={draft.textZh} change={(textZh) => set({ textZh })} />
-        <TextBox long label={t("field.textEn")} value={draft.textEn} change={(textEn) => set({ textEn })} />
-      </div>
-      {(["chassis", "casting", "ladder", "features"] as const).map((step) => (
-        <details key={step} open={step === "chassis"} className="rounded border p-3">
-          <summary className="cursor-pointer font-medium">{t(`class.step.${step}`)}</summary>
-          <div className="mt-3">
-            {step === "chassis" && <ChassisStep {...parts} />}
-            {step === "casting" && <CastingStep {...parts} />}
-            {step === "ladder" && <LadderStep {...parts} />}
-            {step === "features" && <FeatureSteps form={draft} set={set} generated={generated} />}
+      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:items-start xl:gap-5">
+        <div className="min-w-0 space-y-5">
+          <EditorHeading>{t("kind.class")}</EditorHeading>
+          {!owned && (
+            <label className="block space-y-1 text-sm">
+              <span>{t("class.copyFrom")}</span>
+              <select
+                className="block w-full rounded border bg-background p-2"
+                defaultValue=""
+                onChange={(e) => {
+                  const from = e.target.value;
+                  const base = from ? classCodec.copyFrom(from, ctx.builtin) : classCodec.empty();
+                  const { id: _id, nameEn, nameZh, textEn, textZh, features } = draft;
+                  set({ ...base, id: draft.id, nameEn, nameZh, textEn, textZh, features });
+                }}
+              >
+                <option value="">{t("class.copyNone")}</option>
+                {catalog.ids.map((c) => (
+                  <option key={c} value={c}>
+                    {ctx.classNames[c]?.[zh ? "zh" : "en"] ?? c}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          {!owned && <p className="text-sm text-muted-foreground">{t("class.copyNote")}</p>}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <TextBox label={t("field.nameZh")} value={draft.nameZh} change={(nameZh) => set({ nameZh })} />
+            <TextBox label={t("field.nameEn")} value={draft.nameEn} change={(nameEn) => set({ nameEn })} />
+            <TextBox long label={t("field.textZh")} value={draft.textZh} change={(textZh) => set({ textZh })} />
+            <TextBox long label={t("field.textEn")} value={draft.textEn} change={(textEn) => set({ textEn })} />
           </div>
-        </details>
-      ))}
-      {preview && <ClassPreview rows={preview} zh={zh} />}
+          {(["chassis", "casting", "ladder", "features"] as const).map((step) => (
+            <details key={step} open={step === "chassis"} className="rounded border p-3">
+              <summary className="cursor-pointer font-medium">{t(`class.step.${step}`)}</summary>
+              <div className="mt-3">
+                {step === "chassis" && <ChassisStep {...parts} />}
+                {step === "casting" && <CastingStep {...parts} />}
+                {step === "ladder" && <LadderStep {...parts} />}
+                {step === "features" && <FeatureSteps form={draft} set={set} generated={generated} />}
+              </div>
+            </details>
+          ))}
+        </div>
+        {/* Desktop: the live table stays beside the form while it scrolls; phones keep it after the steps. */}
+        <aside
+          className={`mt-5 min-w-0 space-y-2 xl:sticky xl:top-4 xl:mt-0 xl:max-h-[calc(100dvh-2rem)] xl:overflow-y-auto ${preview ? "" : "hidden xl:block"}`}
+          data-class-table-aside
+        >
+          <h4 className="text-sm text-muted-foreground">{t("class.table")}</h4>
+          {preview ? (
+            <div data-class-preview>
+              <ClassTable head={preview[0]} zh={zh} labels={{ en: EN_TABLE_LABELS, zh: ctx.labels.zh }} />
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">{t("class.tablePending")}</p>
+          )}
+        </aside>
+      </div>
+      {preview && <GeneratedFeatures rows={preview} zh={zh} />}
       {progress && <p role="status">{t("class.progress", progress)}</p>}
       {problem && <p role="alert">{problem}</p>}
       <Button type="submit">{t("save")}</Button>

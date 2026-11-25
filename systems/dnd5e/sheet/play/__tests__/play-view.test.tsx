@@ -234,7 +234,8 @@ describe("D&D play view: the 角色 tab (T4e)", () => {
     const tab = view().querySelector("[data-play-character-tab]") as HTMLElement;
     expect(tab.querySelectorAll("input, textarea, select")).toHaveLength(0);
     expect(within(tab).getByRole("heading", { name: "艾琳" })).toBeInTheDocument();
-    expect(tab).toHaveTextContent("法師 · 塑能師 · 1級");
+    // UAT m15: the class line and level are in the sheet's header strip, on every tab.
+    expect(view().querySelector("[data-play-class-line]")).toHaveTextContent("法師 · 塑能師 · 1 級");
     expect(tab).toHaveTextContent("精靈 · 高等精靈血系");
     expect(tab).toHaveTextContent("智者");
     expect(tab).toHaveTextContent("中立善良");

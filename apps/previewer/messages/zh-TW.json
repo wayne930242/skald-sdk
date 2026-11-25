@@ -3,6 +3,12 @@
     "title": "Skald 角色卡預覽器",
     "intro": "以編輯、遊玩或列印模式開啟系統的角色卡。角色資料只存在這個瀏覽器（localStorage），不會傳到任何地方。",
     "language": "語言",
+    "systemPack": {
+      "title": "預覽系統擴充包",
+      "note": "請選擇 skald/system-pack/v1 格式的 JSON 檔。擴充包與角色變更只留在這個分頁，重新整理就會清除。創角精靈不能離線執行，請到網站上試跑。",
+      "rules": "規則速查",
+      "failed": "無法開啟這個擴充包。"
+    },
     "systems": {
       "fate-condensed": "Fate Condensed",
       "dnd5e-2024": "D&D 2024（SRD 5.2.1）"

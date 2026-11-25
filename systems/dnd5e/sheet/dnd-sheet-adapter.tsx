@@ -7,6 +7,7 @@ import type { EditorHandlers } from "@skald/sheet-sdk/modules/sheet-schema";
 import type { SheetAdapterInput, SheetAdapterOutput } from "@skald/sheet-sdk/modules/systems/ui/system-plugin-ui";
 import type { CharacterUpdater } from "./compendium-dialog";
 import type { CompendiumDialogTab, CompendiumStart } from "./compendium-rows";
+import { presentRefs } from "./compendium-present";
 import type { CharacterReferenceRow, ReferenceRequest } from "./reference-dialog";
 import type { LevelUpRequest } from "./play/play-context";
 import { useDevicePacks } from "./use-device-packs";
@@ -98,7 +99,7 @@ export function useDnd5eSheetAdapter({ system, initialData, inTable = false }: S
       },
       openCompendium: (data, setData) => {
         revalidate();
-        setCompendium({ update: (updater) => setData(updater), ...levelOf(data), start: { tab: lastTab.current } });
+        setCompendium({ update: (updater) => setData(updater), ...levelOf(data), start: { tab: lastTab.current, present: presentRefs(data) } });
       },
     }),
     [revalidate],
@@ -120,7 +121,7 @@ export function useDnd5eSheetAdapter({ system, initialData, inTable = false }: S
     (update: CharacterUpdater, character?: Record<string, unknown>, start?: CompendiumStart) => {
       revalidate();
       if (start) lastTab.current = start.tab;
-      setCompendium({ update, ...levelOf(character), start: start ?? { tab: lastTab.current } });
+      setCompendium({ update, ...levelOf(character), start: { ...(start ?? { tab: lastTab.current }), present: presentRefs(character) } });
     },
     [revalidate],
   );

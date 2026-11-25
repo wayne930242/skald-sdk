@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import type { PrintPaper } from "@skald/sheet-sdk/modules/systems/ui/system-print";
 import { signed } from "../sheet/play/play-model";
 import { PrintPage } from "@skald/sheet-sdk/modules/character/ui/print/kit/print-page";
@@ -189,22 +189,34 @@ export function Page1({ model, labels, paper, frames, identity: identityView }: 
         </Box>
         <Box region="hitDice" className="dnd-print-hd">
           <h3>{print("hitDice.title")}</h3>
-          <div>
-            <span className="dnd-print-label">{print("hitDice.spent")}</span>
-            <span className="dnd-print-value">
-              {model.hitDicePools.length > 1
-                ? model.hitDicePools.every((pool) => pool.spent === null)
-                  ? ""
-                  : model.hitDicePools.map((pool) => `d${pool.faces} ${pool.spent ?? ""}`).join(" · ")
-                : model.hitDice.spent ?? ""}
-            </span>
-          </div>
-          <div>
-            <span className="dnd-print-label">{print("hitDice.max")}</span>
-            <span className="dnd-print-value">
-              {model.hitDicePools.map((pool) => print("hitDice.dice", { max: pool.max, faces: pool.faces })).join(" + ")}
-            </span>
-          </div>
+          {model.hitDicePools.length > 1 ? (
+            // Several die sizes (UAT m17, M13): one line per die, the labels above the values.
+            <div className="dnd-print-hd-lines" data-print-hit-dice-lines>
+              <span />
+              <span className="dnd-print-label">{print("hitDice.spent")}</span>
+              <span className="dnd-print-label">{print("hitDice.max")}</span>
+              {model.hitDicePools.map((pool) => (
+                <Fragment key={pool.faces}>
+                  <span className="dnd-print-hd-die" data-print-hit-die={pool.faces}>{`d${pool.faces}`}</span>
+                  <span className="dnd-print-value">{pool.spent ?? ""}</span>
+                  <span className="dnd-print-value">{pool.max}</span>
+                </Fragment>
+              ))}
+            </div>
+          ) : (
+            <>
+              <div>
+                <span className="dnd-print-label">{print("hitDice.spent")}</span>
+                <span className="dnd-print-value">{model.hitDice.spent ?? ""}</span>
+              </div>
+              <div>
+                <span className="dnd-print-label">{print("hitDice.max")}</span>
+                <span className="dnd-print-value">
+                  {model.hitDicePools.map((pool) => print("hitDice.dice", { max: pool.max, faces: pool.faces })).join(" + ")}
+                </span>
+              </div>
+            </>
+          )}
         </Box>
         <Box region="death" className="dnd-print-ds">
           <h3>{print("death.title")}</h3>

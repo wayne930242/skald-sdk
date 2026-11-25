@@ -1,0 +1,23 @@
+{
+  "$schema": "../../../data/schemas/template.schema.json",
+  "id": "lantern-bearers-sheet",
+  "name": "提燈人",
+  "version": "1.0.0",
+  "schemaId": "lantern-bearers",
+  "schemaVersion": "1.0.0",
+  "pages": [
+    {
+      "id": "main",
+      "layout": { "type": "stack" },
+      "children": [
+        { "type": "field-ref", "fieldId": "name" },
+        { "type": "field-ref", "fieldId": "origin" },
+        { "type": "field-ref", "fieldId": "might" },
+        { "type": "field-ref", "fieldId": "grace" },
+        { "type": "field-ref", "fieldId": "wits" },
+        { "type": "field-ref", "fieldId": "oil" },
+        { "type": "field-ref", "fieldId": "gear" }
+      ]
+    }
+  ]
+}

@@ -13,6 +13,7 @@ export type ZhFile =
   | "messages/zh-TW.json"
   | "messages/economy/zh-TW.json"
   | "messages/edit/zh-TW.json"
+  | "messages/homebrew/zh-TW.json"
   | "messages/play/zh-TW.json"
   | "messages/play-tabs/zh-TW.json"
   | "messages/print/zh-TW.json"

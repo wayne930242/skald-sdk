@@ -64,7 +64,7 @@ it("copies Wizard, saves generated rows, then edits, re-levels and changes the A
   await closed();
   expect(keys(store)).toEqual(["ember-sage", ...WIZARD_GENERATED].sort());
   expect(items(store).filter((r) => r.kind === "classFeature").every((r) => r.payload.entry!.meta!.generated)).toBe(true);
-  expect(screen.getByText(`${WIZARD_GENERATED.length} features`)).toBeTruthy();
+  expect(screen.getByText(`Class and ${WIZARD_GENERATED.length} features: ${WIZARD_GENERATED.length + 1} entries`)).toBeTruthy();
 
   await reopen();
   expect(document.querySelectorAll("[data-class-table] tbody tr")).toHaveLength(20);
@@ -162,12 +162,21 @@ it("offers the saved class as a subclass parent and under a spell's classes, and
   const classes = screen.getAllByLabelText(m.field.classes).find((el) => el.tagName === "SELECT")!;
   expect(within(classes).getByRole("option", { name: "Ember Sage" })).toHaveProperty("value", "ember-sage");
 
-  const row = screen.getByText(`${WIZARD_GENERATED.length} features`).parentElement!;
-  const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
+  const row = screen.getByText(`Class and ${WIZARD_GENERATED.length} features: ${WIZARD_GENERATED.length + 1} entries`).parentElement!;
+  const saveItems = vi.spyOn(store, "saveItems");
+  const deleteItem = vi.spyOn(store, "deleteItem");
   fireEvent.click(within(row).getByRole("button", { name: m.delete }));
+  const dialog = within(await screen.findByRole("alertdialog"));
+  expect(dialog.getByRole("heading").textContent).toBe("Delete “Ember Sage”");
+  expect(within(dialog.getByRole("list")).getByText("Circle of Cinders")).toBeTruthy();
+  fireEvent.click(dialog.getByRole("button", { name: m.delete }));
+  // Only the deleted row is busy; the page stays usable while the batch runs.
+  expect(within(row).getByRole("status").textContent).toBe(m.deleting);
+  expect(button(`Add ${m.kind.feat}`)).not.toBeDisabled();
   await waitFor(() => expect(keys(store)).toEqual(["ember-sage/circle-of-cinders", "ember-sage/circle-of-cinders/circle-of-cinders-l3"].sort()));
-  expect(confirm.mock.calls[0][0]).toContain("Circle of Cinders");
-  confirm.mockRestore();
+  expect(saveItems).toHaveBeenCalledTimes(1);
+  expect(saveItems.mock.calls[0][1].deletes).toHaveLength(WIZARD_GENERATED.length + 1);
+  expect(deleteItem).toHaveBeenCalledTimes(WIZARD_GENERATED.length + 1);
 });
 
 it("opens a hand-written class read-only", async () => {
@@ -182,8 +191,83 @@ it("opens a hand-written class read-only", async () => {
     kind: "classFeature", key: "hand/grip-l2", payload: entry("classFeature", "hand/grip-l2", "Grip", { level: 2 }),
   } as never);
   await open(store);
-  expect(await screen.findByText("1 feature", undefined, slow)).toBeTruthy();
+  expect(await screen.findByText("Class and 1 feature: 2 entries", undefined, slow)).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Hand Class" }));
   await waitFor(() => expect(screen.getAllByText(m.advanced)).toHaveLength(2), slow);
   expect(document.querySelector("[data-class-editor]")).toBeNull();
+});
+
+it("labels each custom column cell with its level and fills every level at once", async () => {
+  const store = await start(undefined, "wizard");
+  fireEvent.click(button(c.addColumn));
+  const column = within(document.querySelector('[data-class-column="0"]') as HTMLElement);
+  fill(column.getByLabelText(c.columnNameEn), "Embers");
+  const grid = within(document.querySelector("[data-column-grid]") as HTMLElement);
+  expect(grid.getAllByRole("textbox")).toHaveLength(20);
+  expect(grid.getByText("Lv. 1")).toBeTruthy();
+  expect(grid.getByText("Lv. 20")).toBeTruthy();
+  fill(column.getByLabelText(c.fillValue), "d6");
+  fireEvent.click(column.getByRole("button", { name: c.fillAll }));
+  expect(grid.getAllByRole("textbox").map((el) => (el as HTMLInputElement).value)).toEqual(Array(20).fill("d6"));
+  fill(column.getByLabelText("Embers at level 5"), "d8");
+  await save();
+  await closed();
+  const meta = items(store).find((r) => r.kind === "class")!.payload.entry!.meta!;
+  expect((meta.chassis as { columns: Array<{ values: string[] }> }).columns[0].values).toEqual([...Array(4).fill("d6"), "d8", ...Array(15).fill("d6")]);
+});
+
+it("keeps the live table beside the form on desktop, with short headers and a pinned level column on phones", async () => {
+  await start(undefined, "wizard");
+  await waitFor(() => expect(document.querySelector("[data-class-preview]")).not.toBeNull(), slow);
+  const aside = document.querySelector("[data-class-table-aside]")!;
+  expect(aside.className).toContain("xl:sticky");
+  const table = within(aside.querySelector("[data-class-table]") as HTMLElement);
+  const proficiency = table.getByRole("columnheader", { name: /Proficiency Bonus/ });
+  expect(within(proficiency).getByText(c.tableShort.proficiency).className).toContain("sm:hidden");
+  expect(within(proficiency).getByText("Proficiency Bonus").className).toContain("sm:inline");
+  const first = table.getAllByRole("rowheader")[0];
+  expect(first.textContent).toBe("1");
+  expect(first.className).toContain("sticky");
+  expect(table.getByRole("columnheader", { name: /Class Features/ }).className).toContain("min-w-[14ch]");
+  // Generated feature text is previewed after the form, not in the side column.
+  expect(aside.querySelector("[data-class-features-preview]")).toBeNull();
+  expect(document.querySelector("[data-class-features-preview]")).not.toBeNull();
+});
+
+it("scrolls to and focuses the editor heading when an item opens", async () => {
+  await open();
+  fireEvent.click(await screen.findByRole("button", { name: `Add ${m.kind.class}` }));
+  await waitFor(() => expect(document.activeElement?.hasAttribute("data-editor-heading")).toBe(true), slow);
+  expect(document.activeElement!.textContent).toBe(m.kind.class);
+});
+
+it("picks tools and starting items by name, storing refs, and keeps custom text", async () => {
+  const store = await start(undefined, "druid", "Grove Keeper");
+  const tools = within(document.querySelector("[data-class-step='chassis'] > [data-tool-chips]") as HTMLElement);
+  expect(tools.getByRole("button", { name: c.removeRef.replace("{name}", "Herbalism Kit") })).toBeTruthy();
+  fill(tools.getByLabelText(c.toolSearch.replace("{field}", c.toolGrants)), "Thieves' Tools");
+  fireEvent.click(tools.getByRole("button", { name: c.addTool }));
+  expect(tools.getByRole("button", { name: c.removeRef.replace("{name}", "Thieves' Tools") })).toBeTruthy();
+  expect([...document.querySelectorAll(`#hb-class-tools option`)].map((o) => (o as HTMLOptionElement).value)).toContain("Herbalism Kit");
+
+  fireEvent.click(button(c.addOption));
+  const option = within(screen.getByRole("group", { name: c.equipment }));
+  fireEvent.click(option.getAllByRole("button", { name: c.addItem }).at(-1)!);
+  fireEvent.click(option.getAllByRole("button", { name: c.addItem }).at(-1)!);
+  const pickers = option.getAllByLabelText(c.itemRef);
+  fill(pickers.at(-2)!, "Dagger");
+  fill(pickers.at(-1)!, "Lucky Coin");
+  expect(pickers.at(-2)!.getAttribute("data-ref")).toBe("baseItem:dagger");
+  expect(pickers.at(-2)).toHaveProperty("value", "Dagger");
+  await save();
+  await closed();
+  const meta = items(store).find((r) => r.kind === "class")!.payload.entry!.meta! as {
+    toolGrants: string[];
+    startingEquipment: Array<{ items: Array<{ ref?: string; displayName?: string }> }>;
+  };
+  expect(meta.toolGrants).toEqual(["item:herbalism-kit", "item:thieves-tools"]);
+  expect(meta.startingEquipment.flatMap((o) => o.items).slice(-2)).toEqual([
+    { qty: 1, ref: "baseItem:dagger" },
+    { displayName: "Lucky Coin", qty: 1 },
+  ]);
 });

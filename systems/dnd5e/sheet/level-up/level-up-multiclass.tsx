@@ -1,6 +1,9 @@
 "use client";
 
+import { Check } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Button } from "@skald/sheet-sdk/components/ui/button";
+import { cn } from "@skald/sheet-sdk/lib/utils";
 import { Checkbox } from "@skald/sheet-sdk/components/ui/checkbox";
 import { Input } from "@skald/sheet-sdk/components/ui/input";
 import { Label } from "@skald/sheet-sdk/components/ui/label";
@@ -8,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@skald/sheet-sdk/components/ui/radio
 import type { Prerequisite } from "../../reference/multiclass";
 import type { LevelUpPlan } from "./plan";
 import { Section } from "./level-up-parts";
+import { useListText } from "./list-text";
 
 /** The level-up dialog's multiclass parts (CLASS-IMPL §7.4): the class picker, prerequisites, gains, notes. */
 
@@ -16,6 +20,8 @@ export interface ClassCandidate {
   id: string;
   name: string;
   prerequisites: Prerequisite[];
+  /** A pack or homebrew class: listed after the built-in ones, past a divider. */
+  custom: boolean;
 }
 
 export interface GainsDraft {
@@ -24,33 +30,56 @@ export interface GainsDraft {
   tools: readonly string[];
 }
 
-/** "Needs INT 13 (now 10)", each unmet score joined. */
+/** "Needs Strength 13, Charisma 13 (now 10/8)": the unmet scores in one list, the current ones after (UAT m12, m25). */
 export function usePrerequisiteText(): (missing: readonly Prerequisite[]) => string {
   const t = useTranslations("levelUp.multiclass");
   const tAbility = useTranslations("ability");
-  return (missing) => missing.map((entry) => "anyOf" in entry
-    ? t("prerequisite", {
-        ability: entry.anyOf.map(({ ability }) => tAbility(ability)).join(t("abilityOr")),
-        have: entry.anyOf.map(({ have }) => have).join(t("scoreSeparator")),
-      })
-    : t("prerequisite", { ability: tAbility(entry.ability), have: entry.have })).join("、");
+  const list = useListText();
+  return (missing) => {
+    const abilities = missing.map((entry) =>
+      t("prerequisiteScore", {
+        ability: "anyOf" in entry ? entry.anyOf.map(({ ability }) => tAbility(ability)).join(t("abilityOr")) : tAbility(entry.ability),
+        need: entry.need,
+      }),
+    );
+    const have = missing.flatMap((entry) => ("anyOf" in entry ? entry.anyOf.map(({ have: score }) => score) : [entry.have])).join(t("scoreSeparator"));
+    return t("prerequisite", { abilities: list(abilities), have });
+  };
 }
 
-/** 新增職業: the classes not on the sheet, each with its prerequisite badge. */
-export function ClassPicker({ candidates, picked, onPick }: { candidates: ClassCandidate[]; picked: string | null; onPick: (id: string) => void }) {
+/**
+ * 新增職業: the classes not on the sheet, each with its prerequisite badge. Once one is picked the
+ * list folds to that class and 更換, so the rest of the offer is in view (UAT M1).
+ */
+export function ClassPicker({ candidates, picked, onPick, onChange }: { candidates: ClassCandidate[]; picked: string | null; onPick: (id: string) => void; onChange: () => void }) {
   const t = useTranslations("levelUp.multiclass");
   const badge = usePrerequisiteText();
+  const chosen = picked ? candidates.find((candidate) => candidate.id === picked) : undefined;
+  if (picked) {
+    return (
+      <Section title={t("pickTitle")} data-level-up-class-picker data-level-up-picked={picked}>
+        <div className="flex min-h-9 flex-wrap items-center gap-2">
+          <Check className="size-4 text-primary" aria-hidden />
+          <span className="text-sm font-medium">{chosen?.name ?? picked}</span>
+          <Button type="button" variant="outline" size="sm" className="ml-auto" onClick={onChange} data-level-up-change-class>
+            {t("change")}
+          </Button>
+        </div>
+      </Section>
+    );
+  }
   return (
     <Section title={t("pickTitle")} data-level-up-class-picker>
       {candidates.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t("pickNone")}</p>
       ) : (
-        <RadioGroup value={picked ?? ""} onValueChange={onPick}>
-          {candidates.map((candidate) => {
+        <RadioGroup value="" onValueChange={onPick}>
+          {candidates.map((candidate, index) => {
             const id = `level-up-add-${candidate.id}`;
             const unmet = candidate.prerequisites.length > 0;
+            const divider = candidate.custom && index > 0 && !candidates[index - 1].custom;
             return (
-              <div key={candidate.id} className="flex min-h-9 flex-wrap items-center gap-2" data-level-up-candidate={candidate.id}>
+              <div key={candidate.id} className={cn("flex min-h-9 flex-wrap items-center gap-2", divider && "mt-1 border-t border-border pt-2")} data-level-up-candidate={candidate.id} data-level-up-candidate-custom={candidate.custom || undefined}>
                 <RadioGroupItem value={candidate.id} id={id} />
                 <Label htmlFor={id} className="font-normal">{candidate.name}</Label>
                 <span
@@ -162,16 +191,21 @@ export function GainsSection({ plan, draft, onChange }: { plan: LevelUpPlan; dra
   );
 }
 
-/** Unarmored Defense of a new Barbarian or Monk: a checkbox while the sheet has none, else a note. */
+/** Unarmored Defense of a new Barbarian or Monk, in its own 護甲等級 section (UAT m13): a checkbox while the sheet has none, else a note. */
 export function UnarmoredSection({ plan, name, apply, onApply }: { plan: LevelUpPlan; name: string; apply: boolean; onApply: (apply: boolean) => void }) {
   const t = useTranslations("levelUp.multiclass.unarmored");
   const offer = plan.unarmoredDefense;
   if (!offer) return null;
-  if (!offer.settable) return <p className="text-sm text-muted-foreground" role="note" data-level-up-unarmored-note>{t("note")}</p>;
   return (
-    <div className="flex min-h-9 items-center gap-2" data-level-up-unarmored>
-      <Checkbox id="level-up-unarmored" checked={apply} onCheckedChange={(value) => onApply(value === true)} />
-      <Label htmlFor="level-up-unarmored" className="font-normal">{t("set", { name })}</Label>
-    </div>
+    <Section title={t("title")} data-level-up-armor-class>
+      {offer.settable ? (
+        <div className="flex min-h-9 items-center gap-2" data-level-up-unarmored>
+          <Checkbox id="level-up-unarmored" checked={apply} onCheckedChange={(value) => onApply(value === true)} />
+          <Label htmlFor="level-up-unarmored" className="font-normal">{t("set", { name })}</Label>
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground" role="note" data-level-up-unarmored-note>{t("note")}</p>
+      )}
+    </Section>
   );
 }

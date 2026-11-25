@@ -24,6 +24,7 @@ import { TransferSlot } from "./transfer-slot";
 import { ItemEditor } from "./item-editor";
 import { SubclassEditor } from "./subclass-editor";
 import { ClassEditor } from "./class-editor";
+import { EntryRow } from "./entry-list";
 import { subclassCodec } from "../domain/subclass";
 import { classCodec } from "../domain/class";
 
@@ -51,8 +52,8 @@ export function HomebrewWorkspace({ signInLink }: { signInLink?: ReactNode }) {
   const store = useHostPort(dndHomebrewStorePort);
   const t = useTranslations("homebrew");
   return (
-    <main className="container mx-auto max-w-6xl space-y-5 px-4 py-8">
-      <h1 className="font-heading text-3xl font-bold">{t("title")}</h1>
+    <main className="container mx-auto max-w-7xl space-y-5 px-4 py-8">
+      <h1 className="font-heading text-3xl font-bold lining-nums">{t("title")}</h1>
       {store ? (
         <AccountWorkspace store={store} signInLink={signInLink} />
       ) : (
@@ -75,6 +76,7 @@ function AccountWorkspace({
   );
   const [error, setError] = useState<HomebrewErrorCode | null>(null);
   const [busy, setBusy] = useState(false);
+  const [deleting, setDeleting] = useState<ReadonlySet<string>>(new Set());
   const [editorGeneration, resetEditor] = useState(0);
   const [packId, setPack] = useState("");
   const [selection, select] = useState<{
@@ -97,6 +99,28 @@ function AccountWorkspace({
       active = false;
     };
   }, [store]);
+  /**
+   * Delete an entry with its feature rows in one batch (features first: a stopped delete leaves the
+   * main row listed, so deleting again finishes). Only that row shows as busy; the page stays usable.
+   */
+  async function removeEntry(pack: string, row: HomebrewItemRecord, features: readonly HomebrewItemRecord[]) {
+    setDeleting((d) => new Set(d).add(row.id));
+    setError(null);
+    try {
+      const result = await store.saveItems(pack, { writes: [], deletes: [...features.map((f) => f.id), row.id] });
+      if (!result.ok) setError(result.error);
+      else select((s) => (s?.id === row.id ? null : s));
+      setData(await load(store));
+    } catch {
+      setError("network");
+    } finally {
+      setDeleting((d) => {
+        const next = new Set(d);
+        next.delete(row.id);
+        return next;
+      });
+    }
+  }
   async function run(
     write: () => Promise<HomebrewResult<unknown>>,
     done?: () => void,
@@ -245,11 +269,12 @@ function AccountWorkspace({
           </li>
         ))}
       </ul>
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm text-muted-foreground" data-usage>
         {t("usage", {
           items: data.usage.items,
           kb: Math.ceil(data.usage.bytes / 1024),
         })}
+        {allRows.some((r) => r.kind === "class" || r.kind === "subclass") && <> · {t("usageNote")}</>}
       </p>
       <TransferSlot pack={pack} onImported={async (id) => {
         open(id);
@@ -273,9 +298,9 @@ function AccountWorkspace({
         </p>
       )}
       {pack && (
-        <div className="grid items-start gap-4 md:grid-cols-[minmax(14rem,1fr)_2fr]">
+        <div className="grid items-start gap-4 md:grid-cols-[minmax(14rem,1fr)_2fr] xl:grid-cols-[16rem_minmax(0,1fr)]">
           <aside className="space-y-3 rounded-lg border p-4">
-            <h2 className="font-heading text-xl">{pack.name}</h2>
+            <h2 className="font-heading text-xl lining-nums">{pack.name}</h2>
             <Input
               aria-label={t("search")}
               placeholder={t("search")}
@@ -312,51 +337,21 @@ function AccountWorkspace({
                     const features =
                       r.kind === "subclass" ? subclassCodec.rowsOf(r.key, rows) : r.kind === "class" ? classCodec.rowsOf(r.key, rows) : [];
                     const k: EditorKind | null = r.kind === "subclass" || r.kind === "class" ? r.kind : formKindOf(r.payload);
-                    // Subclasses in any own pack whose parent this class is: they stay, orphaned.
-                    const children =
-                      r.kind === "class"
-                        ? allRows.filter((x) => x.kind === "subclass" && x.payload.entry?.meta?.parent === r.key).map(rowName)
-                        : [];
                     return (
-                      <div
+                      <EntryRow
                         key={r.id}
-                        className="flex items-center justify-between"
-                      >
-                        <button
-                          disabled={!k}
-                          onClick={() => k && select({ kind: k, id: r.id })}
-                        >
-                          {rowName(r)}
-                        </button>
-                        {(r.kind === "subclass" || r.kind === "class") && (
-                          <span className="ml-1 mr-auto text-xs text-muted-foreground" data-feature-count>
-                            {t(`${r.kind}.features`, { count: features.length })}
-                          </span>
-                        )}
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            const message =
-                              r.kind === "class" && children.length
-                                ? t("class.confirmDeleteSubclasses", { name: rowName(r), count: features.length, subclasses: children.join(", ") })
-                                : r.kind === "subclass" || r.kind === "class"
-                                  ? t(`${r.kind}.confirmDelete`, { name: rowName(r), count: features.length })
-                                  : t("confirm", { name: rowName(r) });
-                            if (window.confirm(message))
-                              void run(async () => {
-                                // Features first: a stopped delete leaves the subclass row listed, so deleting again finishes.
-                                for (const f of features) {
-                                  const gone = await store.deleteItem(f.id);
-                                  if (!gone.ok) return gone;
-                                }
-                                return store.deleteItem(r.id);
-                              }, () => select(null));
-                          }}
-                        >
-                          {t("delete")}
-                        </Button>
-                      </div>
+                        name={rowName(r)}
+                        kind={r.kind}
+                        features={features.length}
+                        subclasses={
+                          r.kind === "class"
+                            ? allRows.filter((x) => x.kind === "subclass" && x.payload.entry?.meta?.parent === r.key).map(rowName)
+                            : []
+                        }
+                        deleting={deleting.has(r.id)}
+                        open={k ? () => select({ kind: k, id: r.id }) : null}
+                        remove={() => void removeEntry(pack.id, r, features)}
+                      />
                     );
                   })}
               </section>

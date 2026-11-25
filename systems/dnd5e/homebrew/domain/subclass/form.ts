@@ -1,8 +1,12 @@
 import { namedIssues, type TextForm } from "../forms/common";
 import type { SubclassParent } from "./parents";
+import { spellLevels } from "./spells";
+import type { LegacyAware } from "../read-back";
 export interface SubclassFeatureForm extends Omit<TextForm, "id"> {
   key?: string;
   level: number;
+  /** Editor-only identity that survives edits (a move tracks the feature by it); never written to rows. */
+  draftId?: string;
 }
 export interface Breakpoint {
   level: number;
@@ -35,7 +39,8 @@ export type SubclassLabels = Record<
   | "prepared",
   string
 >;
-export interface SubclassContext {
+/** `legacy`, `legacyText`: the v4.152.0 regeneration of the read-back (`../read-back.ts`). */
+export interface SubclassContext extends LegacyAware<SubclassLabels> {
   parent: SubclassParent;
   labels: { en: SubclassLabels; zh: SubclassLabels };
   spellNames: Readonly<Record<string, Localized>>;
@@ -85,13 +90,7 @@ export function issues(f: SubclassForm, p?: SubclassParent) {
         )
       )
         errors.push("breakpoints");
-  const levels = sc
-    ? [3, 7, 13, 19]
-    : p?.caster === "half"
-      ? [3, 5, 9, 13, 17]
-      : p?.caster === "full" || p?.caster === "pact"
-        ? [3, 5, 7, 9]
-        : [];
+  const levels = p ? spellLevels(p, f) : [];
   if (
     f.spells.some(
       (s, i) =>

@@ -79,11 +79,45 @@ export function prerequisites(scores: Record<Ability,number>, classes: Multiclas
 }
 export type CasterKind = 'full'|'half'|'third'|'pact';
 function progression(meta: unknown) { return (meta as {spellcasting?:{progression?:unknown}} | null)?.spellcasting?.progression; }
+/**
+ * A subclass's own Spellcasting feature, `subclassFeature:<class>/<subclass>/spellcasting-l<N>`: in
+ * the 2024 rules a subclass with one makes its class a one-third caster. Its pack entry carries no
+ * `meta.spellcasting`, so the feature is what identifies it; group 1 is the subclass id.
+ */
+export const SUBCLASS_SPELLCASTING_FEATURE = /^subclassFeature:([^/]+\/[^/]+)\/spellcasting-l\d+$/;
+/** What the 2024 rules' subclass casters cast with: Wizard spells, Intelligence. */
+const SUBCLASS_CASTING_DEFAULT = { ability: 'int', list: 'wizard' } as const;
+const SPELL_ABILITIES = new Set(['int','wis','cha']);
+export interface SubclassCasting { kind:'third'; ability:string; list?:string }
+/**
+ * The spellcasting a subclass grants: a homebrew subclass's `meta.spellcasting` with progression
+ * `third` (its own ability and list), else, when the subclass has its own Spellcasting feature
+ * (`hasSpellcastingFeature`), the 2024 default. Null when it grants none.
+ */
+export function subclassCastingOf(meta: unknown, hasSpellcastingFeature = false): SubclassCasting|null {
+  const own = (meta as {spellcasting?:{progression?:unknown;ability?:unknown;list?:unknown}} | null | undefined)?.spellcasting;
+  if (own?.progression === 'third') {
+    const ability = typeof own.ability === 'string' && SPELL_ABILITIES.has(own.ability) ? own.ability : SUBCLASS_CASTING_DEFAULT.ability;
+    const list = typeof own.list === 'string' && own.list ? own.list : undefined;
+    return { kind: 'third', ability, ...(list ? { list } : {}) };
+  }
+  return hasSpellcastingFeature ? { kind: 'third', ...SUBCLASS_CASTING_DEFAULT } : null;
+}
+/**
+ * The one subclass-casting rule, shared by the level-up helper and the sheet: a subclass is a
+ * one-third caster when its `meta` says so or one of `featureRefs` is its own Spellcasting feature
+ * (`subclassFeature:<class>/<subclass>/spellcasting-l<N>`).
+ */
+export function subclassCasting(subclassId: string, meta: unknown, featureRefs: Iterable<string>): SubclassCasting|null {
+  let feature = false;
+  for (const ref of featureRefs) if (SUBCLASS_SPELLCASTING_FEATURE.exec(ref)?.[1] === subclassId) { feature = true; break; }
+  return subclassCastingOf(meta, feature);
+}
 export function casterKindOf(classMeta: unknown, subclassMeta?: unknown): CasterKind|null {
   const p = progression(classMeta);
   if (p==='artificer') return 'half';
   if (p==='full'||p==='half'||p==='pact') return p;
-  return progression(subclassMeta)==='third' ? 'third' : null;
+  return subclassCastingOf(subclassMeta) ? 'third' : null;
 }
 type Caster = {kind:CasterKind|null;level:number};
 type Row = Caster & {classId:string};

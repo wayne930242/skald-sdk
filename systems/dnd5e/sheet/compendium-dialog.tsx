@@ -1,7 +1,7 @@
 "use client";
 
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { BookOpen, Plus, Search, Swords } from "lucide-react";
+import { Fragment, lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { BookOpen, Check, Plus, Search, Swords } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import type { LoadedSystem } from "@skald/types/system";
@@ -10,11 +10,12 @@ import { Button } from "@skald/sheet-sdk/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@skald/sheet-sdk/components/ui/dialog";
 import { Input } from "@skald/sheet-sdk/components/ui/input";
 import { ScrollArea } from "@skald/sheet-sdk/components/ui/scroll-area";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@skald/sheet-sdk/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@skald/sheet-sdk/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@skald/sheet-sdk/components/ui/tabs";
 import { splitRef, type DndKind } from "../reference/tags";
 import { packLabel } from "./pack-label";
-import { appendCompendiumRows, buildCompendiumRow, type CompendiumDialogTab, type CompendiumStart, type CompendiumTab } from "./compendium-rows";
+import { appendCompendiumRows, buildCompendiumRow, ONCE_LISTS, presenceKey, spellCastersFor, spellKey, type CompendiumDialogTab, type CompendiumStart, type CompendiumTab } from "./compendium-rows";
+import { SpellCasterSelect, sortClassFilter } from "./compendium-choices";
 import type { ReferenceContextValue } from "./use-reference-context";
 import { loadEnglishCorpus } from "../reference/load-corpus";
 import { appendAttack, attackLabels } from "./play/attack-rows";
@@ -189,9 +190,40 @@ function CompendiumDialogBody({
     return new Map(feats.map((feat) => [feat.ref ?? `feat:${feat.id}`, feat.category ?? ""]));
   }, [system]);
 
-  const known = useMemo(() => Object.keys(context.names.class ?? context.englishNames.class ?? {}).sort(), [context]);
+  const known = useMemo(() => Object.keys(context.names.class ?? context.englishNames.class ?? {}), [context]);
+  const builtinClasses = useMemo(() => {
+    const list = Array.isArray(system.gameData?.classes) ? (system.gameData.classes as Array<{ id?: unknown }>) : [];
+    return new Set(list.flatMap((item) => (typeof item.id === "string" ? [item.id] : [])));
+  }, [system]);
   // A preset class the catalog does not name (a pack class) still shows as the selected filter.
-  const classes = [...known, ...[...(mine ?? []), ...(classId !== ALL && classId !== MINE ? [classId] : [])].filter((id, index, all) => !known.includes(id) && all.indexOf(id) === index)];
+  const extraClasses = [...(mine ?? []), ...(classId !== ALL && classId !== MINE ? [classId] : [])].filter((id, index, all) => !known.includes(id) && all.indexOf(id) === index);
+  const classFilter = sortClassFilter([...known, ...extraClasses], { builtin: builtinClasses, nameOf: (id) => context.nameOf(`class:${id}`), locale: context.locale });
+  // UAT M6: presence keys already on a once-only list (spells, features), and those added while the
+  // dialog is open. A spell's key names its caster (F003); a feature's is its ref.
+  const [added, setAdded] = useState<ReadonlySet<string>>(() => new Set());
+  const keyOf = (list: CompendiumTab, ref: string, castingClass?: string) => (list === "spells" ? spellKey(ref, castingClass ?? "") : ref);
+  const isPresent = (list: CompendiumTab, key: string) => ONCE_LISTS.has(list) && (added.has(`${list}|${key}`) || (start?.present?.[list]?.includes(key) ?? false));
+  // UAT M5: the class picked for a spell several of the sheet's class lists hold, by ref.
+  const [picks, setPicks] = useState<Record<string, string>>({});
+  const filterList = classId !== ALL && classId !== MINE ? classId : undefined;
+  // The casting classes a spell can still be added under: one per class whose list holds it, less those that already have it.
+  const castersOf = (ref: string) => (start?.spellClasses
+    ? spellCastersFor(start, context.gameSpells.get(ref.slice(ref.indexOf(":") + 1))?.classes, filterList).filter((caster) => !isPresent("spells", spellKey(ref, caster.castingClass)))
+    : []);
+  const listsHolding = (ref: string) => (start?.spellClasses ? spellCastersFor(start, context.gameSpells.get(ref.slice(ref.indexOf(":") + 1))?.classes, filterList).length : 0);
+  /** The class a spell added now casts as (decided before the presence check, F003); undefined = the starting class. */
+  const castingClassFor = (ref: string): string | undefined => {
+    const casters = castersOf(ref);
+    if (casters.length > 0) return casters.find((caster) => caster.castingClass === picks[ref])?.castingClass ?? casters[0].castingClass;
+    if (listsHolding(ref) > 0) return undefined;
+    return filterList !== undefined ? start?.castingClassOf?.[filterList] : undefined;
+  };
+  /** Whether this row shows 已加入: every class that could take the spell already has it. */
+  const rowPresent = (list: CompendiumTab, ref: string) => {
+    if (list !== "spells") return isPresent(list, ref);
+    if (listsHolding(ref) > 0) return castersOf(ref).length === 0;
+    return isPresent(list, keyOf(list, ref, castingClassFor(ref)));
+  };
 
   const candidates = useMemo<Candidate[]>(() => {
     const out: Candidate[] = [];
@@ -253,12 +285,25 @@ function CompendiumDialogBody({
 
   const add = (candidate: Pick<Candidate, "ref" | "name">, listTab: CompendiumTab | null = isListTab(tab) ? tab : null) => {
     if (!onUpdate || !listTab) return;
+    // A multiclass sheet's spell belongs to the class whose list holds it, or to the one picked in
+    // the row when several do (UAT M5); without the sheet's classes (the level-up's follow-up), to
+    // the class of the filtered list. Decided first: the presence key names it (F003).
+    const castingClass = listTab === "spells" ? castingClassFor(candidate.ref) : undefined;
+    const key = keyOf(listTab, candidate.ref, castingClass);
+    if (rowPresent(listTab, candidate.ref) || isPresent(listTab, key)) {
+      toast(t("alreadyOnSheet", { name: candidate.name }));
+      return;
+    }
     const built = buildCompendiumRow(listTab, candidate.ref, candidate.name, system, context, !inTable);
     if (!built) return;
-    // A multiclass sheet's spell added while one class's list is filtered belongs to that class.
-    const castingClass = listTab === "spells" && classId !== ALL && classId !== MINE ? start?.castingClassOf?.[classId] : undefined;
     if (castingClass) built.row.castingClass = castingClass;
     onUpdate((previous) => {
+      // A second add of the same spell or feature is ignored (the sheet may have changed since the dialog opened).
+      const onSheet = ONCE_LISTS.has(listTab) && Array.isArray(previous[listTab]) && (previous[listTab] as unknown[]).some((row) => presenceKey(listTab, row) === key);
+      if (onSheet) {
+        queueMicrotask(() => toast(t("alreadyOnSheet", { name: candidate.name })));
+        return previous;
+      }
       // A feat's own sheet fields come with its row (Archery: the ranged attack bonus the attack formula reads).
       const patch = listTab === "feats" ? featSheetPatch(candidate.ref) : undefined;
       // Snapshot cap (§5b): the picker refuses a pack row that would pass 200 KB of pack text.
@@ -267,7 +312,10 @@ function CompendiumDialogBody({
         queueMicrotask(() => toast.error(tPack("tooMuchText", { kb: Math.ceil(appended.bytes / 1024) })));
         return previous;
       }
-      queueMicrotask(() => toast.success(t("added", { list: tField(built.list) })));
+      queueMicrotask(() => {
+        if (ONCE_LISTS.has(listTab)) setAdded((current) => new Set(current).add(`${listTab}|${key}`));
+        toast.success(t("added", { list: tField(built.list) }));
+      });
       return appended.data;
     });
   };
@@ -357,10 +405,11 @@ function CompendiumDialogBody({
               <SelectContent>
                 <SelectItem value={ALL}>{t("allClasses")}</SelectItem>
                 {mine && <SelectItem value={MINE}>{t("myClasses")}</SelectItem>}
-                {classes.map((id) => (
-                  <SelectItem key={id} value={id}>
-                    {context.nameOf(`class:${id}`)}
-                  </SelectItem>
+                {classFilter.ids.map((id, index) => (
+                  <Fragment key={id}>
+                    {index === classFilter.packStart && <SelectSeparator />}
+                    <SelectItem value={id}>{context.nameOf(`class:${id}`)}</SelectItem>
+                  </Fragment>
                 ))}
               </SelectContent>
             </Select>
@@ -371,7 +420,10 @@ function CompendiumDialogBody({
             <p className="text-sm text-muted-foreground">{t("empty")}</p>
           ) : (
             <ul className="space-y-1">
-              {filtered.slice(0, LIST_LIMIT).map((candidate) => (
+              {filtered.slice(0, LIST_LIMIT).map((candidate) => {
+                const present = isListTab(tab) && rowPresent(tab, candidate.ref);
+                const casters = tab === "spells" && !present ? castersOf(candidate.ref) : [];
+                return (
                 <li key={candidate.ref} className="flex items-center gap-2 rounded px-2 py-1 hover:bg-muted/60" data-compendium-ref={candidate.ref}>
                   <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
                     {candidate.level !== undefined && (
@@ -408,13 +460,31 @@ function CompendiumDialogBody({
                         {t("addAttack")}
                       </Button>
                     )}
-                    <Button type="button" variant="outline" size="sm" disabled={!onUpdate} onClick={() => add(candidate)}>
-                      <Plus className="size-4" />
-                      {t("add")}
-                    </Button>
+                    {present ? (
+                      <Badge variant="secondary" className="h-8 gap-1 px-2.5 text-xs" data-compendium-present>
+                        <Check className="size-3.5" aria-hidden />
+                        {t("alreadyAdded")}
+                      </Badge>
+                    ) : (
+                      <>
+                        {casters.length > 1 && (
+                          <SpellCasterSelect
+                            casters={casters}
+                            value={casters.find((caster) => caster.castingClass === picks[candidate.ref])?.castingClass ?? casters[0].castingClass}
+                            onChange={(value) => setPicks((previous) => ({ ...previous, [candidate.ref]: value }))}
+                            label={t("castAs", { name: candidate.name })}
+                          />
+                        )}
+                        <Button type="button" variant="outline" size="sm" disabled={!onUpdate} onClick={() => add(candidate)}>
+                          <Plus className="size-4" />
+                          {t("add")}
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           )}
         </ScrollArea>

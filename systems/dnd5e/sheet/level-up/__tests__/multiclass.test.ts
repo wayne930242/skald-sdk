@@ -4,7 +4,7 @@ import { loadDnd5e2024Data } from "../../../data-access/builtin-local-data";
 import { buildCompendiumRow } from "../../compendium-rows";
 import { applyLevelUp, runIds, undoLevelUp, type LevelUpChoices, type LevelUpRowBuilder } from "../apply";
 import { gainsOffer } from "../multiclass";
-import { levelUpPlan, type ClassInfo, type LevelUpInput, type LevelUpPlan } from "../plan";
+import { levelUpPlan, slotsDefaultOn, slotsFor, type ClassInfo, type LevelUpInput, type LevelUpPlan } from "../plan";
 import { builtinClassInfo, sheet } from "./class-info";
 
 let buildRow: LevelUpRowBuilder;
@@ -15,6 +15,12 @@ beforeAll(async () => {
   const system = { schema: data.schema, gameData: data.gameData } as unknown as LoadedSystem;
   buildRow = (tab, ref, name) => buildCompendiumRow(tab, ref, name, system, { gameSpells: new Map(), token: String }, true);
   for (const id of ["barbarian", "cleric", "fighter", "monk", "paladin", "rogue", "wizard"]) info[id] = await builtinClassInfo(id);
+  // A pack subclass with its own Spellcasting feature and no `meta.spellcasting` (a stand-in name).
+  info.fighterSb = await builtinClassInfo("fighter", [
+    { ref: "subclass:fighter/spell-blade", name: "Spell Blade", meta: {} },
+    { ref: "subclassFeature:fighter/spell-blade/spellcasting-l3", name: "Spellcasting", meta: { level: 3 } },
+    { ref: "subclassFeature:fighter/spell-blade/blade-bond-l3", name: "Blade Bond", meta: { level: 3 } },
+  ]);
 });
 
 const ok = (result: ReturnType<typeof applyLevelUp>) => {
@@ -82,6 +88,90 @@ describe("levelUpPlan / applyLevelUp with several classes (CLASS-IMPL §7.4)", (
     expect(offer.slots).toMatchObject({ before: [4, 2, 0, 0, 0, 0, 0, 0, 0], after: [4, 3, 0, 0, 0, 0, 0, 0, 0], matches: true, changed: true });
     expect(plan({ ...data, slot2Total: 3 }, { kind: "add", classInfo: info.wizard }).slots?.matches).toBe(false);
     expect(ok(applyLevelUp(data, offer, average, buildRow)).after).toMatchObject({ slot1Total: 4, slot2Total: 3 });
+  });
+
+  it("Fighter 3 (Spell Blade) adds Wizard 1: caster level ⌊3/3⌋ + 1 = 2, three 1st-level slots", () => {
+    const fighterSb = info.fighterSb;
+    expect(fighterSb.casting).toBeNull();
+    expect(fighterSb.subclasses.find((subclass) => subclass.id === "fighter/spell-blade")?.casting).toBe("third");
+    const data = sheet("fighter", 3, {
+      hitDieFaces: 10, int: 14, subclass: "Spell Blade", slot1Total: 2,
+      features: [{ id: "f_sc", ref: "subclassFeature:fighter/spell-blade/spellcasting-l3", name: "Spellcasting", level: 3 }],
+    });
+    const offer = levelUpPlan({ data, classInfo: null, classes: new Map([["fighter", fighterSb]]), target: { kind: "add", classInfo: info.wizard } })!;
+    expect(offer.slots).toMatchObject({ before: [2, 0, 0, 0, 0, 0, 0, 0, 0], after: [3, 0, 0, 0, 0, 0, 0, 0, 0], matches: true, changed: true });
+    expect(ok(applyLevelUp(data, offer, average, buildRow)).after).toMatchObject({ level: 4, slot1Total: 3 });
+
+    // The same with Wizard as the starting class and the Fighter row picking Spell Blade at 3.
+    const wizardStart = sheet("wizard", 3, { hitDieFaces: 6, str: 13, slot1Total: 2, multiclass: [{ id: "class_f", classId: "fighter", ref: "class:fighter", origin: "srd", name: "Fighter", subclass: "", level: 2, hitDie: 10, hitDiceSpent: 0, spellAbility: "none" }] });
+    const pick = levelUpPlan({ data: wizardStart, classInfo: null, classes: new Map([["wizard", info.wizard], ["fighter", fighterSb]]), target: { kind: "advance", classId: "fighter" } })!;
+    expect(pick.slots?.changed).toBe(false);
+    expect(slotsFor(pick, "subclass:fighter/spell-blade")).toMatchObject({ before: [2, 0, 0, 0, 0, 0, 0, 0, 0], after: [3, 0, 0, 0, 0, 0, 0, 0, 0], matches: true });
+    expect(ok(applyLevelUp(wizardStart, pick, { ...average, subclass: "subclass:fighter/spell-blade" }, buildRow)).after).toMatchObject({ level: 4, slot1Total: 3 });
+    expect(ok(applyLevelUp(wizardStart, pick, { ...average, subclass: "subclass:fighter/champion" }, buildRow)).after.slot1Total).toBe(2);
+  });
+
+  it("a single-class Fighter picking Spell Blade at 3 gets its two slots; at 4 three", () => {
+    const fighterSb = info.fighterSb;
+    const data = sheet("fighter", 2, { hitDieFaces: 10 });
+    const offer = levelUpPlan({ data, classInfo: fighterSb })!;
+    expect(offer.slots).toBeNull();
+    expect(slotsFor(offer, "subclass:fighter/spell-blade")).toMatchObject({ after: [2, 0, 0, 0, 0, 0, 0, 0, 0], matches: true });
+    const { after } = ok(applyLevelUp(data, offer, { ...average, subclass: "subclass:fighter/spell-blade" }, buildRow));
+    expect(after).toMatchObject({ level: 3, slot1Total: 2 });
+    expect(levelUpPlan({ data: after, classInfo: fighterSb })!.slots).toMatchObject({ before: [2, 0, 0, 0, 0, 0, 0, 0, 0], after: [3, 0, 0, 0, 0, 0, 0, 0, 0], matches: true });
+  });
+
+  it("a Fighter 4 who chose later picks Spell Blade at 5: slots 0 → 3, the update on (UAT F002)", () => {
+    const fighterSb = info.fighterSb;
+    const data = sheet("fighter", 4, { hitDieFaces: 10 });
+    const offer = levelUpPlan({ data, classInfo: fighterSb })!;
+    expect(offer.subclass.choose).toBe(true);
+    expect(slotsFor(offer, "subclass:fighter/spell-blade")).toMatchObject({ before: [0, 0, 0, 0, 0, 0, 0, 0, 0], after: [3, 0, 0, 0, 0, 0, 0, 0, 0], matches: true, changed: true });
+    expect(ok(applyLevelUp(data, offer, { ...average, subclass: "subclass:fighter/spell-blade" }, buildRow)).after).toMatchObject({ level: 5, slot1Total: 3 });
+
+    // Fighter 4 as a second class (no subclass yet) picking it at 5: the combined slots gain it.
+    const wizardStart = sheet("wizard", 7, { hitDieFaces: 6, str: 13, slot1Total: 4, slot2Total: 2, multiclass: [{ id: "class_f", classId: "fighter", ref: "class:fighter", origin: "srd", name: "Fighter", subclass: "", level: 4, hitDie: 10, hitDiceSpent: 0, spellAbility: "none" }] });
+    const pick = levelUpPlan({ data: wizardStart, classInfo: null, classes: new Map([["wizard", info.wizard], ["fighter", fighterSb]]), target: { kind: "advance", classId: "fighter" } })!;
+    expect(slotsFor(pick, "subclass:fighter/spell-blade")).toMatchObject({ before: [4, 2, 0, 0, 0, 0, 0, 0, 0], after: [4, 3, 0, 0, 0, 0, 0, 0, 0], matches: true, changed: true });
+  });
+
+  it("Fighter 3 (Spell Blade) with no slots set adds Wizard 1: the slots are set (UAT F002)", () => {
+    const fighterSb = info.fighterSb;
+    const data = sheet("fighter", 3, {
+      hitDieFaces: 10, int: 14, subclass: "Spell Blade",
+      features: [{ id: "f_sc", ref: "subclassFeature:fighter/spell-blade/spellcasting-l3", name: "Spellcasting", level: 3 }],
+    });
+    const add = (sheetData: Record<string, unknown>) =>
+      levelUpPlan({ data: sheetData, classInfo: null, classes: new Map([["fighter", fighterSb]]), target: { kind: "add", classInfo: info.wizard } })!;
+    const offer = add(data);
+    expect(offer.slots).toMatchObject({ before: [2, 0, 0, 0, 0, 0, 0, 0, 0], after: [3, 0, 0, 0, 0, 0, 0, 0, 0], matches: false, unset: true, changed: true });
+    expect(ok(applyLevelUp(data, offer, average, buildRow)).after).toMatchObject({ level: 4, slot1Total: 3 });
+    expect(ok(applyLevelUp(data, offer, { ...average, slots: false }, buildRow)).after).not.toHaveProperty("slot1Total");
+
+    // Slots set but not the table's: the player decides, the update starts off.
+    const differs = add({ ...data, slot1Total: 1 });
+    expect(differs.slots).toMatchObject({ matches: false, unset: false });
+    expect(ok(applyLevelUp({ ...data, slot1Total: 1 }, differs, average, buildRow)).after).toMatchObject({ level: 4, slot1Total: 1 });
+  });
+
+  it("legacy Fighter 4 (Spell Blade) with no slots levels to 5: the repair is offered, on, and writes 3 (UAT F002)", () => {
+    const data = sheet("fighter", 4, {
+      hitDieFaces: 10, int: 14, subclass: "Spell Blade",
+      features: [{ id: "f_sc", ref: "subclassFeature:fighter/spell-blade/spellcasting-l3", name: "Spellcasting", level: 3 }],
+    });
+    const offer = levelUpPlan({ data, classInfo: info.fighterSb })!;
+    expect(offer.slots).toMatchObject({ before: [3, 0, 0, 0, 0, 0, 0, 0, 0], after: [3, 0, 0, 0, 0, 0, 0, 0, 0], unset: true, changed: true });
+    expect(slotsDefaultOn(offer.slots)).toBe(true);
+    expect(ok(applyLevelUp(data, offer, average, buildRow)).after).toMatchObject({ level: 5, slot1Total: 3 });
+  });
+
+  it("a plain full caster with all slots at 0: the update is offered but starts off (zero may be intended, UAT F002)", () => {
+    const data = sheet("wizard", 3, { hitDieFaces: 6 });
+    const offer = levelUpPlan({ data, classInfo: info.wizard })!;
+    expect(offer.slots).toMatchObject({ matches: false, unset: false, changed: true });
+    expect(slotsDefaultOn(offer.slots)).toBe(false);
+    expect(ok(applyLevelUp(data, offer, average, buildRow)).after).not.toHaveProperty("slot1Total");
   });
 
   it("Paladin 5 + Fighter 4→5: the fighter's Extra Attack starts unchecked", () => {

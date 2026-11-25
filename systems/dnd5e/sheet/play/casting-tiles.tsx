@@ -7,7 +7,9 @@ import { OverrideMark } from "@skald/sheet-sdk/modules/character/ui/derived/over
 import { fieldRoll, useOpenDndEditor, usePlay, usePlayEditing } from "./play-context";
 import { PlayRollButton } from "./play-roll-button";
 import { rows, signed, text } from "./play-model";
-import { isMulticlass, type CastingClass } from "./casting-classes";
+import { isMulticlass, spellSourceOf, type CastingClass } from "./casting-classes";
+import { className } from "./sheet-names";
+import { useSheetNames } from "./use-sheet-names";
 import { sheetClasses } from "./class-model";
 
 /** The spells tab's stat tile. */
@@ -62,11 +64,25 @@ export function CastingTiles({ caster }: { caster: CastingClass }) {
  */
 export function CastingClassControl({ spell, name }: { spell: Record<string, unknown>; name: string }) {
   const t = useTranslations("play");
+  const tOption = useTranslations("option");
   const { values, editable, write } = usePlay();
+  const { names } = useSheetNames();
   const editing = usePlayEditing();
   if (!isMulticlass(values)) return null;
-  const classes = sheetClasses(values).filter((sheetClass) => sheetClass.start || sheetClass.classId);
+  const classes = sheetClasses(values)
+    .filter((sheetClass) => sheetClass.start || sheetClass.classId)
+    .map((sheetClass) => ({ ...sheetClass, name: className(sheetClass.classId, sheetClass.name, names) }));
   const current = text(spell.castingClass);
+  // A background's or feat's spell (Magic Initiate) or a species' spell belongs to no class: it shows its source (UAT M5).
+  const source = spellSourceOf(spell);
+  if (source && !(editing && editable)) {
+    const key = `spellSource.${source}`;
+    return (
+      <span className="rounded-full border border-dashed border-border px-2 py-0.5 text-xs text-muted-foreground" title={t("spells.multiclass.castingClass")} data-play-spell-source={source}>
+        {tOption.has(key) ? tOption(key) : source}
+      </span>
+    );
+  }
   const keyOf = (sheetClass: (typeof classes)[number]) => (sheetClass.start ? "" : sheetClass.classId);
   const shown = classes.find((sheetClass) => keyOf(sheetClass) === current) ?? classes[0];
   if (editing && editable) {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import items from "@skald/system-dnd5e/data/dnd5e-2024/economy/items.json";
 import type { Catalog } from "../catalog";
+import { shopMagicNames } from "../shop-names";
 import { affordable, cartCost, purchase, shopItems } from "../shop";
 
 const catalog = items as unknown as Catalog;
@@ -38,6 +39,14 @@ describe("shop purchase (plan-uat2 §3.5)", () => {
     const data = { gp: 10, equipment: [{ id: "d", ref: "baseItem:dagger", qty: 1, equipped: false }], weapons: [{ id: "w", itemId: "d" }] };
     const result = purchase(data, { "baseItem:dagger": 1 }, catalog, build)!;
     expect(result.data.weapons).toEqual([{ id: "w", itemId: "d" }]);
+  });
+
+  it.each(["en", "zh-TW"])("resolves the shop's magic item names from the %s index", async (locale) => {
+    const names = await shopMagicNames(locale);
+    for (const id of ["potion-of-healing", "spell-scroll-cantrip", "spell-scroll-level-1"]) {
+      expect(names.get(`item:${id}`)?.name).toMatch(/^[A-Z\p{Script=Han}]/u);
+      expect(names.get(`item:${id}`)?.english).toMatch(/^(Potion|Spell Scroll)/);
+    }
   });
 
   it("sells the priced items, not the single units a bundle prices", () => {

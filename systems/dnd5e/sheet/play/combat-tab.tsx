@@ -8,6 +8,7 @@ import { PlayRollButton } from "./play-roll-button";
 import { OverrideMark } from "@skald/sheet-sdk/modules/character/ui/derived/override-mark";
 import { cantripDice, num, rows, signed, text, weaponAttack } from "./play-model";
 import { castingClasses } from "./casting-classes";
+import { useSheetNames } from "./use-sheet-names";
 import { CastButton, SlotPips, SpellDamageButtons } from "./spells-tab";
 import { Conditions, DeathSaves, HitDiceBlock, RestButtons } from "./vitals-bar";
 import { displayName, spellLine, summaryOf, useSpellFacts } from "./row-text";
@@ -137,10 +138,11 @@ export function AttackTable({ compact }: { compact: boolean }) {
 function CombatSpells() {
   const t = useTranslations("play");
   const { values, reference } = usePlay();
+  const { casting } = useSheetNames();
   const leveled = rows(values.spells).filter((spell) => num(spell.level) > 0 && spell.prepared === true);
   if (leveled.length === 0) return null;
   const levels = [...new Set(leveled.map((spell) => num(spell.level)))].sort((a, b) => a - b);
-  const casters = castingClasses(values);
+  const casters = castingClasses(values, casting);
   return (
     <section className={CARD} aria-label={t("combat.spells")} data-play-combat-spells>
       <header className="flex flex-wrap items-baseline justify-between gap-2">

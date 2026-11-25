@@ -2,28 +2,24 @@
 
 import { use, useEffect, useMemo, useRef, useState } from "react";
 import { NextIntlClientProvider, useLocale, useMessages, useTranslations } from "next-intl";
-import { toast } from "sonner";
-import { rollDice } from "@skald/dice";
 import type { LoadedSystem } from "@skald/types/system";
-import { Button } from "@skald/sheet-sdk/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@skald/sheet-sdk/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@skald/sheet-sdk/components/ui/dialog";
 import type { EffectivePacks } from "../../content-pack/domain/types";
-import { buildCompendiumRow } from "../compendium-rows";
 import type { ReferenceContextValue } from "../use-reference-context";
 import type { LevelUpRequest } from "../play/play-context";
 import { cachedUntilRejected } from "../play/play-messages";
-import { applyLevelUp, runIds, undoLevelUp, type LevelUpChoices, type LevelUpFollowUp, type LevelUpRowBuilder, type LevelUpUndo } from "./apply";
-import { classInfoOf, levelUpPlan, offeredFeatures, type LevelUpPlan } from "./plan";
+import { classInfoOf, levelUpPlan, type LevelUpPlan } from "./plan";
 import { loadClass, loadClasses } from "./load-class";
-import { ClassPicker, GainsSection, PrerequisiteSection, UnarmoredSection, type ClassCandidate, type GainsDraft } from "./level-up-multiclass";
+import { ClassPicker, type ClassCandidate } from "./level-up-multiclass";
+import { LevelUpForm, LevelUpShell, type Applied } from "./level-up-form";
+import { AppliedView } from "./level-up-result";
 import { multiclassRulesOf, prerequisites } from "../../reference/multiclass";
 import { sheetClasses, type SheetClass } from "../play/class-model";
 import { ABILITIES, type Ability } from "../play/play-model";
-import { AsiSection, ColumnsSection, FeaturesSection, HpSection, SlotsSection, SpellsSection, SubclassSection, type AsiDraft, type HpDraft } from "./level-up-parts";
 
 /**
  * The level-up helper (phase 2b §4): 升級 raises the sheet one level with the class's offer, in one
- * data update, and a 復原 in the result notice that stays until closed. Mounted by the D&D adapter
+ * data update; the latest level up can be undone from its notice or the result screen. Mounted by the D&D adapter
  * beside the compendium, loaded when first opened; its labels are a lazy catalog of their own.
  */
 
@@ -100,8 +96,6 @@ function useLoaded<T>(key: string | null, load: () => Promise<T>): T | undefined
   return key !== null && loaded && loaded.key === key ? loaded.value : undefined;
 }
 
-type Applied = { level: number; followUp: LevelUpFollowUp };
-
 /** The header select's value: an existing class (`advance:<classId>`, `""` = a starting class without id) or 新增職業. */
 type Pick = { kind: "advance"; classId: string } | { kind: "add" };
 const ADD = "add";
@@ -111,18 +105,38 @@ const SCORE_KEYS: readonly Ability[] = ABILITIES;
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
 
 /** Built-in (game data, packs merged), Drive-pack and homebrew classes, by id: their `meta` for the prerequisite badge. */
-function classSources(system: LoadedSystem, packs: EffectivePacks | null): Map<string, { name: string; meta: Record<string, unknown> | undefined }> {
-  const out = new Map<string, { name: string; meta: Record<string, unknown> | undefined }>();
+type ClassSource = { name: string; meta: Record<string, unknown> | undefined; /** The game's class order; null for a pack or homebrew class. */ order: number | null };
+
+function classSources(system: LoadedSystem, packs: EffectivePacks | null): Map<string, ClassSource> {
+  const out = new Map<string, ClassSource>();
   const builtin = Array.isArray(system.gameData?.classes) ? (system.gameData.classes as unknown[]) : [];
   for (const item of builtin) {
     if (!isRecord(item) || typeof item.id !== "string" || !item.id) continue;
-    out.set(item.id, { name: item.id, meta: isRecord(item.meta) ? item.meta : item });
+    out.set(item.id, { name: item.id, meta: isRecord(item.meta) ? item.meta : item, order: out.size });
   }
   for (const entry of packs?.content.entries ?? []) {
     if (entry.kind !== "class" || !entry.id || out.has(entry.id)) continue;
-    out.set(entry.id, { name: entry.name, meta: isRecord(entry.meta) ? entry.meta : undefined });
+    out.set(entry.id, { name: entry.name, meta: isRecord(entry.meta) ? entry.meta : undefined, order: null });
   }
   return out;
+}
+
+/** The Fighting Style feats a feature's choice offers: built-in and pack, minus those on the sheet. */
+function fightingStyleFeats(system: LoadedSystem, packs: EffectivePacks | null, nameOf: (ref: string) => string, data: Record<string, unknown>): Array<{ ref: string; name: string }> {
+  const out = new Map<string, string>();
+  const named = (ref: string, fallback: string) => {
+    const name = nameOf(ref);
+    return name && name !== ref.slice(ref.indexOf(":") + 1) ? name : fallback;
+  };
+  const builtin = Array.isArray(system.gameData?.feats) ? (system.gameData.feats as unknown[]) : [];
+  for (const feat of builtin) {
+    if (isRecord(feat) && feat.category === "fightingStyle" && typeof feat.id === "string") out.set(`feat:${feat.id}`, named(`feat:${feat.id}`, feat.id));
+  }
+  for (const entry of packs?.content.entries ?? []) {
+    if (entry.kind === "feat" && isRecord(entry.meta) && entry.meta.category === "fightingStyle" && !out.has(entry.ref)) out.set(entry.ref, named(entry.ref, entry.name));
+  }
+  const taken = new Set((Array.isArray(data.feats) ? data.feats : []).map((row) => (isRecord(row) ? row.ref : undefined)));
+  return [...out].filter(([ref]) => !taken.has(ref)).map(([ref, name]) => ({ ref, name }));
 }
 
 function LevelUpBody({ request, system, context, packs, inTable = false, onClose }: LevelUpDialogProps) {
@@ -167,6 +181,7 @@ function LevelUpBody({ request, system, context, packs, inTable = false, onClose
   }, [base, loadedSheet, loadedAdd, pick, addId, multiclass, classId, nameOf, tMulti, martialWeaponsLabels]);
 
   const sourcesById = useMemo(() => classSources(system, packs), [system, packs]);
+  const fightingStyles = useMemo(() => fightingStyleFeats(system, packs, nameOf, base), [system, packs, nameOf, base]);
   function candidateName(id: string) {
     const local = nameOf(`class:${id}`);
     return local && local !== id ? local : sourcesById.get(id)?.name ?? id;
@@ -177,17 +192,21 @@ function LevelUpBody({ request, system, context, packs, inTable = false, onClose
     const sheetRules = sheet.map((entry) => loadedSheet?.get(entry.classId)?.info?.multiclass ?? multiclassRulesOf(entry.classId, sourcesById.get(entry.classId)?.meta));
     return [...sourcesById]
       .filter(([id]) => !onSheet.has(id))
-      .map(([id, source]) => ({ id, name: candidateName(id), prerequisites: prerequisites(scores, [...sheetRules, multiclassRulesOf(id, source.meta)]) }))
-      .sort((a, b) => a.name.localeCompare(b.name, locale));
+      .map(([id, source]) => ({ id, name: candidateName(id), order: source.order, prerequisites: prerequisites(scores, [...sheetRules, multiclassRulesOf(id, source.meta)]) }))
+      // Built-in classes in the game's order, then pack and homebrew ones by name (UAT m11).
+      .sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity) || a.name.localeCompare(b.name, locale))
+      .map(({ order, ...candidate }) => ({ ...candidate, custom: order === null }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourcesById, base, sheet, loadedSheet, locale, nameOf]);
 
-  const continueLevel = () => {
-    setBase(request.current());
+  /** Back to the form on `data`: after 繼續升級 the sheet now, after 復原上次升級 the sheet undone. */
+  const restart = (data: Record<string, unknown>) => {
+    setBase(data);
     setApplied(null);
-    setPick({ kind: "advance", classId });
+    setPick({ kind: "advance", classId: text(data.classId) });
     setAddId(null);
   };
+  const continueLevel = () => restart(request.current());
   const openFollowUp = (start: Parameters<NonNullable<LevelUpRequest["openCompendium"]>>[0]) => {
     request.openCompendium?.(start);
     onClose();
@@ -198,14 +217,18 @@ function LevelUpBody({ request, system, context, packs, inTable = false, onClose
     setAddId(null);
   };
   const addName = addId ? candidateName(addId) : "";
+  const picker = pick.kind === "add" && (
+    <ClassPicker candidates={candidates} picked={addId} onPick={setAddId} onChange={() => setAddId(null)} />
+  );
   const formKey = `${pickValue(pick)}:${addId ?? ""}:${plan?.character?.to ?? plan?.toLevel ?? 0}`;
 
   return (
     <Dialog open onOpenChange={(next) => !next && onClose()}>
-      <DialogContent className="flex max-h-[92vh] flex-col sm:max-w-lg" data-level-up-dialog>
+      <DialogContent className="flex max-h-[90dvh] flex-col gap-3 p-4 sm:max-w-lg sm:p-6" data-level-up-dialog>
         <DialogHeader>
           <DialogTitle>{applied ? t("result.title", { level: applied.level }) : t("title")}</DialogTitle>
-          <DialogDescription>{t("description")}</DialogDescription>
+          {/* The instruction is for choosing; the result screen summarizes instead (UAT m8). */}
+          <DialogDescription className={applied ? "sr-only" : undefined}>{applied ? t("result.changes") : t("description")}</DialogDescription>
         </DialogHeader>
         {!applied && (
           <div className="flex flex-wrap items-center gap-2" data-level-up-class-slot>
@@ -232,240 +255,29 @@ function LevelUpBody({ request, system, context, packs, inTable = false, onClose
           </div>
         )}
         {applied ? (
-          <AppliedView applied={applied} request={request} onContinue={continueLevel} onFollowUp={openFollowUp} onClose={onClose} />
+          <AppliedView applied={applied} request={request} onContinue={continueLevel} onUndone={restart} onFollowUp={openFollowUp} onClose={onClose} />
+        ) : plan ? (
+          <LevelUpForm
+            key={formKey}
+            plan={plan}
+            before={picker}
+            featChoices={fightingStyles}
+            columnLabels={(pick.kind === "add" ? loadedAdd : loadedSheet?.get(pick.classId))?.columnLabels ?? {}}
+            unarmoredName={plan.unarmoredDefense ? candidateName(plan.unarmoredDefense.value) : addName}
+            request={request}
+            system={system}
+            context={context}
+            inTable={inTable}
+            onApplied={(next) => setApplied(next)}
+            onClose={onClose}
+          />
         ) : (
-          <>
-            {pick.kind === "add" && <ClassPicker candidates={candidates} picked={addId} onPick={setAddId} />}
-            {plan === undefined ? (
-              pick.kind === "add" && !addId ? null : <p className="text-sm text-muted-foreground" role="status">{t("loading")}</p>
-            ) : plan === null ? null : (
-              <LevelUpForm
-                key={formKey}
-                plan={plan}
-                columnLabels={(pick.kind === "add" ? loadedAdd : loadedSheet?.get(pick.classId))?.columnLabels ?? {}}
-                unarmoredName={plan.unarmoredDefense ? candidateName(plan.unarmoredDefense.value) : addName}
-                request={request}
-                system={system}
-                context={context}
-                inTable={inTable}
-                onApplied={(next) => setApplied(next)}
-                onClose={onClose}
-              />
-            )}
-          </>
+          <LevelUpShell onCancel={onClose} blocked={pick.kind === "add" && !addId ? tMulti("blocked.pick") : t("loading")}>
+            {picker}
+            {plan === undefined && (pick.kind !== "add" || addId) && <p className="text-sm text-muted-foreground" role="status">{t("loading")}</p>}
+          </LevelUpShell>
         )}
       </DialogContent>
     </Dialog>
-  );
-}
-
-function AppliedView({
-  applied,
-  request,
-  onContinue,
-  onFollowUp,
-  onClose,
-}: {
-  applied: Applied;
-  request: LevelUpRequest;
-  onContinue: () => void;
-  onFollowUp: (start: Parameters<NonNullable<LevelUpRequest["openCompendium"]>>[0]) => void;
-  onClose: () => void;
-}) {
-  const t = useTranslations("levelUp");
-  const { feats, spells } = applied.followUp;
-  const canOpen = request.openCompendium !== null;
-  return (
-    <DialogFooter className="flex-wrap gap-2 sm:justify-start" data-level-up-result>
-      {canOpen && feats && (
-        <Button type="button" onClick={() => onFollowUp({ tab: "feats", category: feats })}>
-          {feats === "epicBoon" ? t("result.epicBoon") : t("result.feats")}
-        </Button>
-      )}
-      {canOpen && spells && (
-        <Button type="button" variant={feats ? "outline" : "default"} onClick={() => onFollowUp({
-          tab: "spells",
-          classId: spells.list,
-          ...(spells.castingClass !== undefined ? { castingClassOf: { [spells.list]: spells.castingClass } } : {}),
-        })}>
-          {t("result.spells")}
-        </Button>
-      )}
-      {applied.level < 20 && (
-        <Button type="button" variant="outline" onClick={onContinue}>
-          {t("result.continue", { level: applied.level + 1 })}
-        </Button>
-      )}
-      <Button type="button" variant="ghost" onClick={onClose}>
-        {t("close")}
-      </Button>
-    </DialogFooter>
-  );
-}
-
-function LevelUpForm({
-  plan,
-  columnLabels,
-  unarmoredName,
-  request,
-  system,
-  context,
-  inTable,
-  onApplied,
-  onClose,
-}: {
-  plan: LevelUpPlan;
-  columnLabels: Readonly<Record<number, string>>;
-  /** The localized class name of the offered Unarmored Defense. */
-  unarmoredName: string;
-  request: LevelUpRequest;
-  system: LoadedSystem;
-  context: ReferenceContextValue;
-  inTable: boolean;
-  onApplied: (applied: Applied) => void;
-  onClose: () => void;
-}) {
-  const t = useTranslations("levelUp");
-  const tField = useTranslations("field");
-  const tMulti = useTranslations("levelUp.multiclass");
-  const [hp, setHp] = useState<HpDraft>({ mode: "average" });
-  // Extra Attack another class already gives starts unchecked: it never stacks.
-  const stacks = plan.extraAttackStacks ?? [];
-  const [unchecked, setUnchecked] = useState<ReadonlySet<string>>(() => new Set(stacks));
-  const [allowed, setAllowed] = useState(false);
-  const [gains, setGains] = useState<GainsDraft>({ off: new Set(), skills: [], tools: [] });
-  const [unarmored, setUnarmored] = useState(true);
-  const [subclass, setSubclass] = useState<string | null>(null);
-  const [asi, setAsi] = useState<AsiDraft>({ kind: "abilities", increases: {} });
-  const [slots, setSlots] = useState(plan.slots?.matches ?? false);
-  const [error, setError] = useState<string | null>(null);
-  // One row per pick for the whole run: a re-run of the apply inside the updater keeps the row ids the undo removes.
-  const built = useRef(new Map<string, ReturnType<LevelUpRowBuilder>>());
-  const buildRow: LevelUpRowBuilder = (tab, ref, name) => {
-    const key = `${tab}|${ref}`;
-    if (!built.current.has(key)) built.current.set(key, buildCompendiumRow(tab, ref, name, system, context, !inTable));
-    return built.current.get(key) ?? null;
-  };
-
-  const features = offeredFeatures(plan, plan.subclass.choose ? subclass : plan.subclass.known?.ref ?? null);
-  const rolled = hp.mode === "roll" ? Number(hp.result) : NaN;
-  const hpReady = hp.mode === "average" || (Number.isInteger(rolled) && rolled >= 1 && rolled <= plan.hp.faces);
-  const asiUsed = asi.kind === "abilities" ? Object.values(asi.increases).reduce((sum, value) => sum + (value ?? 0), 0) : 0;
-  const asiReady = !plan.asi || asi.kind !== "abilities" || asiUsed === plan.asi.points;
-  const issues = plan.issues ?? [];
-  const prerequisitesReady = (plan.prerequisites ?? []).length === 0 || allowed;
-  const ready = hpReady && asiReady && prerequisitesReady && issues.length === 0;
-  const notes = Object.fromEntries(stacks.map((ref) => [ref, tMulti("extraAttack")]));
-
-  const toggle = (ref: string) =>
-    setUnchecked((previous) => {
-      const next = new Set(previous);
-      if (next.has(ref)) next.delete(ref);
-      else next.add(ref);
-      return next;
-    });
-
-  /** A skipped field's label; a row field (`multiclass.<id>.<field>`) reads like "Wizard's level". */
-  const fieldLabel = (data: Record<string, unknown>, field: string) => {
-    const label = (key: string) => (tField.has(key) ? tField(key) : key);
-    const [list, id, rowField] = field.split(".");
-    if (rowField === undefined) return label(field);
-    const row = Array.isArray(data[list]) ? (data[list] as Array<Record<string, unknown>>).find((entry) => entry?.id === id) : undefined;
-    return tMulti("rowField", { name: text(row?.name) || label(list), field: label(rowField) });
-  };
-
-  const undo = (written: LevelUpUndo) =>
-    request.update((previous) => {
-      const result = undoLevelUp(previous, written);
-      queueMicrotask(() => {
-        toast.success(t("undone"));
-        const keptRows = result.skipped.rows.flatMap(({ list, id }) => {
-          const row = Array.isArray(previous[list]) ? (previous[list] as Array<Record<string, unknown>>).find((entry) => entry?.id === id) : undefined;
-          if (!row) return [];
-          const name = text(row.name) || id;
-          return [list === "multiclass" ? tMulti("keptRow", { name }) : name];
-        });
-        const kept = [...result.skipped.fields.map((field) => fieldLabel(previous, field)), ...keptRows];
-        if (kept.length > 0) {
-          const items = kept.join("、");
-          toast.warning(t("undoKept", { items }));
-        }
-      });
-      return result.data;
-    });
-
-  const characterTo = plan.character?.to ?? plan.toLevel;
-  const issuesText = tMulti("issues", { items: issues.map((issue) => tMulti(`issue.${issue}`)).join("、") });
-
-  const apply = () => {
-    const choices: LevelUpChoices = {
-      hp: hp.mode === "roll" ? { mode: "roll", result: rolled } : { mode: "average" },
-      unchecked: [...unchecked],
-      subclass,
-      asi: asi.kind === "abilities" ? { kind: "abilities", increases: asi.increases } : asi.kind === "feat" ? { kind: "feat" } : null,
-      slots,
-      checked: stacks.filter((ref) => !unchecked.has(ref)),
-      ...(plan.gains ? { gains: { off: [...gains.off], skills: gains.skills, tools: gains.tools.filter((name) => name.trim()) } } : {}),
-      unarmoredDefense: unarmored,
-    };
-    const now = request.current();
-    const ids = runIds();
-    const result = applyLevelUp(now, plan, choices, buildRow, ids);
-    if (!result.ok) {
-      setError(result.reason === "snapshot" ? t("tooMuchText", { kb: Math.ceil(result.bytes / 1024) }) : result.reason === "issues" ? issuesText : t("stale"));
-      return;
-    }
-    // One data update. The sheet may have moved since `now` (a remote change): apply again on the latest data.
-    request.update((previous) => {
-      if (previous === now) return result.after;
-      const again = applyLevelUp(previous, plan, choices, buildRow, ids);
-      return again.ok ? again.after : previous;
-    });
-    request.recalc(now, result.after);
-    toast.success(t("done", { level: characterTo }), {
-      duration: Infinity,
-      closeButton: true,
-      action: { label: t("undo"), onClick: () => undo(result.undo) },
-    });
-    onApplied({ level: characterTo, followUp: result.followUp });
-  };
-
-  return (
-    <>
-      <div className="-mx-1 min-h-0 flex-1 space-y-3 overflow-y-auto px-1">
-        {issues.length > 0 && <p className="text-sm text-destructive" role="alert" data-level-up-issues>{issuesText}</p>}
-        {issues.length === 0 && <PrerequisiteSection plan={plan} allowed={allowed} onAllow={setAllowed} />}
-        {issues.length === 0 && !plan.classFound && <p className="text-sm text-muted-foreground" role="note" data-level-up-no-class>{t("noClass")}</p>}
-        {issues.length === 0 && <HpSection
-          plan={plan}
-          draft={hp}
-          onChange={setHp}
-          onRoll={() => setHp({ mode: "roll", result: String(rollDice({ count: 1, sides: plan.hp.faces }).subtotal) })}
-        />}
-        {issues.length === 0 && plan.classFound && (
-          <>
-            <SubclassSection plan={plan} picked={subclass} onPick={setSubclass} />
-            <FeaturesSection features={features} unchecked={unchecked} onToggle={toggle} notes={notes} />
-            <GainsSection plan={plan} draft={gains} onChange={setGains} />
-            <UnarmoredSection plan={plan} name={unarmoredName} apply={unarmored} onApply={setUnarmored} />
-            <AsiSection plan={plan} draft={asi} onChange={setAsi} />
-            {plan.epicBoon && <p className="text-sm" data-level-up-epic-boon>{t("epicBoon")}</p>}
-            <SlotsSection plan={plan} apply={slots} onApply={setSlots} />
-            {plan.slotsUnknown && <p className="text-sm text-muted-foreground" role="note" data-level-up-slots-unknown>{tMulti("slotsUnknown")}</p>}
-            <SpellsSection plan={plan} />
-            <ColumnsSection plan={plan} labels={columnLabels} />
-          </>
-        )}
-      </div>
-      {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
-      <DialogFooter>
-        <Button type="button" variant="ghost" onClick={onClose}>
-          {t("cancel")}
-        </Button>
-        <Button type="button" onClick={apply} disabled={!ready} data-level-up-apply>
-          {t("apply")}
-        </Button>
-      </DialogFooter>
-    </>
   );
 }

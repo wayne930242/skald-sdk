@@ -145,11 +145,11 @@ describe("the adapter's compendium start", () => {
       );
     });
     await act(async () => host.open!());
-    await waitFor(() => expect(seen.start).toEqual({ tab: "spells" }));
+    await waitFor(() => expect(seen.start).toEqual({ tab: "spells", present: { spells: [], features: [] } }));
     act(() => seen.onTabChange!("monsters"));
     fireEvent.click(screen.getByRole("button", { name: "close" }));
     await act(async () => host.open!());
-    await waitFor(() => expect(seen.start).toEqual({ tab: "monsters" }));
+    await waitFor(() => expect(seen.start).toEqual({ tab: "monsters", present: { spells: [], features: [] } }));
     vi.doUnmock("../compendium-dialog");
     vi.doUnmock("../use-reference-context");
   });

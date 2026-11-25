@@ -385,6 +385,7 @@
     }
   },
   "common": {
+    "closeToast": "關閉通知",
     "appName": "Skald",
     "loading": "載入中...",
     "error": "發生錯誤",
@@ -405,6 +406,16 @@
     "addSkillDescription": "選擇要新增到角色卡的技能",
     "aiTranslatedNotice": "此語言由 AI 翻譯，可能存在錯誤",
     "errorRetry": "發生錯誤，請稍後再試"
+  },
+  "packRules": {
+    "title": "系統擴充包規則",
+    "contents": "目錄",
+    "search": "搜尋規則",
+    "empty": "找不到相符的規則。",
+    "error": "無法讀取這套規則。",
+    "loading": "正在載入規則…",
+    "next": "下一頁",
+    "previous": "上一頁"
   },
   "characterReferenceField": {
     "namePlaceholder": "輸入角色名稱...",

@@ -2,6 +2,7 @@
 
 import { createContext, lazy, Suspense, useCallback, useContext, useState, type ReactNode } from "react";
 import { useSheetMode } from "@skald/sheet-sdk/modules/character/ui/renderer/sheet-mode";
+import type { RecalcNoticeInput } from "@skald/sheet-sdk/modules/character/ui/derived/use-recalc";
 import type { LoadedSystem } from "@skald/types/system";
 import type { Schema } from "@skald/types/schema";
 import type { RollConfig } from "@skald/dice/roll-expression";
@@ -42,8 +43,8 @@ export interface PlayContextValue {
 export interface LevelUpRequest {
   update: (updater: (previous: Record<string, unknown>) => Record<string, unknown>) => void;
   current: () => Record<string, unknown>;
-  /** B-024: the notice of what the change recalculated. */
-  recalc: (before: Record<string, unknown>, after: Record<string, unknown>) => void;
+  /** B-024: the notice of what the change recalculated; `into` shows its rows in the level-up notice. */
+  recalc: (before: Record<string, unknown>, after: Record<string, unknown>, into?: RecalcNoticeInput["into"]) => void;
   openCompendium: ((start: CompendiumStart) => void) | null;
 }
 

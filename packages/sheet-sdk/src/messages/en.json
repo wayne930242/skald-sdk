@@ -385,6 +385,7 @@
     }
   },
   "common": {
+    "closeToast": "Dismiss notification",
     "appName": "Skald",
     "loading": "Loading...",
     "error": "Something went wrong",
@@ -405,6 +406,16 @@
     "addSkillDescription": "Select a skill to add to the character sheet",
     "aiTranslatedNotice": "This language is AI-translated and may contain errors",
     "errorRetry": "Something went wrong. Please try again later."
+  },
+  "packRules": {
+    "title": "System pack rules",
+    "contents": "Contents",
+    "search": "Search rules",
+    "empty": "No matching rules.",
+    "error": "These rules are unavailable.",
+    "loading": "Loading rules…",
+    "next": "Next page",
+    "previous": "Previous page"
   },
   "characterReferenceField": {
     "namePlaceholder": "Enter character name...",

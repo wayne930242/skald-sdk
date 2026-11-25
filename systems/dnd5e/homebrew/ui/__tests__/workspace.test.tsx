@@ -183,7 +183,7 @@ it("lists a subclass's feature rows under it and keeps other feature rows in the
   await save("subclassFeature", "paladin/oath-of-devotion/extra-l7", "Extra Vow");
   mount(store);
   const subclass = await screen.findByRole("button", { name: "Oath of Ash" });
-  expect(subclass.parentElement!.textContent).toContain("1 feature");
+  expect(subclass.parentElement!.textContent).toContain("Subclass and 1 feature: 2 entries");
   expect(screen.queryByRole("button", { name: "Ash Ward" })).toBeNull();
   const orphan = screen.getByRole("button", { name: "Extra Vow" });
   expect(orphan.closest("section")!.querySelector("h3")!.textContent).toBe("subclassFeature");

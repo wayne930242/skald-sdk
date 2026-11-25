@@ -3,14 +3,24 @@ import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@skald/sheet-sdk/components/ui/button";
 import { loadBuiltinIdentity, loadOpenPackSchemaCheck } from "../../content-pack/open/load";
 import { nameKey } from "../../content-pack/domain/identity";
-import { EntriesRenderer } from "../../reference/entries-renderer";
 import { assembleOpenPack } from "../domain/assemble";
 import { newHomebrewId } from "../domain/forms";
 import { HOMEBREW_LIMITS } from "../domain/limits";
-import { subclassCodec, type SubclassContext, type SubclassForm } from "../domain/subclass";
+import {
+  keepsAll,
+  planMove,
+  spellProblems,
+  subclassCodec,
+  type MoveStash,
+  type SubclassContext,
+  type SubclassForm,
+} from "../domain/subclass";
 import type { HomebrewItemRecord, HomebrewPackRecord } from "../domain/types";
 import type { DndHomebrewStore, HomebrewResult } from "../store-port";
+import { EditorHeading } from "./editor-heading";
 import { ImportedBlocks } from "./imported-blocks";
+import { ReparentConfirm } from "./reparent-confirm";
+import { SubclassPreview } from "./subclass-preview";
 import { loadSubclassCatalog, loadSubclassContext, type SubclassCatalog } from "./subclass-context";
 import { FeatureSections, SpellRows, TextBox, ThirdCaster } from "./subclass-parts";
 
@@ -23,7 +33,8 @@ type Props = {
   reload(): void;
   run(write: () => Promise<HomebrewResult<unknown>>, done?: () => void): Promise<void>;
 };
-type Opened = { catalog: SubclassCatalog; context?: SubclassContext; form: SubclassForm; lossless: boolean };
+/** `orphan`: the stored key of a subclass whose parent class is gone; it opens with no parent chosen. */
+type Opened = { catalog: SubclassCatalog; context?: SubclassContext; form: SubclassForm; lossless: boolean; orphan?: string };
 
 /** Loads the catalog (and, for a stored subclass, its context) before the form can read it back. */
 export function SubclassEditor(props: Props) {
@@ -36,7 +47,20 @@ export function SubclassEditor(props: Props) {
       const catalog = await loadSubclassCatalog(allRows);
       if (!row) return { catalog, form: subclassCodec.empty(), lossless: true };
       const parent = catalog.parents.find((p) => p.id === row.payload.entry?.meta?.parent);
-      if (!parent) return { catalog, form: subclassCodec.empty(), lossless: false };
+      if (!parent) {
+        const features = subclassCodec.rowsOf(row.key, rows);
+        const base = {
+          labels: catalog.labels,
+          legacy: catalog.legacy,
+          spellNames: catalog.spells,
+          abilityNames: catalog.abilityNames,
+          classNames: catalog.classNames,
+        };
+        const stand = subclassCodec.orphanContext(row.payload, features, base, allRows, row.key);
+        if (!stand) return { catalog, form: subclassCodec.empty(), lossless: false };
+        const read = subclassCodec.fromRows(row.payload, features, stand);
+        return { catalog, form: { ...read.form, parent: "" }, lossless: read.lossless, orphan: row.key };
+      }
       const context = await loadSubclassContext(catalog, parent, allRows, row.key);
       return { catalog, context, ...subclassCodec.fromRows(row.payload, subclassCodec.rowsOf(row.key, rows), context) };
     })().then(
@@ -59,7 +83,9 @@ export function SubclassEditor(props: Props) {
         ))}
       </div>
     );
-  return <SubclassFormView {...props} catalog={opened.catalog} initial={opened.form} initialContext={opened.context} />;
+  return (
+    <SubclassFormView {...props} catalog={opened.catalog} initial={opened.form} initialContext={opened.context} orphan={opened.orphan} />
+  );
 }
 
 function SubclassFormView({
@@ -73,16 +99,33 @@ function SubclassFormView({
   catalog,
   initial,
   initialContext,
-}: Props & { catalog: SubclassCatalog; initial: SubclassForm; initialContext?: SubclassContext }) {
+  orphan,
+}: Props & { catalog: SubclassCatalog; initial: SubclassForm; initialContext?: SubclassContext; orphan?: string }) {
   const t = useTranslations("homebrew");
   const zh = useLocale() === "zh-TW";
   const [draft, setDraft] = useState(initial);
   const [context, setContext] = useState(initialContext);
   const [fallback] = useState(() => newHomebrewId(""));
   const [problem, setProblem] = useState("");
+  // A parent change that would remove or move parts of the draft waits here for the author's confirmation.
+  const [pendingParent, setPendingParent] = useState<string | null>(null);
+  // What confirmed moves took, given back when a later parent fits it.
+  const [stash, setStash] = useState<MoveStash>();
   // The stored subclass this editor writes: the opened row, or the one a partial save created.
   const [owned, setOwned] = useState(row?.key);
   const parent = catalog.parents.find((p) => p.id === draft.parent);
+  // Recomputed on every render, so edits made while a move waits for confirmation count.
+  const moveOf = (id: string) => planMove(draft, stash, catalog.parents.find((p) => p.id === id));
+  const pending = pendingParent === null ? null : { parent: catalog.parents.find((p) => p.id === pendingParent), ...moveOf(pendingParent) };
+  const apply = (move: ReturnType<typeof moveOf>) => {
+    setProblem("");
+    setDraft(move.form);
+    setStash(move.stash);
+    setPendingParent(null);
+  };
+  const reparent = Boolean(orphan) && !parent;
+  // An orphan picks a new parent until a save starts writing it under that parent's key.
+  const parentLocked = Boolean(owned) && !(orphan && owned === orphan);
   useEffect(() => {
     if (!parent || context?.parent.id === parent.id) return;
     let active = true;
@@ -98,6 +141,8 @@ function SubclassFormView({
   const form = { ...draft, id: draft.id || newHomebrewId(draft.nameEn).slice(0, 60).replace(/-+$/, "") || fallback };
   const ready = parent && context?.parent.id === parent.id ? context : undefined;
   const issues = subclassCodec.issues(form, parent);
+  // A spell above the castable level (or a cantrip) blocks the save; the read-back of stored rows does not check it.
+  const spellIssues = parent ? spellProblems(form, parent, (ref) => catalog.spellInfo[ref]) : [];
   let preview: ReturnType<typeof subclassCodec.toRows> | null = null;
   try {
     preview = ready && !issues.length ? subclassCodec.toRows(form, ready) : null;
@@ -134,7 +179,8 @@ function SubclassFormView({
     const file = assembleOpenPack(pack, rowsOut);
     file.manifest.payloadSha256 = "0".repeat(64);
     if (!(await loadOpenPackSchemaCheck())(file).ok) return { ok: false, error: "invalid" };
-    const plan = subclassCodec.plan(fixed, ctx, rows);
+    // A re-parented orphan gets a new key: its old rows are deleted once the new ones are written.
+    const plan = subclassCodec.plan(fixed, ctx, rows, row?.key);
     const usage = await store.usage();
     if (!usage.ok) return usage;
     if (usage.value.items + plan.addedRows > HOMEBREW_LIMITS.items) return { ok: false, error: "limitItems" };
@@ -156,30 +202,28 @@ function SubclassFormView({
       onSubmit={(e) => {
         e.preventDefault();
         setProblem("");
-        if (!ready || issues.length) {
-          setProblem(t("invalidFields", { fields: (issues.length ? issues : ["parent"]).map(issueName).join(", ") }));
+        const blocking = [...issues, ...(spellIssues.length ? ["spellLevel"] : [])];
+        if (!ready || blocking.length) {
+          setProblem(t("invalidFields", { fields: (blocking.length ? blocking : ["parent"]).map(issueName).join(", ") }));
           return;
         }
         void run(() => save(ready));
       }}
     >
-      <h3 className="font-heading text-xl">{t("kind.subclass")}</h3>
+      <EditorHeading>{t("kind.subclass")}</EditorHeading>
       <label className="block space-y-1 text-sm">
         <span>{t("subclass.parent")}</span>
         <select
-          className="block w-full rounded border bg-background p-2"
-          value={draft.parent}
-          disabled={Boolean(owned)}
+          className={`block w-full rounded border bg-background p-2 ${reparent ? "border-destructive ring-2 ring-destructive/40" : ""}`}
+          value={pendingParent ?? draft.parent}
+          disabled={parentLocked}
+          aria-invalid={reparent || undefined}
+          aria-describedby={reparent ? "subclass-reparent" : undefined}
           onChange={(e) => {
-            const next = catalog.parents.find((p) => p.id === e.target.value);
-            set({
-              parent: e.target.value,
-              spells: [],
-              spellcasting: null,
-              features: draft.features.map((f) =>
-                next?.subclassLevels.includes(f.level) ? f : { ...f, level: next?.subclassLevels[0] ?? f.level },
-              ),
-            });
+            // Applied at once only when nothing of the draft is removed or moved; else it waits for confirmation.
+            const move = moveOf(e.target.value);
+            if (keepsAll(move.changes)) apply(move);
+            else setPendingParent(e.target.value);
           }}
         >
           <option value="">{t("subclass.pickParent")}</option>
@@ -189,8 +233,23 @@ function SubclassFormView({
             </option>
           ))}
         </select>
-        {owned && <span className="text-muted-foreground">{t("subclass.parentFixed")}</span>}
+        {owned && !orphan && <span className="text-muted-foreground">{t("subclass.parentFixed")}</span>}
       </label>
+      {reparent && !pending && (
+        <p id="subclass-reparent" role="alert" className="-mt-3 text-sm text-destructive">
+          {t("subclass.reparent")}
+        </p>
+      )}
+      {pending?.parent && (
+        <ReparentConfirm
+          parent={pending.parent}
+          changes={pending.changes}
+          catalog={catalog}
+          zh={zh}
+          confirm={() => apply(pending)}
+          cancel={() => setPendingParent(null)}
+        />
+      )}
       <div className="grid gap-3 sm:grid-cols-2">
         <TextBox label={t("field.nameZh")} value={draft.nameZh} change={(nameZh) => set({ nameZh })} />
         <TextBox label={t("field.nameEn")} value={draft.nameEn} change={(nameEn) => set({ nameEn })} />
@@ -204,20 +263,7 @@ function SubclassFormView({
           <SpellRows form={draft} set={set} parent={parent} catalog={catalog} />
         </>
       )}
-      {preview && (
-        <section className="space-y-3 rounded bg-muted p-3 sm:p-4" data-subclass-preview>
-          <h4 className="text-sm text-muted-foreground">{t("preview")}</h4>
-          {preview.map((r) => (
-            <article key={r.key} className="min-w-0 break-words">
-              <strong>{(zh && r.payload.zhTW?.name) || r.payload.entry!.name}</strong>
-              <EntriesRenderer
-                context={{ resolveRef: () => null }}
-                entries={zh && r.payload.zhTW ? r.payload.zhTW.entries : r.payload.entry!.entries}
-              />
-            </article>
-          ))}
-        </section>
-      )}
+      {preview && <SubclassPreview rows={preview} zh={zh} />}
       {problem && <p role="alert">{problem}</p>}
       <Button type="submit">{t("save")}</Button>
     </form>

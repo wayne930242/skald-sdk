@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { toast } from "sonner";
 import type { FormulaValue } from "@skald/formula";
 import { diffDerived, snapshotDerived, type CharacterFormulaRuntime, type DerivedSnapshot, type RecalcRow } from "@skald/sheet-sdk/modules/sheet-schema";
@@ -14,6 +15,11 @@ export interface RecalcNoticeInput {
   format?: (fieldId: string, value: FormulaValue | undefined) => string;
   /** A 恢復自動計算 button on each "overridden" row. */
   restore?: (fieldId: string) => void | Promise<void>;
+  /**
+   * Shows the rows inside the caller's own notice instead of a toast of their own (the level-up
+   * notice: one toast per level up), with the notice's title.
+   */
+  into?: (rows: ReactNode, title: string) => void;
 }
 
 const plain = (_fieldId: string, value: FormulaValue | undefined) =>
@@ -83,6 +89,11 @@ export function showRecalcSnapshots(before: DerivedSnapshot, after: DerivedSnaps
 
 export function showRecalcNotice(input: RecalcNoticeInput, text: RecalcText): void {
   if (input.rows.length === 0) return;
+  if (input.into) {
+    // The caller's notice stays open: a restore leaves it there.
+    input.into(<RecalcRows {...input} text={text} done={() => {}} />, text("recalc.title"));
+    return;
+  }
   const hasRestore = !!input.restore && input.rows.some((row) => row.kind === "overridden");
   const id = toast(text("recalc.title"), {
     description: <RecalcRows {...input} text={text} done={() => toast.dismiss(id)} />,

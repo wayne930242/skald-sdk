@@ -23,8 +23,9 @@ import {
   type SlotLevel,
 } from "../sheet/play/play-model";
 import { rowBodyText } from "../sheet/play/row-body";
-import { classLine, hitDicePools, sheetClasses } from "../sheet/play/class-model";
-import { castingClasses, spellCasting } from "../sheet/play/casting-classes";
+import { classLine, hitDicePools, subclassLine } from "../sheet/play/class-model";
+import { originName } from "../sheet/play/sheet-names";
+import { castingClasses, spellCasting, type CastingOptions } from "../sheet/play/casting-classes";
 import { inventorySummary, type CarryStatus } from "../sheet/economy/carry";
 import { catalogItem, type Catalog } from "../sheet/economy/catalog";
 
@@ -210,6 +211,11 @@ export interface DndPrintInput {
   gameData?: Record<string, unknown>;
   /** The SRD item catalog (weights); null until it loads, or when it does not. */
   catalog?: Catalog | null;
+  /**
+   * Class, subclass, species and background names in the viewer's locale (UAT M10) and the packs'
+   * subclass entries (a homebrew third caster); without them the print keeps the stored text.
+   */
+  casting?: CastingOptions;
 }
 
 function originOf(row: Row): PrintRowLine["origin"] {
@@ -306,7 +312,8 @@ function damageCantrip(gameData: Record<string, unknown> | undefined, ref: strin
 
 const tenth = (value: number) => Math.round(value * 10) / 10;
 
-export function buildDndPrintModel({ values, blanks, nameOf, compare = (a, b) => a.localeCompare(b), gameData, catalog = null }: DndPrintInput): DndPrintModel {
+export function buildDndPrintModel({ values, blanks, nameOf, compare = (a, b) => a.localeCompare(b), gameData, catalog = null, casting = {} }: DndPrintInput): DndPrintModel {
+  const names = casting.names;
   const level = Math.max(1, num(values.level, 1));
 
   const abilities = ABILITIES.map((id) => ({
@@ -320,7 +327,6 @@ export function buildDndPrintModel({ values, blanks, nameOf, compare = (a, b) =>
 
   const hp = hitPoints(values);
   const dice = hitDice(values);
-  const multiclass = sheetClasses(values).length > 1;
   const exhaustion = exhaustionLevel(values);
   const active = new Set(conditionsOf(values));
   const conditions = blanks
@@ -368,8 +374,8 @@ export function buildDndPrintModel({ values, blanks, nameOf, compare = (a, b) =>
       key: `cantrip:${index}`,
       kind: "cantrip" as const,
       name: spell.name,
-      attack: facts.attack ? spellCasting(values, spell.row).attack : null,
-      dc: facts.attack ? null : spellCasting(values, spell.row).dc,
+      attack: facts.attack ? spellCasting(values, spell.row, casting).attack : null,
+      dc: facts.attack ? null : spellCasting(values, spell.row, casting).dc,
       dice: cantripDice(facts.dice, level),
       damageType: "",
       notes: spell.notes,
@@ -391,7 +397,7 @@ export function buildDndPrintModel({ values, blanks, nameOf, compare = (a, b) =>
   const pact = pactSlots(values);
   const casterAbility = text(values.spellAbility);
   const hasAbility = casterAbility !== "" && casterAbility !== "none";
-  const casters = castingClasses(values);
+  const casters = castingClasses(values, casting);
   const caster = hasAbility || casters.length > 0 || spells.length > 0 || slots.some((slot) => slot.total > 0) || pact !== null;
 
   const summary = inventorySummary(values, catalog);
@@ -420,12 +426,13 @@ export function buildDndPrintModel({ values, blanks, nameOf, compare = (a, b) =>
     name: text(values.name).trim(),
     blanks,
     identity: {
-      background: text(values.background).trim(),
-      // Several classes: "Fighter 5 · Champion / Wizard 2" in the class box, the subclasses inside it.
-      className: multiclass ? classLine(values, { separator: " / ", level: String }) : text(values.className).trim(),
-      species: text(values.species).trim(),
+      background: originName(values, "background", names).trim(),
+      // Several classes: "Fighter 5 / Wizard 2" in the class box and each class's subclass in the
+      // subclass box (UAT m17), all in the viewer's locale.
+      className: classLine(values, { separator: " / ", level: String }, names, { subclasses: false }),
+      species: originName(values, "species", names).trim(),
       lineage: text(values.lineage).trim(),
-      subclass: multiclass ? "" : text(values.subclass).trim(),
+      subclass: subclassLine(values, " / ", names),
       player: text(values.player).trim(),
       level,
       xp: Math.max(0, num(values.xp)),

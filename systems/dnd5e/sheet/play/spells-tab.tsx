@@ -29,7 +29,9 @@ import {
 } from "./play-model";
 import { displayName, spellLine, summaryOf, useRowText, useSpellFacts, type SpellFacts } from "./row-text";
 import { ConcentrationChip } from "./vitals-bar";
-import { castingClasses, isMulticlass, spellCasting } from "./casting-classes";
+import { castingClasses, grantedCasting, isMulticlass, singleClassGranted, spellCasting, type CastingOptions } from "./casting-classes";
+import { className } from "./sheet-names";
+import { useSheetNames } from "./use-sheet-names";
 import { CastingClassControl, CastingTiles, TILE } from "./casting-tiles";
 import { sheetClasses } from "./class-model";
 import type { CompendiumStart } from "../compendium-rows";
@@ -109,6 +111,7 @@ export function castFacts(facts: SpellFacts, spellLevel: number, castLevel: numb
 export function CastButton({ spell, onCast }: { spell: Record<string, unknown>; onCast?: (level: number) => void }) {
   const t = useTranslations("play");
   const { values, editable, write, reference } = usePlay();
+  const { casting } = useSheetNames();
   // B-023 Q2: casting has nothing to edit, so edit mode disables it
   const editing = usePlayEditing();
   const [choosing, setChoosing] = useState(false);
@@ -123,7 +126,7 @@ export function CastButton({ spell, onCast }: { spell: Record<string, unknown>; 
     write(patch);
     const level = via === "ritual" ? num(spell.level) : via.level;
     onCast?.(level);
-    const atLevel = facts ? castFacts(facts, num(spell.level), level, spellCasting(values, spell).mod) : null;
+    const atLevel = facts ? castFacts(facts, num(spell.level), level, spellCasting(values, spell, casting).mod) : null;
     const dice = atLevel?.dice ?? atLevel?.heal;
     const done =
       via === "ritual"
@@ -173,12 +176,15 @@ export function CastButton({ spell, onCast }: { spell: Record<string, unknown>; 
 export function SpellDamageButtons({ spell, facts, compact = false }: { spell: Record<string, unknown>; facts: SpellFacts; compact?: boolean }) {
   const t = useTranslations("play");
   const { values, schema, reference } = usePlay();
+  const { casting } = useSheetNames();
   const open = useOpenDndEditor();
   const openRow = useOpenRowEditor();
   const name = displayName(reference, spell);
-  // A multiclass sheet's row rolls with its own class's attack bonus (CLASS-IMPL §7.5 M5).
-  const attack = spellCasting(values, spell).attack;
-  const attackData = isMulticlass(values) ? { ...values, spellAttack: attack } : values;
+  // The row rolls with the bonus it shows: its own class's on a multiclass sheet (CLASS-IMPL §7.5 M5), the
+  // subclass's on a single-class third caster (UAT F009).
+  const computed = spellCasting(values, spell, casting);
+  const attack = computed.attack;
+  const attackData = { ...values, spellAttack: attack, spellMod: computed.mod, spellSaveDc: computed.dc };
   // B-023: in edit mode the attack opens spellcasting, the dice the spell's fields
   const editFields = () => openRow({ kind: "fields", list: "spells", row: spell, name });
   return (
@@ -212,6 +218,7 @@ function Tag({ children }: { children: string }) {
 function SpellRow({ spell }: { spell: Record<string, unknown> }) {
   const t = useTranslations("play");
   const { values, reference, openReference } = usePlay();
+  const { casting } = useSheetNames();
   const level = num(spell.level);
   const facts = useSpellFacts(text(spell.ref));
   const body = useRowText(reference, spell);
@@ -221,7 +228,7 @@ function SpellRow({ spell }: { spell: Record<string, unknown> }) {
   const [castLevel, setCastLevel] = useState(level);
   const unprepared = level > 0 && spell.prepared !== true;
   const castable = level > 0 && (!unprepared || canCastRitual(values, spell));
-  const scaled = facts && level > 0 ? castFacts(facts, level, castLevel, spellCasting(values, spell).mod) : facts;
+  const scaled = facts && level > 0 ? castFacts(facts, level, castLevel, spellCasting(values, spell, casting).mod) : facts;
   const dice = scaled?.dice ? (level === 0 ? cantripDice(scaled.dice, num(values.level, 1)) : scaled.dice) : null;
   const heal = scaled?.heal ?? null;
   const rollable = facts && (facts.attack || dice || heal);
@@ -286,26 +293,39 @@ export function classSpellList(system: ReturnType<typeof usePlay>["system"], cla
 
 /**
  * The 法術 library preset. Single class: that class's list, as before. Multiclass: 「我的職業」, the
- * union of every sheet class's list (borrowed lists respected); a spell added while one list is
- * filtered records the class that casts from it (`castingClass`, CLASS-IMPL §7.5 M5).
+ * union of every sheet class's list (borrowed lists respected; a class that casts only through its
+ * subclass, the subclass's list). A spell added from it records the class
+ * that casts it (`castingClass`, CLASS-IMPL §7.5 M5): the one class whose list holds it, or the class
+ * the player picks in the row when several do (`spellClasses`).
  */
 export function spellLibrary(
   system: ReturnType<typeof usePlay>["system"],
   values: Record<string, unknown>,
   reference?: Pick<ReferenceContextValue, "packSpellListOf">,
+  casting: CastingOptions = {},
 ): CompendiumStart {
   if (!isMulticlass(values)) {
     const classId = text(values.classId);
+    // A class that casts only through its subclass (F009) presets the subclass's list.
+    const list = singleClassGranted(values, casting)?.list;
+    if (list) return { tab: "spells", classId: list };
     return { tab: "spells", ...(classId ? { classId: classSpellList(system, classId, reference) } : {}) };
   }
   const castingClassOf: Record<string, string> = {};
+  const spellClasses: NonNullable<CompendiumStart["spellClasses"]> = [];
   for (const sheetClass of sheetClasses(values)) {
     if (!sheetClass.classId) continue;
-    const list = classSpellList(system, sheetClass.classId, reference);
-    if (!(list in castingClassOf)) castingClassOf[list] = sheetClass.start ? "" : sheetClass.classId;
+    const ownAbility = sheetClass.start ? text(values.spellAbility) : sheetClass.spellAbility;
+    const granted = CASTING_ABILITIES.has(ownAbility) ? null : grantedCasting(values, sheetClass, casting);
+    const list = granted?.list ?? classSpellList(system, sheetClass.classId, reference);
+    const key = sheetClass.start ? "" : sheetClass.classId;
+    if (!(list in castingClassOf)) castingClassOf[list] = key;
+    spellClasses.push({ castingClass: key, list, name: className(sheetClass.classId, sheetClass.name, casting.names) || sheetClass.classId });
   }
-  return { tab: "spells", classIds: Object.keys(castingClassOf), castingClassOf };
+  return { tab: "spells", classIds: Object.keys(castingClassOf), castingClassOf, spellClasses };
 }
+
+const CASTING_ABILITIES = new Set(["int", "wis", "cha"]);
 
 export function SpellsTab() {
   return (
@@ -333,7 +353,8 @@ function SpellsTabBody() {
   const attack = num(values.spellAttack);
   const slotLevels = new Set([...spellSlots(values).map((slot) => slot.level), ...(pactSlots(values) ? [pactSlots(values)!.level] : [])]);
   const levels = [...new Set([...groups.map((group) => group.level), ...slotLevels])].sort((a, b) => a - b);
-  const casters = castingClasses(values);
+  const { casting } = useSheetNames();
+  const casters = castingClasses(values, casting);
   const preparedTile = (
     <div className={TILE} data-play-stat="prepared">
       <span className="text-xs text-muted-foreground">{t("spells.preparedLong")}</span>
@@ -389,7 +410,7 @@ function SpellsTabBody() {
       <ConcentrationChip />
       <EditSlot part="spellcasting" />
       <div className="flex flex-wrap items-center justify-between gap-x-3">
-        <AddControls list="spells" library={spellLibrary(system, values, reference)} />
+        <AddControls list="spells" library={spellLibrary(system, values, reference, casting)} />
         <CustomLink list="spells" />
       </div>
       <section className="space-y-2 rounded-xl border border-border bg-card p-2">

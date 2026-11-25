@@ -3,6 +3,12 @@
     "title": "Skald sheet previewer",
     "intro": "Open a system's sheet in edit, play or print mode. Characters stay in this browser (localStorage); nothing is sent anywhere.",
     "language": "Language",
+    "systemPack": {
+      "title": "Preview a system pack",
+      "note": "Load a skald/system-pack/v1 JSON file. The pack and character edits stay in this tab until reload. Test the character creation wizard on the site; it does not run offline.",
+      "rules": "Rules reference",
+      "failed": "Could not open this pack."
+    },
     "systems": {
       "fate-condensed": "Fate Condensed",
       "dnd5e-2024": "D&D 2024 (SRD 5.2.1)"

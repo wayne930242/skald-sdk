@@ -3,7 +3,21 @@ import type { DiceRoll } from "@skald/dice";
 import type { ExcelFormulaEvaluator } from "@skald/dice/formula";
 import type { GameIconSource } from "@skald/sheet-sdk/lib/game-icons/client";
 import { defineHostPort } from "./host-ports";
+import type { RuleNode } from "../domain/system-pack/rule-nodes";
 import type { PdfRenderer } from "./system-print";
+
+export interface RulesTitle { key: string; title: string }
+export interface RulesDocument extends RulesTitle { blocks: RuleNode[]; summary?: string | null }
+export interface RulesHit extends RulesTitle { collection: string | null; snippet: string }
+export interface SystemRulesReader {
+  toc(): Promise<(RulesTitle & { parent_key: string | null })[]>;
+  section(key: string): Promise<RulesDocument>;
+  collections(): Promise<RulesTitle[]>;
+  entries(collection: string, page: number): Promise<{ items: RulesTitle[]; hasMore: boolean }>;
+  entry(collection: string, key: string): Promise<RulesDocument>;
+  search(query: string): Promise<RulesHit[]>;
+}
+export const systemRulesPort = defineHostPort<(slug: string) => Promise<SystemRulesReader>>("systemRules");
 
 /** Who is rolling at which table: the session a roll is posted to. */
 export interface BoundRollSession {
@@ -38,6 +52,7 @@ export type ExcelFormulaEvaluatorFactory = () => Promise<ExcelFormulaEvaluator>;
  * serve, and the rest show as unavailable.
  */
 export const corePorts = {
+  systemRules: systemRulesPort,
   /** Posts a roll to the bound table session's chat. */
   rollSessionSender: defineHostPort<RollSessionTransport>("rollSessionSender"),
   portraitUpload: defineHostPort<PortraitUploadPort>("portraitUpload"),

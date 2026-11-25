@@ -16,7 +16,7 @@ import { devicePackLoader } from "./device-pack";
 import { MeasureLayer, PrintedPages, continuesOnPage2 } from "./layout-views";
 import { carryLine } from "./page-2";
 import { usePrintLabels } from "./print-labels";
-import { printName, usePrintReference, type PrintReference } from "./print-reference";
+import { printCasting, printName, usePrintPacks, usePrintReference, type PrintReference } from "./print-reference";
 import { buildDndPrintModel, type DndPrintModel, type Row } from "./print-model";
 import { loadCantripFacts, loadPrintTexts, type CantripFacts, type PrintText } from "./print-text";
 import { loadPrintMessages } from "./print-messages";
@@ -106,6 +106,8 @@ function DndPrintPages({ data, formulaRuntime, paper, blanks, onReadyChange }: P
   const gameData = system.gameData as Record<string, unknown> | undefined;
   const reference = usePrintReference(gameData);
   const { catalog, settled: catalogSettled } = useCatalog();
+  const { packs, settled: packsSettled } = usePrintPacks();
+  const casting = useMemo(() => printCasting(reference.naming, packs, locale), [reference, packs, locale]);
 
   const values = useMemo(() => {
     const derived = formulaRuntime ? evaluateCharacterFormulaRuntime(formulaRuntime, data).derivedValues : {};
@@ -121,8 +123,9 @@ function DndPrintPages({ data, formulaRuntime, paper, blanks, onReadyChange }: P
       compare: (a, b) => collator.compare(a, b),
       gameData,
       catalog,
+      casting,
     });
-  }, [blanks, catalog, gameData, locale, reference, values]);
+  }, [blanks, casting, catalog, gameData, locale, reference, values]);
   const loaded = useTexts(model, reference);
 
   const lineOf: SpellLineOf = useCallback(
@@ -138,8 +141,8 @@ function DndPrintPages({ data, formulaRuntime, paper, blanks, onReadyChange }: P
   );
 
   const content = useMemo(
-    () => (loaded && catalogSettled ? buildPrintContent({ model, texts: loaded.texts, cantrips: loaded.cantrips, labels, lineOf }) : null),
-    [catalogSettled, labels, lineOf, loaded, model],
+    () => (loaded && catalogSettled && packsSettled ? buildPrintContent({ model, texts: loaded.texts, cantrips: loaded.cantrips, labels, lineOf }) : null),
+    [catalogSettled, labels, lineOf, loaded, model, packsSettled],
   );
 
   const portrait = typeof data.portrait === "string" && data.portrait ? data.portrait : null;

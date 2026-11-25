@@ -4,6 +4,7 @@ import { act, cleanup, fireEvent, screen, waitFor, within } from "@testing-libra
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { toast } from "sonner";
 import { zhWithheld } from "../../../__tests__/zh-withheld";
+import type { EffectivePacks, PackEntry } from "../../../content-pack/domain/types";
 import { LevelUpDialog } from "../../level-up/level-up-dialog";
 import type { ReferenceContextValue } from "../../use-reference-context";
 import type { LevelUpRequest } from "../play-context";
@@ -29,14 +30,14 @@ afterEach(() => {
 
 type Row = Record<string, unknown>;
 
-function withLevelUp(openCompendium = vi.fn()): MountOptions["useHost"] {
+function withLevelUp(openCompendium = vi.fn(), packs: EffectivePacks | null = null): MountOptions["useHost"] {
   return function useLevelUpHost(reference: ReferenceContextValue) {
     const [request, setRequest] = useState<LevelUpRequest | null>(null);
     return {
       playView: { openLevelUp: setRequest, openCompendium },
       dialogs: request && (
         <Suspense fallback={null}>
-          <LevelUpDialog request={request} system={harness.system} context={reference} packs={null} onClose={() => setRequest(null)} />
+          <LevelUpDialog request={request} system={harness.system} context={reference} packs={packs} onClose={() => setRequest(null)} />
         </Suspense>
       ),
     };
@@ -52,14 +53,15 @@ async function click(element: Element) {
 async function openLevelUp(name = "升級") {
   await click(screen.getByRole("button", { name }));
   const dialog = await screen.findByRole("dialog", { name });
-  await waitFor(() => expect(dialog.querySelector("[data-level-up-apply]")).not.toBeNull());
+  // The form is in once its plan loaded: the footer shows from the start.
+  await waitFor(() => expect(dialog.querySelector("[data-level-up-hp]")).not.toBeNull());
   return dialog;
 }
 
 /** 新增職業… then the class: waits for its plan. */
-async function addClass(dialog: HTMLElement, classId: string) {
+async function addClass(dialog: HTMLElement, classId: string, label = "升級職業") {
   await act(async () => {
-    fireEvent.change(within(dialog).getByRole("combobox", { name: "升級職業" }), { target: { value: "add" } });
+    fireEvent.change(within(dialog).getByRole("combobox", { name: label }), { target: { value: "add" } });
   });
   const candidate = await waitFor(() => {
     const found = dialog.querySelector(`[data-level-up-candidate='${classId}']`);
@@ -67,7 +69,8 @@ async function addClass(dialog: HTMLElement, classId: string) {
     return found as HTMLElement;
   });
   await click(within(candidate).getByRole("radio"));
-  await waitFor(() => expect(dialog.querySelector("[data-level-up-apply]")).not.toBeNull());
+  // The form is in once its plan loaded: the footer shows from the start.
+  await waitFor(() => expect(dialog.querySelector("[data-level-up-hp]")).not.toBeNull());
   return candidate;
 }
 
@@ -106,6 +109,112 @@ describe("level-up helper multiclass UI (CLASS-IMPL §7.4)", () => {
     expect(wizard.querySelector("[data-level-up-prerequisite]")).toHaveTextContent(requirement);
     await click(within(wizard).getByRole("radio"));
     await waitFor(() => expect(dialog.querySelector("[data-level-up-prerequisites]")).toHaveTextContent(requirement));
+  });
+
+  it("keeps Cancel, Apply and the DM override in reach with 14 classes: one scrolling body, the footer outside it", async () => {
+    const homebrew = (id: string, name: string): PackEntry => ({ kind: "class", id, ref: `class:${id}`, name, entries: [], meta: { hitDie: 8, primaryAbility: ["cha"] } });
+    const packs: EffectivePacks = {
+      content: { entries: [homebrew("ash-warden", "Ash Warden"), homebrew("ember-sage", "Ember Sage")], overlays: {}, wizard: {}, zhTW: {} },
+      keys: ["homebrew"], supplier: { "class:ash-warden": "homebrew", "class:ember-sage": "homebrew" }, aliases: {}, shadowed: {},
+    };
+    await mountDnd(harness, { locale: "en", packs, extra: { ...fighter5, className: "Fighter", int: 10 }, useHost: withLevelUp(vi.fn(), packs) });
+    const dialog = await openLevelUp("Level up");
+    expect(dialog.className).toMatch(/max-h-\[90dvh\]/);
+    expect(dialog.className).toMatch(/\bflex-col\b/);
+    await act(async () => {
+      fireEvent.change(within(dialog).getByRole("combobox", { name: "Class" }), { target: { value: "add" } });
+    });
+    let body = dialog.querySelector<HTMLElement>("[data-level-up-body]")!;
+    let footer = dialog.querySelector<HTMLElement>("[data-level-up-footer]")!;
+    expect(body.className).toEqual(expect.stringContaining("overflow-y-auto"));
+    expect(body.className).toEqual(expect.stringContaining("min-h-0"));
+    expect(body.className).toEqual(expect.stringContaining("flex-1"));
+    // 12 built-in and 2 homebrew classes; the sheet's Fighter is not offered. Built-in in the game's order, homebrew after a divider.
+    expect([...body.querySelectorAll("[data-level-up-candidate]")].map((row) => row.getAttribute("data-level-up-candidate"))).toEqual([
+      "barbarian", "bard", "cleric", "druid", "monk", "paladin", "ranger", "rogue", "sorcerer", "warlock", "wizard", "ash-warden", "ember-sage",
+    ]);
+    expect(body.querySelector("[data-level-up-candidate='ash-warden']")?.className).toMatch(/border-t/);
+    expect(body.querySelector("[data-level-up-candidate='ember-sage']")?.className).not.toMatch(/border-t/);
+    expect(body.contains(footer)).toBe(false);
+    expect(footer.parentElement).toBe(dialog);
+    expect(within(footer).getByRole("button", { name: "Apply" })).toBeDisabled();
+    expect(footer.querySelector("[data-level-up-blocked]")).toHaveTextContent("Choose a class to add first.");
+    expect(within(footer).getByRole("button", { name: "Cancel" })).toBeEnabled();
+
+    await click(within(body.querySelector("[data-level-up-candidate='wizard']")!).getByRole("radio"));
+    await waitFor(() => expect(dialog.querySelector("[data-level-up-hp]")).not.toBeNull());
+    body = dialog.querySelector<HTMLElement>("[data-level-up-body]")!;
+    footer = dialog.querySelector<HTMLElement>("[data-level-up-footer]")!;
+    expect(body.contains(footer)).toBe(false);
+    expect(body.querySelector("[data-level-up-hp]")).not.toBeNull();
+    // The list folds to the chosen class; 更換 brings it back.
+    expect(body.querySelectorAll("[data-level-up-candidate]")).toHaveLength(0);
+    expect(body.querySelector("[data-level-up-picked='wizard']")).toHaveTextContent("Wizard");
+    const override = within(body).getByRole("checkbox", { name: "The DM allows it, add anyway" });
+    const apply = within(footer).getByRole("button", { name: "Apply" });
+    expect(apply).toBeDisabled();
+    expect(apply).toHaveAttribute("aria-describedby", "level-up-blocked");
+    expect(footer.querySelector("[data-level-up-blocked]")).toHaveTextContent("The ability requirement is not met");
+    await click(override);
+    expect(apply).toBeEnabled();
+    expect(footer.querySelector("[data-level-up-blocked]")).toBeNull();
+    await click(within(body).getByRole("button", { name: "Change" }));
+    expect(dialog.querySelectorAll("[data-level-up-body] [data-level-up-candidate]")).toHaveLength(13);
+  });
+
+  it("adding Cleric asks Protector or Thaumaturge in a radio group and adds only the pick", async () => {
+    const sheet = await mountDnd(harness, { locale: "en", extra: { ...fighter5, className: "Fighter", wis: 14 }, useHost: withLevelUp() });
+    const dialog = await openLevelUp("Level up");
+    await act(async () => {
+      fireEvent.change(within(dialog).getByRole("combobox", { name: "Class" }), { target: { value: "add" } });
+    });
+    await click(within(dialog.querySelector("[data-level-up-candidate='cleric']")!).getByRole("radio"));
+    await waitFor(() => expect(dialog.querySelector("[data-level-up-hp]")).not.toBeNull());
+    const order = within(dialog).getByRole("radiogroup", { name: "Divine Order: choose one" });
+    expect(within(order).getAllByRole("radio").map((radio) => radio.getAttribute("value"))).toEqual([
+      "classFeature:cleric/protector-l1", "classFeature:cleric/thaumaturge-l1", "",
+    ]);
+    expect(within(order).getByRole("radio", { name: "Choose later" })).toBeChecked();
+    expect(within(dialog).queryByRole("checkbox", { name: "Protector" })).toBeNull();
+    await click(within(order).getByRole("radio", { name: "Protector" }));
+    await click(within(dialog).getByRole("button", { name: "Apply" }));
+    const refs = (sheet.data().features as Row[]).map((row) => row.ref);
+    expect(refs).toContain("classFeature:cleric/divine-order-l1");
+    expect(refs).toContain("classFeature:cleric/protector-l1");
+    expect(refs).not.toContain("classFeature:cleric/thaumaturge-l1");
+  });
+
+  it("lists each unmet score once in one locale-joined line (Paladin at STR 10, CHA 8)", async () => {
+    await mountDnd(harness, { locale: "en", extra: { ...fighter5, className: "Fighter", str: 10, dex: 13, cha: 8 }, useHost: withLevelUp() });
+    const dialog = await openLevelUp("Level up");
+    fireEvent.change(within(dialog).getByRole("combobox", { name: "Class" }), { target: { value: "add" } });
+    const paladin = dialog.querySelector<HTMLElement>("[data-level-up-candidate='paladin']")!;
+    expect(paladin.querySelector("[data-level-up-prerequisite]")).toHaveTextContent(/^Needs Strength 13, Charisma 13 \(now 10\/8\)$/);
+  });
+
+  it.skipIf(zhSheet)("joins unmet scores with 、 in zh-TW: 需要 力量 13、魅力 13（目前 10／8）", async () => {
+    await mountDnd(harness, { extra: { ...fighter5, str: 10, dex: 13, cha: 8 }, useHost: withLevelUp() });
+    const dialog = await openLevelUp();
+    fireEvent.change(within(dialog).getByRole("combobox", { name: "升級職業" }), { target: { value: "add" } });
+    expect(dialog.querySelector("[data-level-up-candidate='paladin'] [data-level-up-prerequisite]")).toHaveTextContent(/^需要 力量 13、魅力 13（目前 10／8）$/);
+  });
+
+  it("adding Monk puts Unarmored Defense in its own Armor Class section", async () => {
+    await mountDnd(harness, { locale: "en", extra: { ...fighter5, className: "Fighter", dex: 13, wis: 13 }, useHost: withLevelUp() });
+    const dialog = await openLevelUp("Level up");
+    await addClass(dialog, "monk", "Class");
+    const section = dialog.querySelector<HTMLElement>("[data-level-up-armor-class]")!;
+    expect(within(section).getByRole("heading", { name: "Armor Class" })).toBeInTheDocument();
+    expect(section.querySelector("[data-level-up-unarmored]")).not.toBeNull();
+    expect(dialog.querySelector("[data-level-up-gains] [data-level-up-unarmored]")).toBeNull();
+  });
+
+  it("adding Cleric counts the cleric's prepared spells, not the sheet's background spells", async () => {
+    const spells = [{ id: "s1", name: "Bless", level: 1, prepared: true, source: "magic-initiate", castingClass: "" }];
+    await mountDnd(harness, { locale: "en", extra: { ...fighter5, className: "Fighter", wis: 13, spells }, useHost: withLevelUp() });
+    const dialog = await openLevelUp("Level up");
+    await addClass(dialog, "cleric", "Class");
+    expect(dialog.querySelector("[data-level-up-spells]")).toHaveTextContent("Prepared spells 0 → 4 (on the sheet: 0)");
   });
 
   it.skipIf(zhSheet)("an unmet prerequisite blocks apply until 「DM 同意，仍要加入」 is ticked", async () => {
@@ -162,7 +271,7 @@ describe("level-up helper multiclass UI (CLASS-IMPL §7.4)", () => {
     expect(sheet.data()).toMatchObject({ level: 6, hpClassAdjust: -2 });
     expect(sheet.data().multiclass).toEqual([expect.objectContaining({ id: row.id, hitDiceSpent: 1 })]);
     const kept = zhLevelUp.multiclass.keptRow.replace("{name}", "法師");
-    expect(vi.mocked(toast.warning)).toHaveBeenCalledWith(zhLevelUp.undoKept.replace("{items}", kept));
+    expect(vi.mocked(toast.warning)).toHaveBeenCalledWith(zhLevelUp.undone, expect.objectContaining({ description: zhLevelUp.undoKept.replace("{items}", kept) }));
   });
 
   it.skipIf(zhSheet)("adding 遊蕩者 writes the picked skill and the Thieves' Tools row", async () => {

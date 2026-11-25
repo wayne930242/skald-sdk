@@ -40,22 +40,14 @@ import {
   speedShown,
   armorSlows,
 } from "./play-model";
-import { hitDicePools, spendHitDie as spendPoolDie, type HitDicePool } from "./class-model";
+import { CompactHitDiceTile, HitDiceBlock, hitDiceSummary } from "./hit-dice";
+import { hitDicePools } from "./class-model";
+import { PANEL, TILE, TILE_LABEL, TILE_VALUE, useEditTap } from "./vitals-styles";
 
-const PANEL = "rounded-xl border border-border bg-card";
-const TILE = "flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-lg bg-muted/50 px-2 py-1.5 text-center";
-const TILE_LABEL = "max-w-full text-balance text-xs leading-tight text-muted-foreground";
-const TILE_VALUE = "whitespace-nowrap text-xl font-semibold leading-tight tabular-nums";
+export { HitDiceBlock };
+
 const ICON_BUTTON =
   "inline-flex size-11 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/40 transition-colors hover:bg-muted disabled:opacity-40 disabled:hover:bg-muted/40 sm:size-10";
-
-/** B-023: in edit mode a play control opens its value's editor; its name says so. */
-function useEditTap(target: EditTarget, name: string) {
-  const tRenderer = useTranslations("renderer");
-  const editing = usePlayEditing();
-  const open = useOpenDndEditor();
-  return editing ? { onClick: () => open(target), label: tRenderer("editValue", { name }) } : null;
-}
 
 function HitPointBlock({ compact }: { compact: boolean }) {
   const t = useTranslations("play");
@@ -184,91 +176,6 @@ function InitiativeTile() {
       </span>
     </PlayRollButton>
   );
-}
-
-export function HitDiceBlock() {
-  const t = useTranslations("play");
-  const { values, editable, update } = usePlay();
-  const roll = useRollOptional();
-  const edit = useEditTap("hitDice", t("hitDice.short"));
-  const pools = hitDicePools(values);
-  const [busy, setBusy] = useState(false);
-  const use = async (faces: number) => {
-    const pool = pools.find((candidate) => candidate.faces === faces);
-    if (!roll || busy || !pool || pool.left <= 0) return;
-    setBusy(true);
-    try {
-      const result = await roll.executeRoll(
-        { expression: `1d${faces}+{{@mod}}`, system: "dnd5e" as RollConfig["system"] },
-        { mod: num(values.conMod) },
-        t("hitDice.roll"),
-      );
-      if (!result || !update) return;
-      // The dice can take seconds: heal from the HP and spent dice at commit time, so damage or a
-      // die spent elsewhere meanwhile is kept. The maximums still come from the click-time values.
-      update((previous) => {
-        const patch = spendPoolDie(
-          { ...values, hp: previous.hp, hitDiceSpent: previous.hitDiceSpent, multiclass: previous.multiclass },
-          faces,
-          result.rolled,
-        );
-        return patch ? { ...previous, ...patch } : previous;
-      });
-    } finally {
-      setBusy(false);
-    }
-  };
-  const single = pools.length === 1;
-  return (
-    <div className="flex min-w-0 flex-col gap-1.5" data-play-hit-dice>
-      <div className="flex items-baseline justify-between gap-2 text-xs text-muted-foreground">
-        <span>{single ? t("hitDice.title", { faces: pools[0].faces }) : t("hitDice.short")}</span>
-        <span className="font-semibold text-foreground">
-          {single ? t("hitDice.left", { left: pools[0].left, max: pools[0].max }) : hitDiceSummary(pools)}
-          <OverrideMark fieldId="hitDiceMax" />
-        </span>
-      </div>
-      {single ? (
-        <button
-          type="button"
-          disabled={!edit && (!editable || !update || !roll || pools[0].left <= 0 || busy)}
-          title={!edit && pools[0].left <= 0 ? t("hitDice.none") : undefined}
-          aria-label={edit?.label}
-          onClick={edit?.onClick ?? (() => void use(pools[0].faces))}
-          className={USE_DIE}
-        >
-          {t("hitDice.use")}
-        </button>
-      ) : (
-        // Several die sizes: one button per size, so the player picks which die to spend.
-        <div className="flex gap-1.5">
-          {pools.map((pool) => (
-            <button
-              key={pool.faces}
-              type="button"
-              disabled={!edit && (!editable || !update || !roll || pool.left <= 0 || busy)}
-              title={!edit && pool.left <= 0 ? t("hitDice.none") : undefined}
-              aria-label={edit?.label}
-              onClick={edit?.onClick ?? (() => void use(pool.faces))}
-              data-hit-die={pool.faces}
-              className={cn(USE_DIE, "flex-1")}
-            >
-              {`${t("hitDice.use")} d${pool.faces}`}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-const USE_DIE =
-  "min-h-11 rounded-lg border border-border bg-muted/50 px-3 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-50 disabled:hover:bg-muted/50 sm:min-h-10";
-
-/** Several pools on one line: "d10 3/5 · d6 1/2"; one pool: "3/5". */
-function hitDiceSummary(pools: HitDicePool[]): string {
-  if (pools.length === 1) return `${pools[0].left}/${pools[0].max}`;
-  return pools.map((pool) => `d${pool.faces} ${pool.left}/${pool.max}`).join(" · ");
 }
 
 function Pips({ field, label }: { field: "deathSuccesses" | "deathFailures"; label: string }) {
@@ -492,24 +399,32 @@ export function VitalsBar() {
   );
 }
 
-/** Phones and narrow panels: the compact card of frame 07. */
-export function CompactVitals() {
+/**
+ * Phones and narrow panels: the compact card of frame 07. `condensed` (the page is scrolled past the
+ * card's place, UAT m24) keeps the first row only, hit points, AC and initiative, so the content
+ * below keeps more of the screen; the second row returns at the top of the page.
+ */
+export function CompactVitals({ condensed = false }: { condensed?: boolean }) {
   const t = useTranslations("play");
   const { values } = usePlay();
   const speed = speedShown(values, useIsOverridden("currentSpeed"));
   const hd = hitDicePools(values);
   return (
-    <section className={cn(PANEL, "space-y-2 p-2.5")} aria-label={t("hp.title")} data-play-vitals>
+    <section className={cn(PANEL, "space-y-2 p-2.5")} aria-label={t("hp.title")} data-play-vitals data-condensed={condensed || undefined}>
       <div className="grid grid-cols-[minmax(0,1fr)_4.25rem_4.25rem] items-stretch gap-1.5">
         <HitPointBlock compact />
         <StatTile label={t("acShort")} value={String(num(values.ac))} testId="ac" target="ac" derived="ac" />
         <InitiativeTile />
       </div>
-      <div className="grid grid-cols-5 gap-1.5">
+      <div className={cn("grid grid-cols-5 gap-1.5", condensed && "hidden")} data-play-vitals-more>
         <TempButton tile />
         <StatTile label={t("speed")} value={t("feet", { value: speed })} testId="speed" note={armorSlows(values) ? t("armorStr") : undefined} target="speed" derived="currentSpeed" />
         <StatTile label={t("profShort")} value={signed(num(values.profBonus))} testId="prof" />
-        <StatTile label={t("hitDice.short")} value={hitDiceSummary(hd)} testId="hit-dice" target="hitDice" derived="hitDiceMax" />
+        {hd.length === 1 ? (
+          <StatTile label={t("hitDice.short")} value={hitDiceSummary(hd)} testId="hit-dice" target="hitDice" derived="hitDiceMax" />
+        ) : (
+          <CompactHitDiceTile pools={hd} />
+        )}
         <InspirationButton tile />
       </div>
     </section>

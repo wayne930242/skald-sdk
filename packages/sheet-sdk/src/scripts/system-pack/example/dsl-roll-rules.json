@@ -1,0 +1,15 @@
+{
+  "$schema": "../../../data/schemas/roll-rules.schema.json",
+  "default": "lantern",
+  "rules": {
+    "lantern": {
+      "type": "roll-over",
+      "dice": "2d6",
+      "successLevels": [
+        { "id": "full", "label": "成功", "condition": "{{@total >= 10}}", "style": "success" },
+        { "id": "cost", "label": "有代價的成功", "condition": "{{@total >= 7 && @total < 10}}", "style": "partial" },
+        { "id": "miss", "label": "失手", "condition": "{{@total < 7}}", "style": "failure" }
+      ]
+    }
+  }
+}

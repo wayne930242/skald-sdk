@@ -1,12 +1,12 @@
 /**
  * Reading a class back from its rows and planning a save (CLASS-IMPL §2.4). A class reads as a form
- * only when regenerating it gives the stored entries and zh-TW layers back (canonical JSON); else
- * `lossless` is false and the editor opens its rows read-only. Wizard items are derived from the
- * entry on every save, so they do not decide `lossless`.
+ * only when regenerating it (current or v4.152.0 wording: `read-back.ts`) gives the stored entries and
+ * zh-TW layers back exactly, progression table included; else `lossless` is false and the editor opens
+ * its rows read-only. Wizard items are derived from the entry on every save, so they do not decide `lossless`.
  */
-import { canonicalJson } from "../../../content-pack/domain/canonical-json";
 import { readNames, readTexts } from "../forms/common";
 import { planRows, type MultiRowPlan } from "../multi-row-plan";
+import { legacyContext, readsBack } from "../read-back";
 import type { FormRead } from "../forms/common";
 import type { HomebrewItemRecord, HomebrewPayload } from "../types";
 import { empty, emptyMulticlass, type ClassContext, type ClassMulticlassForm, type ClassEquipmentOption, type ClassForm } from "./form";
@@ -65,8 +65,6 @@ function multiclassOf(value: unknown): ClassMulticlassForm {
   };
 }
 
-const comparable = (p: HomebrewPayload | undefined) => canonicalJson({ entry: p?.entry, zhTW: p?.zhTW });
-
 export function fromRows(payload: HomebrewPayload, features: readonly HomebrewItemRecord[], ctx: ClassContext): FormRead<ClassForm> {
   const form = empty();
   try {
@@ -102,14 +100,7 @@ export function fromRows(payload: HomebrewPayload, features: readonly HomebrewIt
       const meta = r.payload.entry?.meta ?? {};
       if (!meta.generated) form.features.push({ ...text(r.payload, 0), level: Number(meta.level), key: r.key.split("/").at(-1) });
     }
-    const all = toRows(form, ctx);
-    const old = new Map(features.map((r) => [r.key, r.payload]));
-    return {
-      form,
-      lossless:
-        all.length === features.length + 1 &&
-        all.every((r, i) => comparable(r.payload) === comparable(i ? old.get(r.key) : payload)),
-    };
+    return { form, lossless: readsBack([toRows(form, ctx), toRows(form, legacyContext(ctx))], payload, features) };
   } catch {
     return { form, lossless: false };
   }

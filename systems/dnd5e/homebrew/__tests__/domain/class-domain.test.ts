@@ -84,8 +84,13 @@ describe("class codec", () => {
     const hand: HomebrewPayload = { entry: { ...wizard, id: "hand", ref: "class:hand", source: "homebrew" } };
     expect(classCodec.fromRows(hand, [], classContext()).lossless).toBe(false);
     const { rows } = saved(ashWarden());
+    const stored = structuredClone(rows);
+    // A generated row's text edited by hand is not today's or v4.152.0's wording: read-only, so a save cannot overwrite it.
+    expect(rows[3].payload.entry!.meta!.generated).toBeTruthy();
     rows[3].payload = { ...rows[3].payload, entry: { ...rows[3].payload.entry!, entries: ["Edited by hand."] } };
     expect(classCodec.fromRows(rows[0].payload, rows.slice(1), classContext()).lossless).toBe(false);
+    stored[3].payload = { ...stored[3].payload, entry: { ...stored[3].payload.entry!, meta: { ...stored[3].payload.entry!.meta, extra: 1 } } };
+    expect(classCodec.fromRows(stored[0].payload, stored.slice(1), classContext()).lossless).toBe(false);
   });
 
   it("plans only changed rows, new ASI rows and deletes of re-levelled features", () => {

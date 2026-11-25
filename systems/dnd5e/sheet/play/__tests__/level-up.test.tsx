@@ -6,8 +6,10 @@ import type { LoadedSystem } from "@skald/types/system";
 import { zhWithheld } from "../../../__tests__/zh-withheld";
 import type { EffectivePacks, PackEntry } from "../../../content-pack/domain/types";
 import { LevelUpDialog } from "../../level-up/level-up-dialog";
+import { LEVEL_UP_TOAST_ID } from "../../level-up/level-up-notice";
 import type { ReferenceContextValue } from "../../use-reference-context";
 import type { LevelUpRequest } from "../play-context";
+import { loadEditMessages } from "../edit-messages";
 import { loadDndHarness, mountDnd, openTab, type DndHarness, type MountOptions } from "./dnd-harness";
 
 /** The level-up helper's UI (phase 2b §4.1, §4.4; slice L2) on the real play view and template. */
@@ -57,7 +59,8 @@ async function openLevelUp(name = "升級", title = name) {
     fireEvent.click(screen.getByRole("button", { name }));
   });
   const dialog = await screen.findByRole("dialog", { name: title });
-  await waitFor(() => expect(dialog.querySelector("[data-level-up-apply]")).not.toBeNull());
+  // The form is in once its plan loaded: the footer shows from the start.
+  await waitFor(() => expect(dialog.querySelector("[data-level-up-hp]")).not.toBeNull());
   return dialog;
 }
 
@@ -106,16 +109,105 @@ describe("level-up helper UI (phase 2b §4)", () => {
       "subclassFeature:paladin/oath-of-devotion/oath-of-devotion-spells-l3",
       "subclassFeature:paladin/oath-of-devotion/sacred-weapon-l3",
     ]);
-    await waitFor(() => expect(vi.mocked(toast).mock.calls.some(([title]) => title === "已重新計算")).toBe(true));
+    // One notice: 已升到 3 級, then the same toast again with what was recalculated, and 復原.
+    await waitFor(() => expect(vi.mocked(toast.success).mock.calls.some(([, options]) => (options as { description?: unknown } | undefined)?.description)).toBe(true));
+    expect(vi.mocked(toast)).not.toHaveBeenCalled();
     expect(within(dialog).getByRole("button", { name: "繼續升到 4 級" })).toBeInTheDocument();
 
-    const [message, options] = vi.mocked(toast.success).mock.calls.find(([title]) => title === "已升到 3 級") as unknown as [string, { duration: number; action: { label: string; onClick: () => void } }];
-    expect(message).toBe("已升到 3 級");
-    expect(options.duration).toBe(Infinity);
+    const calls = vi.mocked(toast.success).mock.calls.filter(([title]) => title === "已升到 3 級") as unknown as Array<[string, { id: string; duration: number; action: { label: string; onClick: () => void } }]>;
+    expect(calls).toHaveLength(2);
+    const [, options] = calls[calls.length - 1];
+    expect(calls.every(([, call]) => call.id === LEVEL_UP_TOAST_ID)).toBe(true);
+    expect(options.duration).toBe(20_000);
     expect(options.action.label).toBe("復原");
     await act(async () => options.action.onClick());
     expect(sheet.data()).toMatchObject({ level: 2, subclass: "", slot1Total: 2 });
     expect(featureRows(sheet.data())).toEqual([]);
+  });
+
+  it("only the latest level up can be undone, from its notice or the result screen; one notice id for all", async () => {
+    const sheet = await mountDnd(harness, { locale: "en", extra: { className: "Fighter", level: 1, hitDieFaces: 10, features: [] }, useHost: withLevelUp() });
+    const dialog = await openLevelUp("Level up");
+    await click(within(dialog).getByRole("button", { name: "Apply" }));
+    expect(sheet.data()).toMatchObject({ level: 2 });
+    expect(dialog.querySelector("[data-level-up-summary]")).toHaveTextContent("This level: +");
+    expect(dialog).not.toHaveTextContent("Level up one level at a time");
+    await click(within(dialog).getByRole("button", { name: "Continue to level 3" }));
+    await waitFor(() => expect(dialog.querySelector("[data-level-up-hp]")).not.toBeNull());
+    await click(within(dialog).getByRole("button", { name: "Apply" }));
+    expect(sheet.data()).toMatchObject({ level: 3 });
+
+    type Options = { id: string; action?: { onClick: () => void } };
+    const notice = (title: string) => vi.mocked(toast.success).mock.calls.find(([text]) => text === title)?.[1] as unknown as Options;
+    expect(notice("Now level 2").id).toBe(LEVEL_UP_TOAST_ID);
+    expect(notice("Now level 3").id).toBe(LEVEL_UP_TOAST_ID);
+    // The older run's 復原 does nothing once a newer level up was applied.
+    await act(async () => notice("Now level 2").action!.onClick());
+    expect(sheet.data()).toMatchObject({ level: 3 });
+
+    await click(within(dialog).getByRole("button", { name: "Undo last level up" }));
+    await act(async () => {});
+    expect(sheet.data()).toMatchObject({ level: 2 });
+    await waitFor(() => expect(dialog.querySelector("[data-level-up-class]")).toHaveTextContent("Fighter 2 → 3"));
+    expect(vi.mocked(toast.success)).toHaveBeenCalledWith("Level up undone", expect.objectContaining({ id: LEVEL_UP_TOAST_ID, action: undefined }));
+    // Undone once: the notice's 復原 no longer applies either.
+    await act(async () => notice("Now level 3").action!.onClick());
+    expect(sheet.data()).toMatchObject({ level: 2 });
+  });
+
+  it("puts the ASI grid under its own option, drops an unchanged subclass card, and sums up each subclass option", async () => {
+    await mountDnd(harness, { locale: "en", extra: { className: "Fighter", level: 3, str: 15, subclass: "Champion", features: [], feats: [] }, useHost: withLevelUp() });
+    const dialog = await openLevelUp("Level up");
+    const grid = dialog.querySelector<HTMLElement>("[data-level-up-asi-grid]")!;
+    expect(grid.previousElementSibling).toContainElement(within(dialog).getByRole("radio", { name: "+2 to one ability or +1 to two" }));
+    expect(grid.nextElementSibling).toContainElement(within(dialog).getByRole("radio", { name: "Another feat" }));
+    // Champion gives nothing at Fighter 4: no 子職 card.
+    expect(dialog.querySelector("[data-level-up-subclass]")).toBeNull();
+    cleanup();
+
+    await mountDnd(harness, { locale: "en", extra: { ...paladin, className: "Paladin" }, useHost: withLevelUp() });
+    const pick = await openLevelUp("Level up");
+    const devotion = within(pick).getByRole("radio", { name: "Oath of Devotion" });
+    expect(devotion).toHaveAccessibleDescription(/\S/);
+    expect(pick.querySelector("[data-level-up-choice-description]")).not.toBeNull();
+  });
+
+  it("a plain caster with all slots at 0: the update is offered but starts off, zero may be intended (UAT F002)", async () => {
+    const sheet = await mountDnd(harness, { locale: "en", extra: { ...paladin, className: "Paladin", slot1Total: 0 }, useHost: withLevelUp() });
+    const dialog = await openLevelUp("Level up");
+    expect(dialog.querySelector("[data-level-up-slots-unset]")).toBeNull();
+    expect(dialog.querySelector("[data-level-up-slots-differ]")).not.toBeNull();
+    expect(within(dialog).getByRole("checkbox", { name: "Update the spell slot totals" })).not.toBeChecked();
+    await click(within(dialog).getByRole("button", { name: "Apply" }));
+    expect(sheet.data()).toMatchObject({ level: 3, slot1Total: 0 });
+  });
+
+  it("Ranger 2→3 Hunter: the Hunter's Prey pick shows on the sheet beside the catalog name (UAT F005)", async () => {
+    const sheet = await mountDnd(harness, { locale: "en", extra: { classId: "ranger", className: "Ranger", level: 2, hitDieFaces: 10, slot1Total: 2, features: [] }, useHost: withLevelUp() });
+    const dialog = await openLevelUp("Level up");
+    await click(within(dialog).getByRole("radio", { name: "Hunter" }));
+    const prey = within(dialog).getByRole("radiogroup", { name: "Hunter's Prey: choose one" });
+    await click(within(prey).getByRole("radio", { name: "Horde Breaker" }));
+    await click(within(dialog).getByRole("button", { name: "Apply" }));
+    const after = sheet.data();
+    expect((after.features as Row[]).find((row) => row.ref === "subclassFeature:ranger/hunter/hunters-prey-l3")).toMatchObject({ option: "Horde Breaker", optionName: "Horde Breaker" });
+    cleanup();
+    // The harness preloads the zh-TW edit catalog only; the Features tab reads it.
+    await loadEditMessages("en");
+    await mountDnd(harness, { locale: "en", extra: after });
+    await openTab("Features");
+    expect(await screen.findByText("Hunter's Prey: Horde Breaker")).toBeInTheDocument();
+  });
+
+  it("Ranger 1→2: Fighting Style offers the feats and Druidic Warrior (UAT F006)", async () => {
+    const sheet = await mountDnd(harness, { locale: "en", extra: { classId: "ranger", className: "Ranger", level: 1, hitDieFaces: 10, slot1Total: 2, features: [] }, useHost: withLevelUp() });
+    const dialog = await openLevelUp("Level up");
+    const style = within(dialog).getByRole("radiogroup", { name: "Fighting Style: choose one" });
+    expect(within(style).getByRole("radio", { name: "Defense" })).toBeInTheDocument();
+    await click(within(style).getByRole("radio", { name: "Druidic Warrior" }));
+    await click(within(dialog).getByRole("button", { name: "Apply" }));
+    expect((sheet.data().features as Row[]).find((row) => row.ref === "classFeature:ranger/fighting-style-l2")).toMatchObject({ option: "Druidic Warrior" });
+    expect(sheet.data().feats ?? []).toEqual([]);
   });
 
   it("writes the English subclass name on an English sheet", async () => {
@@ -147,7 +239,7 @@ describe("level-up helper UI (phase 2b §4)", () => {
     const dialog = await openLevelUp();
     await click(within(dialog).getByRole("radio", { name: "擲骰" }));
     fireEvent.change(within(dialog).getByLabelText("生命骰結果"), { target: { value: "9" } });
-    expect(dialog.querySelector("[data-level-up-hp]")).toHaveTextContent("+3");
+    expect(dialog.querySelector("[data-level-up-hp-gain]")).toHaveTextContent(/^本級生命值 \+\d+（擲出 9 [＋－] 體質 \d）$/);
     await click(within(dialog).getByRole("button", { name: "套用" }));
     expect(sheet.data()).toMatchObject({ level: 2, hpMaxMisc: 4 });
   });

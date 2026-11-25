@@ -17,6 +17,7 @@ import { backgroundRefs, BackgroundChoices } from "./background-refs";
 import { ImportedBlocks } from "./imported-blocks";
 import type { HomebrewPackRecord } from "../domain/types";
 import { Field, OwnClassOptions } from "./form-fields";
+import { EditorHeading } from "./editor-heading";
 
 type Props<K extends HomebrewFormKind> = {
   kind: K;
@@ -190,9 +191,7 @@ export function ItemEditor<K extends HomebrewFormKind>({
         });
       }}
     >
-      <h3 className="font-heading text-xl">
-        {t(`kind.${kind as HomebrewFormKind}`)}
-      </h3>
+      <EditorHeading>{t(`kind.${kind as HomebrewFormKind}`)}</EditorHeading>
       {kind === "background" && <BackgroundChoices rows={allRows} />}
       <OwnClassOptions.Provider value={ownClasses}>
       <div className="grid gap-4 sm:grid-cols-2">{fields(true)}</div>

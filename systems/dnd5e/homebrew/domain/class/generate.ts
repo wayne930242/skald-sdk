@@ -5,6 +5,7 @@
  * level-up helper find them by id; the table uses the reader's English labels.
  */
 import { entryOf, newHomebrewId, pair, textEntries } from "../forms/common";
+import { fillSpaced } from "../spacing";
 import type { HomebrewItemInput } from "../types";
 import { wizardItemsOf, type HomebrewRefInfo } from "../wizard-items";
 import { generatedFeatures, NONE, proficiencyAt, reservedSlugs, slotsAt, type GeneratedFeature } from "./chassis";
@@ -81,12 +82,11 @@ export function toRows(f: ClassForm, ctx: ClassContext): HomebrewItemInput[] {
   const name = pair(f.nameEn, f.nameZh);
   const withZh = [f.nameZh, f.textZh, ...f.features.flatMap((x) => [x.nameZh, x.textZh]), ...f.columns.map((col) => col.nameZh)].some((v) => v.trim());
   const fill = (l: Locale, key: keyof ClassLabels) =>
-    ctx.labels[l][key].replace(/\{(class|ability|list)\}/g, (_, v: string) => {
-      if (v === "class") return name[l];
-      if (!casting) return "";
-      if (v === "ability") return ctx.abilityNames[casting.ability]?.[l] ?? casting.ability;
-      return casting.list ? (ctx.classNames[casting.list]?.[l] ?? casting.list) : name[l];
-    });
+    fillSpaced(ctx.labels[l][key], {
+      class: name[l],
+      ability: casting ? (ctx.abilityNames[casting.ability]?.[l] ?? casting.ability) : "",
+      list: casting ? (casting.list ? (ctx.classNames[casting.list]?.[l] ?? casting.list) : name[l]) : "",
+    }, !ctx.legacyText);
   const tableLabel = (l: Locale, key: TableKey) => (l === "en" ? EN_TABLE_LABELS[key] : ctx.labels.zh[key]);
 
   function row(kind: "class" | "classFeature", id: string, n: Localized, entries: { en: unknown[]; zh: unknown[] }, meta: Record<string, unknown>, zh: boolean) {
