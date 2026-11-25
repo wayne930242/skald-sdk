@@ -404,6 +404,7 @@
     "more": "Read more",
     "less": "Show less",
     "pick": "Choose {count}: {chosen} chosen",
+    "knownLanguage": "Known",
     "pickUpTo": "Up to {count}: {chosen} chosen",
     "items": "Contains: {items}",
     "paren": "{name} ({note})",

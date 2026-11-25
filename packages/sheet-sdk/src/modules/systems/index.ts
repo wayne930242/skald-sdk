@@ -27,3 +27,16 @@ export {
   type TableSetupValue,
   type TableSetupWizardSeed,
 } from "./domain/table-setup";
+export {
+  parseSceneBoardEnvelope,
+  SCENE_BOARD_SCHEMA,
+  type SceneBoardApply,
+  type SceneBoardApplyResult,
+  type SceneBoardApplyTarget,
+  type SceneBoardCallResult,
+  type SceneBoardEnvelopeParse,
+  type SceneBoardIssue,
+  type SceneBoardPresetEnvelope,
+  type SceneBoardPresetProvider,
+  type SceneBoardSummaryItem,
+} from "./domain/scene-board";

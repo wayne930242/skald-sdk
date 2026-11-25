@@ -12,6 +12,11 @@ export interface TableRulesPluginUi {
   };
   /** GM runners only; shown in the workspace if provided, otherwise above the session tabs. */
   readonly gmArea?: ComponentType<{ scope: TableRulesScope }>;
+  /**
+   * GM runners only: the scenario reader's action for a scene's board preset (ADR 0017 §6c),
+   * applied into the table's open scene. `preset` is the scenario's stored, untrusted envelope.
+   */
+  readonly scenarioSceneBoardAction?: ComponentType<{ scope: TableRulesScope; versionId: string; preset: unknown }>;
 }
 
 export type TableRulesUiSlot = keyof TableRulesPluginUi;

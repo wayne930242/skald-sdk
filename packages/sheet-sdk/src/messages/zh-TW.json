@@ -634,7 +634,8 @@
         "pending": "{count} 件待審核申請",
         "chatUnread": "{count} 則未讀訊息",
         "chatUnreadMany": "超過 99 則未讀訊息",
-        "rules": "速查"
+        "rules": "速查",
+        "scenario": "劇本"
       },
       "chatDrawer": {
         "label": "聊天欄",

@@ -29,7 +29,7 @@
     "performance": "表演",
     "persuasion": "說服",
     "religion": "宗教",
-    "sleightOfHand": "手上把戲",
+    "sleightOfHand": "巧手",
     "stealth": "隱匿",
     "survival": "生存"
   },
@@ -89,7 +89,7 @@
       "performance": "表演熟練",
       "persuasion": "說服熟練",
       "religion": "宗教熟練",
-      "sleightOfHand": "手上把戲熟練",
+      "sleightOfHand": "巧手熟練",
       "stealth": "隱匿熟練",
       "survival": "生存熟練"
     },
@@ -404,6 +404,7 @@
     "more": "展開",
     "less": "收合",
     "pick": "選 {count} 項：已選 {chosen} 項",
+    "knownLanguage": "已具備",
     "pickUpTo": "最多 {count} 項：已選 {chosen} 項",
     "items": "內容：{items}",
     "paren": "{name}（{note}）",

@@ -634,7 +634,8 @@
         "pending": "{count, plural, one {# pending application} other {# pending applications}}",
         "chatUnread": "{count, plural, one {# unread message} other {# unread messages}}",
         "chatUnreadMany": "More than 99 unread messages",
-        "rules": "Rules"
+        "rules": "Rules",
+        "scenario": "Scenario"
       },
       "chatDrawer": {
         "label": "Chat",

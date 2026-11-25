@@ -78,7 +78,9 @@
       "pausePreview": "Keep all {count} table wallets and their records. Sheets will use their own local points until the rules are reactivated",
       "deleteGuidance": "To delete the table, first close any open scene and deactivate the rules"
     },
-    "gm": { "lifecycle": "Host the table" },
+    "gm": {
+      "lifecycle": "Host the table"
+    },
     "session": {
       "start": "Start a new play session",
       "notStarted": "A GM needs to start a play session first",
@@ -189,7 +191,13 @@
       "target": "Player character",
       "trouble": "What trouble arises?",
       "withdraw": "Withdraw without spending points",
-      "status": { "pending": "Pending", "accepted": "Accepted", "refused": "Refused", "withdrawn": "Withdrawn", "expired": "Expired" }
+      "status": {
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "refused": "Refused",
+        "withdrawn": "Withdrawn",
+        "expired": "Expired"
+      }
     },
     "notice": {
       "title": "Compel for {name}",
@@ -199,8 +207,44 @@
       "balanceUnknown": "Wallet balance unavailable. Wait for the table to reconnect before responding"
     },
     "summary": {
-      "stress": { "physical": "Physical stress", "mental": "Mental stress", "unified": "Stress", "other": "Stress" },
-      "consequence": { "mild": "Mild", "moderate": "Moderate", "severe": "Severe", "extreme": "Extreme" }
+      "stress": {
+        "physical": "Physical stress",
+        "mental": "Mental stress",
+        "unified": "Stress",
+        "other": "Stress"
+      },
+      "consequence": {
+        "mild": "Mild",
+        "moderate": "Moderate",
+        "severe": "Severe",
+        "extreme": "Extreme"
+      }
+    },
+    "sceneBoard": {
+      "title": "Scene presets",
+      "save": "Save as scene preset",
+      "saveTitle": "Preset name",
+      "saved": "Saved as a draft; submit it from the library.",
+      "openDraft": "Open draft",
+      "saveFailed": "Could not save the preset. Try again later.",
+      "empty": "This scene has no zones or situation aspects to save.",
+      "load": "Load scene preset",
+      "choose": "Choose a preset",
+      "none": "The library has no Fate scene presets yet.",
+      "listFailed": "Could not read the library.",
+      "apply": "Load into this scene",
+      "applied": "Loaded {count} items.",
+      "applyFailed": "Loading stopped after {count} items. Press again to continue where it stopped.",
+      "loadBoard": "Load scene board",
+      "noOpenScene": "Open a scene first to load this board.",
+      "boardUnreadable": "This scene board cannot be read.",
+      "zone": "Zone: {name}",
+      "aspect": "Aspect: {text}",
+      "secretAspect": "Secret aspect: {text}",
+      "tooManyZones": "A scene preset holds at most {max} zones. Remove some before saving.",
+      "tooManyAspects": "A scene preset holds at most {max} situation aspects. Remove some before saving.",
+      "applyConflict": "This scene already loaded this preset with different content, so it cannot load again. Open a new scene and try there.",
+      "applySceneChanged": "The scene changed while loading: {count} items went into the earlier scene and the rest stopped. Press again to load into this scene."
     }
   }
 }

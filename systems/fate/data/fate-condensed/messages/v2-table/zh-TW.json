@@ -78,7 +78,9 @@
       "pausePreview": "保留 {count} 份桌上錢包與帳務記錄。停用期間各角色卡使用自己的點數",
       "deleteGuidance": "要刪除遊戲桌，請先關閉場景，再停用桌上規則"
     },
-    "gm": { "lifecycle": "主持遊戲桌" },
+    "gm": {
+      "lifecycle": "主持遊戲桌"
+    },
     "session": {
       "start": "開始新聚會",
       "notStarted": "請等 GM 開始聚會",
@@ -189,7 +191,13 @@
       "target": "玩家角色",
       "trouble": "會遇上什麼麻煩？",
       "withdraw": "撤回，不扣點",
-      "status": { "pending": "待答", "accepted": "已接受", "refused": "已拒絕", "withdrawn": "已撤回", "expired": "已到期" }
+      "status": {
+        "pending": "待答",
+        "accepted": "已接受",
+        "refused": "已拒絕",
+        "withdrawn": "已撤回",
+        "expired": "已到期"
+      }
     },
     "notice": {
       "title": "給 {name} 的強迫",
@@ -199,8 +207,44 @@
       "balanceUnknown": "未能確認錢包餘額，請等遊戲桌重新連線後再回應"
     },
     "summary": {
-      "stress": { "physical": "體力壓力", "mental": "精神壓力", "unified": "合軌壓力", "other": "壓力" },
-      "consequence": { "mild": "輕度後果", "moderate": "中度後果", "severe": "重度後果", "extreme": "極端後果" }
+      "stress": {
+        "physical": "體力壓力",
+        "mental": "精神壓力",
+        "unified": "合軌壓力",
+        "other": "壓力"
+      },
+      "consequence": {
+        "mild": "輕度後果",
+        "moderate": "中度後果",
+        "severe": "重度後果",
+        "extreme": "極端後果"
+      }
+    },
+    "sceneBoard": {
+      "title": "場景範本",
+      "save": "存成場景範本",
+      "saveTitle": "範本名稱",
+      "saved": "已存成草稿，可到資料庫送審。",
+      "openDraft": "開啟草稿",
+      "saveFailed": "無法存成範本，請稍後再試。",
+      "empty": "這個場景還沒有區域或情境面向可以存。",
+      "load": "載入場景範本",
+      "choose": "選擇範本",
+      "none": "資料庫裡還沒有 Fate 場景範本。",
+      "listFailed": "無法讀取資料庫。",
+      "apply": "載入到這個場景",
+      "applied": "已載入 {count} 項。",
+      "applyFailed": "載入中斷（已完成 {count} 項），再按一次會從中斷處繼續。",
+      "loadBoard": "載入場景板",
+      "noOpenScene": "先開啟一個場景，才能載入場景板。",
+      "boardUnreadable": "這份場景板無法讀取。",
+      "zone": "區域：{name}",
+      "aspect": "面向：{text}",
+      "secretAspect": "秘密面向：{text}",
+      "tooManyZones": "場景範本最多 {max} 個區域，請先移除一些再存。",
+      "tooManyAspects": "場景範本最多 {max} 個情境面向，請先移除一些再存。",
+      "applyConflict": "這個場景已用不同內容載入過這份範本，無法再載入。請開新場景後再試。",
+      "applySceneChanged": "載入途中場景換了：{count} 項已載入先前的場景，其餘已停止。再按一次即可載入到目前的場景。"
     }
   }
 }
