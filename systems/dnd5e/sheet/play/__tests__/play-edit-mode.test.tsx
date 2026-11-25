@@ -87,7 +87,10 @@ function Sheet({ mode, schema = local.schema as Schema, extra }: { mode: "play" 
       mode={mode}
       editable
       setupMode={mode === "edit"}
-      onChange={(path, value) => setData((previous) => ({ ...previous, [path]: value }))}
+      // A list row's change arrives as an updater of the whole list, as the host resolves it.
+      onChange={(path, value) =>
+        setData((previous) => ({ ...previous, [path]: typeof value === "function" ? (value as (prev: unknown) => unknown)(previous[path]) : value }))
+      }
       setData={setData}
       characterId="c-bran"
       formulaRuntime={{ templateVersionId: "v", artifact, derivedOverrides: {} }}
@@ -141,6 +144,43 @@ describe("edit mode in the play view", () => {
     fireEvent.change(input("str") as HTMLInputElement, { target: { value: "17" } });
     expect(input("str")).toHaveValue(17);
     expect(input("armorBase")).not.toBeNull();
+  });
+
+  it.skipIf(zhWithheld("messages/edit/zh-TW.json", "messages/play/zh-TW.json"))("multiclass: edits the class rows, shows the starting class's level and keeps hpClassAdjust current", async () => {
+    const multiclass = [{ id: "class-1", classId: "wizard", ref: "class:wizard", name: "法師", subclass: "", level: 2, hitDie: 6, hitDiceSpent: 0, spellAbility: "int" }];
+    await mount("edit", undefined, { level: 7, hitDieFaces: 10, multiclass, hpClassAdjust: -4 });
+    expect(document.querySelector("[data-play-start-level]")).toHaveTextContent("起始職業等級 5");
+    expect(document.querySelector("[data-class-issue]")).toBeNull();
+    const level = document.querySelector("[data-field-id='multiclass'] [data-field-id='level'] input") as HTMLInputElement;
+    expect(level).not.toBeNull();
+    await act(async () => {
+      fireEvent.change(level, { target: { value: "3" } });
+    });
+    expect(saved.data.hpClassAdjust).toBe(-6);
+    expect((saved.data.multiclass as Array<{ level: number }>)[0].level).toBe(3);
+    expect(document.querySelector("[data-play-start-level]")).toHaveTextContent("起始職業等級 4");
+    await act(async () => {
+      fireEvent.change(level, { target: { value: "7" } });
+    });
+    expect(document.querySelector("[data-class-issue='overflow']")).not.toBeNull();
+  });
+
+  it.skipIf(zhWithheld("messages/edit/zh-TW.json", "messages/play/zh-TW.json"))("multiclass: a starting die changed in the HP editor on 戰鬥 keeps hpClassAdjust current", async () => {
+    const multiclass = [{ id: "class-1", classId: "wizard", ref: "class:wizard", name: "法師", subclass: "", level: 2, hitDie: 6, hitDiceSpent: 0, spellAbility: "int" }];
+    await mount("edit", undefined, { level: 7, hitDieFaces: 10, multiclass, hpClassAdjust: -4 });
+    await openTab("戰鬥");
+    expect(document.querySelector("[data-play-start-level]")).toBeNull();
+    await act(async () => {
+      fireEvent.click(screen.getAllByRole("button", { name: "編輯生命值" })[0]);
+    });
+    const faces = (await screen.findByRole("dialog")).querySelector("[data-field-id='hitDieFaces'] input") as HTMLInputElement;
+    expect(faces).not.toBeNull();
+    await act(async () => {
+      fireEvent.change(faces, { target: { value: "12" } });
+      fireEvent.blur(faces);
+    });
+    expect(saved.data.hitDieFaces).toBe(12);
+    expect(saved.data.hpClassAdjust).toBe(-6);
   });
 
   it.skipIf(zhWithheld("messages/play/zh-TW.json"))("offers the derived-value override for AC", async () => {
@@ -201,7 +241,11 @@ describe("edit mode in the play view", () => {
  * equipping writes from the worn items (§3.3): a shield's +N is set on the shield row, a GM's
  * extra AC goes to `acMisc`.
  */
-const INTERNAL = new Set(["classId", "speciesId", "backgroundId", "startingShop", "armorStrReq", "armorStealth", "shieldBonus"]);
+const INTERNAL = new Set([
+  "classId", "speciesId", "backgroundId", "startingShop", "armorStrReq", "armorStealth", "shieldBonus",
+  // Multiclass (CLASS-IMPL §7.2): the edit layer writes it from the `multiclass` rows (classDerivedPatch).
+  "hpClassAdjust",
+]);
 
 /** Fields the play view itself writes (taps, list rows, the 角色 ✎ editors), in both modes. */
 const PLAY_CONTROLLED = [
@@ -211,8 +255,11 @@ const PLAY_CONTROLLED = [
   "languages", "toolProficiencies", "features", "speciesTraits", "feats", "weapons", "spells",
 ];
 
-/** Row fields no player edits: the row's identity and provenance, and `playerText` (編輯文字 writes it). */
-const ROW_INTERNAL = new Set(["id", "ref", "origin", "itemId", "playerText"]);
+/**
+ * Row fields no player edits: the row's identity and provenance, `playerText` (編輯文字 writes it),
+ * and a spell's `castingClass` (the compendium writes it; its select comes with per-class casting, M5).
+ */
+const ROW_INTERNAL = new Set(["id", "ref", "origin", "itemId", "playerText", "castingClass"]);
 
 /** Row fields a play control writes in place of the form. */
 const ROW_PLAY_CONTROLS: Record<string, string[]> = { spells: ["prepared"] };

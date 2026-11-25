@@ -4,8 +4,11 @@
  * rules are tested without rendering.
  */
 
-export type CharacterValues = Record<string, unknown>;
-export type CharacterPatch = Record<string, unknown>;
+import { hitPoints, num, rows, text, type CharacterPatch, type CharacterValues, type HitPoints } from "./values";
+import { hitDicePools, longRestClassPatch, spendHitDie as spendPoolDie } from "./class-model";
+
+export { hitPoints, num, rows, text };
+export type { CharacterPatch, CharacterValues, HitPoints };
 
 export const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"] as const;
 export type Ability = (typeof ABILITIES)[number];
@@ -45,22 +48,6 @@ export const PLAY_VIEW_FIELDS = [
   "cp", "sp", "ep", "gp", "pp",
 ] as const;
 
-export function num(value: unknown, fallback = 0): number {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string" && value.trim() !== "" && Number.isFinite(Number(value))) return Number(value);
-  return fallback;
-}
-
-export function text(value: unknown): string {
-  return typeof value === "string" ? value : "";
-}
-
-export function rows(value: unknown): Record<string, unknown>[] {
-  return Array.isArray(value)
-    ? value.filter((row): row is Record<string, unknown> => typeof row === "object" && row !== null)
-    : [];
-}
-
 /** `+3`, `−1` (a real minus sign, as the printed sheet does), `+0`. */
 export function signed(value: number): string {
   return value < 0 ? `−${Math.abs(value)}` : `+${value}`;
@@ -69,20 +56,6 @@ export function signed(value: number): string {
 // ---------------------------------------------------------------------------
 // Hit points
 // ---------------------------------------------------------------------------
-
-export interface HitPoints {
-  current: number;
-  max: number;
-  temp: number;
-}
-
-/** A new character has no stored current HP yet: it is at its maximum (resource `follow: max`). */
-export function hitPoints(values: CharacterValues): HitPoints {
-  const max = Math.max(0, num(values.hpMax));
-  const stored = (values.hp as { current?: unknown } | undefined)?.current;
-  const current = typeof stored === "number" && Number.isFinite(stored) ? stored : max;
-  return { current: Math.min(Math.max(current, 0), max), max, temp: Math.max(0, num(values.hpTemp)) };
-}
 
 /** Damage takes temporary hit points first; healing never goes past the maximum (2024 rules). */
 export function adjustHitPoints(values: CharacterValues, delta: number): CharacterPatch {
@@ -97,21 +70,15 @@ export function adjustHitPoints(values: CharacterValues, delta: number): Charact
   return patch;
 }
 
+/** The starting class's Hit Point Dice pool (the only pool of a single-class sheet); see `hitDicePools`. */
 export function hitDice(values: CharacterValues): { faces: number; max: number; left: number } {
-  const max = Math.max(0, num(values.hitDiceMax, num(values.level, 1)));
-  const spent = Math.min(max, Math.max(0, num(values.hitDiceSpent)));
-  return { faces: num(values.hitDieFaces, 8), max, left: max - spent };
+  const [pool] = hitDicePools(values);
+  return { faces: pool.faces, max: pool.max, left: pool.left };
 }
 
-/** Spending a Hit Point Die: one die more spent and the roll healed, at least 1 HP. */
+/** Spending a Hit Point Die of the starting class's size: one die more spent and the roll healed, at least 1 HP. */
 export function spendHitDie(values: CharacterValues, rolled: number): CharacterPatch | null {
-  const dice = hitDice(values);
-  if (dice.left <= 0) return null;
-  const hp = hitPoints(values);
-  return {
-    hitDiceSpent: dice.max - dice.left + 1,
-    hp: { ...(values.hp as object), current: Math.min(hp.max, hp.current + Math.max(1, rolled)) },
-  };
+  return spendPoolDie(values, hitDice(values).faces, rolled);
 }
 
 // ---------------------------------------------------------------------------
@@ -173,6 +140,7 @@ export function longRestPatch(values: CharacterValues): CharacterPatch {
     hp: { ...(values.hp as object), current: hp.max },
     hpTemp: 0,
     hitDiceSpent: 0,
+    ...longRestClassPatch(values),
     deathSuccesses: 0,
     deathFailures: 0,
     pactUsed: 0,

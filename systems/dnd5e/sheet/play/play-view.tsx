@@ -10,7 +10,7 @@ import { cn } from "@skald/sheet-sdk/lib/utils";
 import type { ReferenceContextValue } from "../use-reference-context";
 import type { CharacterUpdater } from "../compendium-dialog";
 import type { CompendiumStart } from "../compendium-rows";
-import { DndEditorHost, EditSlot, PlayContext, usePlay, type PlayContextValue } from "./play-context";
+import { DndEditorHost, EditSlot, PlayContext, usePlay, type LevelUpRequest, type PlayContextValue } from "./play-context";
 import type { CharacterPatch } from "./play-model";
 import { CompactVitals, VitalsBar } from "./vitals-bar";
 import { AbilityGrid, SkillList } from "./abilities-panel";
@@ -40,6 +40,8 @@ export interface DndPlayViewProps {
    * absent where the sheet cannot be changed.
    */
   openCompendium: ((update: CharacterUpdater, character?: Record<string, unknown>, start?: CompendiumStart) => void) | null;
+  /** Opens the level-up helper with the sheet's write path (phase 2b §4.4); absent: no 升級. */
+  openLevelUp?: ((request: LevelUpRequest) => void) | null;
 }
 
 function useContainerWide(): [React.RefObject<HTMLDivElement | null>, boolean | null] {
@@ -173,7 +175,7 @@ export function DndPlayView(props: DndPlayViewProps) {
   );
 }
 
-function PlayViewBody({ system, reference, openReference, openCompendium }: DndPlayViewProps) {
+function PlayViewBody({ system, reference, openReference, openCompendium, openLevelUp = null }: DndPlayViewProps) {
   const locale = useLocale();
   const play = use(loadPlayMessages(locale));
   const messages = useMessages();
@@ -201,6 +203,25 @@ function PlayViewBody({ system, reference, openReference, openCompendium }: DndP
     [canWrite, setData, onBlur],
   );
 
+  // The helper reads the stored data when it plans and applies, not the data of the render that opened it.
+  const latest = useRef(data);
+  useLayoutEffect(() => {
+    latest.current = data;
+  });
+  const levelUp = useMemo<PlayContextValue["openLevelUp"]>(
+    () =>
+      openLevelUp && update
+        ? (recalc) =>
+            openLevelUp({
+              update,
+              current: () => latest.current,
+              recalc,
+              openCompendium: openCompendium ? (start) => openCompendium(update, latest.current, start) : null,
+            })
+        : null,
+    [openLevelUp, update, openCompendium],
+  );
+
   const context = useMemo<PlayContextValue>(
     () => ({
       values,
@@ -211,10 +232,11 @@ function PlayViewBody({ system, reference, openReference, openCompendium }: DndP
       reference,
       openReference: (row) => openReference(row, data),
       openCompendium: openCompendium && update ? (start) => openCompendium(update, data, start) : null,
+      openLevelUp: levelUp,
       system,
       schema,
     }),
-    [values, data, canWrite, write, update, reference, openReference, openCompendium, system, schema],
+    [values, data, canWrite, write, update, reference, openReference, openCompendium, levelUp, system, schema],
   );
 
   const merged = useMemo(

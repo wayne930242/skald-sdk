@@ -137,6 +137,10 @@
                     {
                       "type": "field-ref",
                       "fieldId": "xp"
+                    },
+                    {
+                      "type": "field-ref",
+                      "fieldId": "multiclass"
                     }
                   ]
                 }

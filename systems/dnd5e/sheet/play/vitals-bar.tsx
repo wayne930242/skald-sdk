@@ -31,7 +31,6 @@ import {
   adjustHitPoints,
   deathSave,
   exhaustionLevel,
-  hitDice,
   hitPoints,
   keptD20,
   longRestPatch,
@@ -40,8 +39,8 @@ import {
   signed,
   speedShown,
   armorSlows,
-  spendHitDie,
 } from "./play-model";
+import { hitDicePools, spendHitDie as spendPoolDie, type HitDicePool } from "./class-model";
 
 const PANEL = "rounded-xl border border-border bg-card";
 const TILE = "flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-lg bg-muted/50 px-2 py-1.5 text-center";
@@ -192,14 +191,15 @@ export function HitDiceBlock() {
   const { values, editable, update } = usePlay();
   const roll = useRollOptional();
   const edit = useEditTap("hitDice", t("hitDice.short"));
-  const dice = hitDice(values);
+  const pools = hitDicePools(values);
   const [busy, setBusy] = useState(false);
-  const use = async () => {
-    if (!roll || busy || dice.left <= 0) return;
+  const use = async (faces: number) => {
+    const pool = pools.find((candidate) => candidate.faces === faces);
+    if (!roll || busy || !pool || pool.left <= 0) return;
     setBusy(true);
     try {
       const result = await roll.executeRoll(
-        { expression: `1d${dice.faces}+{{@mod}}`, system: "dnd5e" as RollConfig["system"] },
+        { expression: `1d${faces}+{{@mod}}`, system: "dnd5e" as RollConfig["system"] },
         { mod: num(values.conMod) },
         t("hitDice.roll"),
       );
@@ -207,34 +207,68 @@ export function HitDiceBlock() {
       // The dice can take seconds: heal from the HP and spent dice at commit time, so damage or a
       // die spent elsewhere meanwhile is kept. The maximums still come from the click-time values.
       update((previous) => {
-        const patch = spendHitDie({ ...values, hp: previous.hp, hitDiceSpent: previous.hitDiceSpent }, result.rolled);
+        const patch = spendPoolDie(
+          { ...values, hp: previous.hp, hitDiceSpent: previous.hitDiceSpent, multiclass: previous.multiclass },
+          faces,
+          result.rolled,
+        );
         return patch ? { ...previous, ...patch } : previous;
       });
     } finally {
       setBusy(false);
     }
   };
+  const single = pools.length === 1;
   return (
     <div className="flex min-w-0 flex-col gap-1.5" data-play-hit-dice>
       <div className="flex items-baseline justify-between gap-2 text-xs text-muted-foreground">
-        <span>{t("hitDice.title", { faces: dice.faces })}</span>
+        <span>{single ? t("hitDice.title", { faces: pools[0].faces }) : t("hitDice.short")}</span>
         <span className="font-semibold text-foreground">
-          {t("hitDice.left", { left: dice.left, max: dice.max })}
+          {single ? t("hitDice.left", { left: pools[0].left, max: pools[0].max }) : hitDiceSummary(pools)}
           <OverrideMark fieldId="hitDiceMax" />
         </span>
       </div>
-      <button
-        type="button"
-        disabled={!edit && (!editable || !update || !roll || dice.left <= 0 || busy)}
-        title={!edit && dice.left <= 0 ? t("hitDice.none") : undefined}
-        aria-label={edit?.label}
-        onClick={edit?.onClick ?? (() => void use())}
-        className="min-h-11 rounded-lg border border-border bg-muted/50 px-3 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-50 disabled:hover:bg-muted/50 sm:min-h-10"
-      >
-        {t("hitDice.use")}
-      </button>
+      {single ? (
+        <button
+          type="button"
+          disabled={!edit && (!editable || !update || !roll || pools[0].left <= 0 || busy)}
+          title={!edit && pools[0].left <= 0 ? t("hitDice.none") : undefined}
+          aria-label={edit?.label}
+          onClick={edit?.onClick ?? (() => void use(pools[0].faces))}
+          className={USE_DIE}
+        >
+          {t("hitDice.use")}
+        </button>
+      ) : (
+        // Several die sizes: one button per size, so the player picks which die to spend.
+        <div className="flex gap-1.5">
+          {pools.map((pool) => (
+            <button
+              key={pool.faces}
+              type="button"
+              disabled={!edit && (!editable || !update || !roll || pool.left <= 0 || busy)}
+              title={!edit && pool.left <= 0 ? t("hitDice.none") : undefined}
+              aria-label={edit?.label}
+              onClick={edit?.onClick ?? (() => void use(pool.faces))}
+              data-hit-die={pool.faces}
+              className={cn(USE_DIE, "flex-1")}
+            >
+              {`${t("hitDice.use")} d${pool.faces}`}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
+}
+
+const USE_DIE =
+  "min-h-11 rounded-lg border border-border bg-muted/50 px-3 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-50 disabled:hover:bg-muted/50 sm:min-h-10";
+
+/** Several pools on one line: "d10 3/5 · d6 1/2"; one pool: "3/5". */
+function hitDiceSummary(pools: HitDicePool[]): string {
+  if (pools.length === 1) return `${pools[0].left}/${pools[0].max}`;
+  return pools.map((pool) => `d${pool.faces} ${pool.left}/${pool.max}`).join(" · ");
 }
 
 function Pips({ field, label }: { field: "deathSuccesses" | "deathFailures"; label: string }) {
@@ -463,7 +497,7 @@ export function CompactVitals() {
   const t = useTranslations("play");
   const { values } = usePlay();
   const speed = speedShown(values, useIsOverridden("currentSpeed"));
-  const hd = hitDice(values);
+  const hd = hitDicePools(values);
   return (
     <section className={cn(PANEL, "space-y-2 p-2.5")} aria-label={t("hp.title")} data-play-vitals>
       <div className="grid grid-cols-[minmax(0,1fr)_4.25rem_4.25rem] items-stretch gap-1.5">
@@ -475,7 +509,7 @@ export function CompactVitals() {
         <TempButton tile />
         <StatTile label={t("speed")} value={t("feet", { value: speed })} testId="speed" note={armorSlows(values) ? t("armorStr") : undefined} target="speed" derived="currentSpeed" />
         <StatTile label={t("profShort")} value={signed(num(values.profBonus))} testId="prof" />
-        <StatTile label={t("hitDice.short")} value={`${hd.left}/${hd.max}`} testId="hit-dice" target="hitDice" derived="hitDiceMax" />
+        <StatTile label={t("hitDice.short")} value={hitDiceSummary(hd)} testId="hit-dice" target="hitDice" derived="hitDiceMax" />
         <InspirationButton tile />
       </div>
     </section>

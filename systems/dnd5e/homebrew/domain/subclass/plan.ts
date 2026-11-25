@@ -1,5 +1,5 @@
 import { canonicalJson } from "../../../content-pack/domain/canonical-json";
-import type { HomebrewItemSave } from "../../store-port";
+import { planRows } from "../multi-row-plan";
 import { readNames, readTexts } from "../forms/common";
 import type { HomebrewPayload, HomebrewItemRecord } from "../types";
 import { empty, type SubclassForm, type SubclassContext } from "./form";
@@ -53,23 +53,6 @@ export function fromRows(subclass: HomebrewPayload, features: readonly HomebrewI
 }
 export function plan(form: SubclassForm, ctx: SubclassContext, stored: readonly HomebrewItemRecord[]) {
   const rows = toRows(form, ctx),
-    key = rows[0].key,
-    old = [...stored.filter((r) => r.kind === "subclass" && r.key === key), ...rowsOf(key, stored)],
-    writes: HomebrewItemSave[] = [];
-  let bytesDelta = 0,
-    addedRows = 0;
-  for (const r of rows) {
-    const prev = old.find((p) => p.key === r.key);
-    if (prev && canonicalJson(prev.payload) === canonicalJson(r.payload)) continue;
-    writes.push({ ...r, ...(prev ? { id: prev.id, expectedRevision: prev.revision } : {}) });
-    if (!prev) addedRows++;
-    bytesDelta += new TextEncoder().encode(JSON.stringify(r.payload)).length - (prev?.bytes ?? 0);
-  }
-  const removed = old.filter((o) => !rows.some((r) => r.key === o.key));
-  return {
-    writes,
-    deletes: removed.map((r) => r.id),
-    addedRows,
-    bytesDelta: bytesDelta - removed.reduce((sum, r) => sum + r.bytes, 0),
-  };
+    key = rows[0].key;
+  return planRows(rows, [...stored.filter((r) => r.kind === "subclass" && r.key === key), ...rowsOf(key, stored)]);
 }

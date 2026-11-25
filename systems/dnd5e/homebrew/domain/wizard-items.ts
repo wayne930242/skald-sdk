@@ -56,6 +56,7 @@ export const SKILL_FIELDS: Readonly<Record<string, string>> = {
   stealth: "stealth", survival: "survival",
 };
 const ARMOR_TYPES = ["light", "medium", "heavy"];
+const ABILITY_IDS = ["str", "dex", "con", "int", "wis", "cha"];
 
 /** The wizard's id slug (`wizard-fields.ts` `slug`): lowercase, `'` dropped, other non-alphanumerics → `-`. */
 export const wizardSlug = (text: string): string =>
@@ -164,6 +165,45 @@ class Fields {
     };
   }
 
+  /** `wizard-fields.ts` `class()` for a pack entry, plus `spellList` when the class borrows a list. */
+  class() {
+    const m = this.entry.meta;
+    const casting = object(m.spellcasting);
+    const pact = object(casting.pact);
+    const prepared = number(casting.preparedL1) ?? 0;
+    const choice = object(m.toolChoice);
+    const armor = strings(m.armor);
+    const skill = object(m.skillChoice);
+    const english = (value: string) => value.replace(/\{@\w+ ([^|}]+)[^}]*\}/g, "$1");
+    return {
+      label: this.label(this.entry.ref),
+      hitDie: number(m.hitDie) ?? 8,
+      save: Object.fromEntries(ABILITY_IDS.map((ab) => [ab, strings(m.saves).includes(ab)])),
+      armor: { light: armor.includes("light"), medium: armor.includes("medium"), heavy: armor.includes("heavy"), shields: armor.includes("shield") },
+      weapons: strings(m.weapons).map(english).join("; "),
+      spellAbility: string(casting.ability) || "none",
+      unarmoredDefense: string(m.unarmoredDefense) || "none",
+      slot1: number(array(casting.slotsL1)[0]) ?? 0,
+      pactSlots: number(pact.slots) ?? 0,
+      pactLevel: number(pact.level) ?? 0,
+      can: this.skills(skill.from),
+      skillCount: number(skill.count) ?? 0,
+      cantrips: number(casting.cantripsL1) ?? 0,
+      prepared,
+      spellbookExtra: Math.max(0, (number(casting.spellbookL1) ?? 0) - prepared),
+      mastery: number(m.masteryCountL1) ?? 0,
+      invocations: number(m.invocationsL1) ?? 0,
+      expertise: number(m.expertiseL1) ?? 0,
+      fightingStyle: m.fightingStyleL1 === true,
+      toolCount: number(choice.count) ?? 0,
+      toolCategory: this.toolCategory(choice),
+      hasOrder: array(m.level1Choices).length > 0,
+      features: strings(m.level1Features).map((ref) => this.row(ref)),
+      tools: strings(m.toolGrants).map((ref) => this.row(ref)),
+      ...(string(casting.list) ? { spellList: string(casting.list) } : {}),
+    };
+  }
+
   background() {
     const meta = this.entry.meta;
     const [ab1 = "", ab2 = "", ab3 = ""] = strings(meta.abilityOptions);
@@ -233,9 +273,23 @@ function spellRollFacts(meta: Record<string, unknown>): Raw {
   };
 }
 
+/** The equipment packages an entry owns (`buildGame`'s `class/<id>/a`, `background/<id>/a`, …). */
+function packagesOf(full: Entry, zhTW: PackZhEntry | undefined, fields: Fields): PackWizardItem[] {
+  return objects(full.meta.startingEquipment).map((pkg): PackWizardItem => {
+    const option = string(pkg.option);
+    const id = `${full.kind}/${full.id}/${option.toLowerCase()}`;
+    const label = `${full.name} (${option})`;
+    return {
+      id, origin: "pack", label: { en: label, "zh-TW": zhTW ? `${zhTW.name}（${option}）` : label },
+      owner: full.id, ownerKind: full.kind, ...pkg, w: fields.equipment(id, pkg, label),
+    };
+  });
+}
+
 /**
- * The wizard items of one entry, by list: the entry's pick item and, for a background, its
- * equipment packages. Kinds without wizard items (magic items and the rest) give `{}`.
+ * The wizard items of one entry, by list: the entry's pick item and, for a class or background, its
+ * equipment packages. Kinds without wizard items (magic items and the rest) give `{}`. A homebrew
+ * class has no level-1 options, so it owns no `class-options`.
  */
 export function wizardItemsOf(
   entry: OpenPackEntry,
@@ -264,17 +318,20 @@ export function wizardItemsOf(
       const { traits, ...flags } = meta;
       return { species: [{ ...pick, ...flags, traits: objects(traits).map((trait) => string(trait.name)), w: fields.species() }] };
     }
+    case "class": {
+      // The class builder's own meta (`chassis`, `multiclass`, `spellcasting.list`) is not a game item field
+      // (`game-items.schema.json` `classes` allows no other keys); the borrowed list reaches the wizard as `w.spellList`.
+      const { startingEquipment: _equipment, chassis: _chassis, multiclass: _multiclass, spellcasting, ...flags } = meta;
+      const { list: _list, ...casting } = object(spellcasting);
+      const packages = packagesOf(full, zhTW, fields);
+      return {
+        classes: [{ ...pick, ...flags, ...(spellcasting === undefined ? {} : { spellcasting: casting }), w: fields.class() }],
+        ...(packages.length ? { "equipment-packages": packages } : {}),
+      };
+    }
     case "background": {
-      const { startingEquipment, ...flags } = meta;
-      const packages = objects(startingEquipment).map((pkg): PackWizardItem => {
-        const option = string(pkg.option);
-        const id = `${full.kind}/${full.id}/${option.toLowerCase()}`;
-        const label = `${full.name} (${option})`;
-        return {
-          id, origin: "pack", label: { en: label, "zh-TW": zhTW ? `${zhTW.name}（${option}）` : label },
-          owner: full.id, ownerKind: full.kind, ...pkg, w: fields.equipment(id, pkg, label),
-        };
-      });
+      const { startingEquipment: _equipment, ...flags } = meta;
+      const packages = packagesOf(full, zhTW, fields);
       return {
         backgrounds: [{ ...pick, ...flags, w: fields.background() }],
         ...(packages.length ? { "equipment-packages": packages } : {}),

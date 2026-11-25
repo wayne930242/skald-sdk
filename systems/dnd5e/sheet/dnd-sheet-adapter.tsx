@@ -8,6 +8,7 @@ import type { SheetAdapterInput, SheetAdapterOutput } from "@skald/sheet-sdk/mod
 import type { CharacterUpdater } from "./compendium-dialog";
 import type { CompendiumDialogTab, CompendiumStart } from "./compendium-rows";
 import type { CharacterReferenceRow, ReferenceRequest } from "./reference-dialog";
+import type { LevelUpRequest } from "./play/play-context";
 import { useDevicePacks } from "./use-device-packs";
 import { useReferenceContext } from "./use-reference-context";
 import { DndPlayView } from "./play/play-view";
@@ -17,6 +18,7 @@ import { loadPlayMessages } from "./play/play-messages";
 // The dialogs load when first opened: the sheet's own chunk stays small (D&D sheet ≤ CoC + 60 KB).
 const CompendiumDialog = lazy(() => import("./compendium-dialog").then((module) => ({ default: module.CompendiumDialog })));
 const ReferenceDialog = lazy(() => import("./reference-dialog").then((module) => ({ default: module.ReferenceDialog })));
+const LevelUpDialog = lazy(() => import("./level-up/level-up-dialog").then((module) => ({ default: module.LevelUpDialog })));
 
 /** Lists whose rows name a reference (`name`, `ref`, `origin`, `text`), in sheet order. */
 export const REFERENCE_LISTS = [
@@ -76,13 +78,14 @@ export function useDnd5eSheetAdapter({ system, initialData, inTable = false }: S
   const { packs, revalidate } = useDevicePacks();
   const [reference, setReference] = useState<ReferenceRequest | null>(null);
   const [compendium, setCompendium] = useState<{ update: CharacterUpdater; level?: number; start: CompendiumStart } | null>(null);
+  const [levelUp, setLevelUp] = useState<LevelUpRequest | null>(null);
   // The toolbar's 資料庫 reopens on the last tab used (plan-uat2 §3.2).
   const lastTab = useRef<CompendiumDialogTab>("spells");
   // The English names (dialog search) and the lazy names (creatures, magic items, tables, chapters:
   // plan T2b §5.10) load once a dialog has opened, not with the sheet. Overlays reach only the
   // reference views: play rows read the SRD source.
   const [dialogOpened, setDialogOpened] = useState(false);
-  if (!dialogOpened && (reference !== null || compendium !== null)) setDialogOpened(true);
+  if (!dialogOpened && (reference !== null || compendium !== null || levelUp !== null)) setDialogOpened(true);
   const context = useReferenceContext(system, packs, { english: dialogOpened, reference: dialogOpened });
 
   const handlers = useMemo<EditorHandlers>(
@@ -121,6 +124,14 @@ export function useDnd5eSheetAdapter({ system, initialData, inTable = false }: S
     },
     [revalidate],
   );
+  const openLevelUp = useCallback(
+    (request: LevelUpRequest) => {
+      revalidate();
+      setLevelUp(request);
+    },
+    [revalidate],
+  );
+  const closeLevelUp = useCallback(() => setLevelUp(null), []);
   const rememberTab = useCallback((tab: CompendiumDialogTab) => {
     lastTab.current = tab;
   }, []);
@@ -133,7 +144,7 @@ export function useDnd5eSheetAdapter({ system, initialData, inTable = false }: S
     handlers,
     defaultData: initialData || system.defaultData,
     playView: playable ? (
-      <DndPlayView system={system} reference={context} openReference={openRowReference} openCompendium={openPlayCompendium} />
+      <DndPlayView system={system} reference={context} openReference={openRowReference} openCompendium={openPlayCompendium} openLevelUp={openLevelUp} />
     ) : undefined,
     // One layout for play and edit (plan-uat2 §3.1): edit mode unlocks the structural fields in it.
     ...(playable ? { playViewModes: "both" as const } : {}),
@@ -152,6 +163,9 @@ export function useDnd5eSheetAdapter({ system, initialData, inTable = false }: S
             onTabChange={rememberTab}
             inTable={inTable}
           />
+        )}
+        {levelUp !== null && compendium === null && reference === null && (
+          <LevelUpDialog request={levelUp} system={system} context={context} packs={packs} inTable={inTable} onClose={closeLevelUp} />
         )}
         {reference !== null && <ReferenceDialog request={reference} context={context} onClose={closeReference} />}
       </Suspense>

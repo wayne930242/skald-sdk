@@ -139,21 +139,11 @@ function SubclassFormView({
     if (!usage.ok) return usage;
     if (usage.value.items + plan.addedRows > HOMEBREW_LIMITS.items) return { ok: false, error: "limitItems" };
     if (usage.value.bytes + plan.bytesDelta > HOMEBREW_LIMITS.bytes) return { ok: false, error: "limitBytes" };
-    let done = 0;
-    const steps = [
-      ...plan.writes.map((w) => () => store.saveItem(pack.id, w)),
-      ...plan.deletes.map((id) => () => store.deleteItem(id)),
-    ];
-    for (const step of steps) {
-      const result = await step();
-      if (!result.ok) {
-        // The workspace reloads the pack's rows after this; the next save re-plans against them.
-        if (!done) return result;
-        setProblem(t("subclass.partial"));
-        return { ok: true, value: null };
-      }
-      done++;
-      setOwned(head.key);
+    const result = await store.saveItems(pack.id, plan, () => setOwned(head.key));
+    if (!result.ok) {
+      if (!Number(result.detail)) return result;
+      setProblem(t("subclass.partial"));
+      return { ok: true, value: null };
     }
     reload();
     return { ok: true, value: null };

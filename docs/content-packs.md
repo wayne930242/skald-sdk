@@ -39,7 +39,7 @@ A file-based pack is not:
 
 ## Write homebrew in Skald
 
-Sign in and open the [D&D 2024 homebrew editor](https://skald.tw/en/sheets/dnd5e-2024/homebrew). Unlike a pack you load from Drive, a homebrew pack holds your own content in your Skald account. Guests cannot create packs. Name a pack, then add a feat, spell, magic item, species, background or subclass. You can keep up to 20 named packs; together they can hold up to 300 entries and 1 MB per account.
+Sign in and open the [D&D 2024 homebrew editor](https://skald.tw/en/sheets/dnd5e-2024/homebrew). Unlike a pack you load from Drive, a homebrew pack holds your own content in your Skald account. Guests cannot create packs. Name a pack, then add a feat, spell, magic item, species, background, class or subclass. You can keep up to 20 named packs; together they can hold up to 300 entries and 1 MB per account.
 
 A subclass belongs to the class you pick when you create it, and the class cannot change after the first save. Each feature sits at a level where that class gains subclass features: 3, 7, 15 and 20 for the Paladin. Moving a saved feature to another level saves it as a new feature; sheets that added the old one keep it.
 
@@ -52,6 +52,40 @@ On a sheet, type the subclass name in the subclass field, then add its features 
 Enable a pack in the content pack panel to use it on a sheet. Adding an entry copies its text onto the sheet. If you bring the character to a table, members of that table can read the text in the table copy. Editing the original does not rewrite the sheet: choose **Update to latest** on the sheet row when you want the new version.
 
 To move a pack, export it as a sealed `skald/pack/v1` JSON file. Import that file directly in the editor, without a Drive link. If a pack with the same ID already exists, choose whether to replace it or create another pack.
+
+## Write a class
+
+In the homebrew editor, add a class and copy a built-in class as a starting point. Set its starting proficiencies, equipment, progression and features. You can then use the class as a parent in the subclass editor.
+
+A class saves as one `class` entry plus one `classFeature` entry for each generated or authored feature. Each counts separately toward the entry limit. For a pack class with id `ash-warden`, a level 2 feature might have id `ash-warden/ash-mark-l2` and `meta.level: 2`. Moving a saved feature to another level gives it a new id.
+
+For a hand-written class, put one progression `table` in the class entry's English `entries`. Start `colLabels` with `Level`, `Proficiency Bonus`, and `Class Features`, in that order. Include one row for each level from 1 through 20. In the feature column, link to the feature entries with tags such as `{@classFeature ash-mark|ash-warden||2||Ash Mark}`. Add `Cantrips` and `Prepared Spells` where applicable, numbered columns (`1`, `2`, …) for regular spell slots, or `Spell Slots` and `Slot Level` for Pact Magic. You can add other columns for class-specific counts. Translate the display table in the zh-TW layer; keep the English headers in the source entry so the helper can read it.
+
+To borrow a spell list, set `meta.spellcasting.list` to the source class id, such as `druid`. Character creation and the sheet's spell picker can then offer that list. Omit `list` to use the class's own id. Borrowing a list does not change the class's spellcasting progression.
+
+### Multiclass rules for a pack class
+
+Put the requirements and the proficiencies gained when joining the class under `meta.multiclass`. This example requires Dexterity or Wisdom of at least 13 and grants light armor proficiency plus one skill of the player's choice:
+
+```json
+{
+  "requires": { "abilities": ["dex", "wis"], "mode": "any", "score": 13 },
+  "gains": {
+    "armor": ["light"],
+    "weapons": [],
+    "skills": { "count": 1, "from": "any" },
+    "tools": null
+  }
+}
+```
+
+Use `all` when every listed ability must reach 13. Armor ids are `light`, `medium` and `shield`; the weapon id is `martial`. For skills, use `null` for no grant, or replace `"any"` with an array of skill ids to limit the choice. For tools, use `null` or an object with `grant` (an array of tool ids), `choice` (`category` and `count`), or both. Without `meta.multiclass`, a custom class falls back to its primary abilities and offers no multiclass proficiencies.
+
+## Level up on the sheet
+
+On an editable sheet, open **Level Up** from the Character tab. The helper adds one character level, up to 20. Pick fixed or rolled HP. Review the features, subclass or ability score choices, and spell slot changes offered for the new class level before applying. The helper shows changes to cantrip and prepared spell counts but leaves the choice of spells to you. If it cannot find class data, it can still increase your level and HP. Use **Undo** after applying to reverse the level-up without overwriting later changes to fields.
+
+Choose an existing class to advance it, or choose **Add Class** to start another class at level 1. The helper checks ability requirements for the new class and your existing classes, then offers the new class's multiclass proficiencies. Features and subclass choices follow the chosen class's level, not your total level. The helper can combine regular spell slots when it has the needed progression data; Pact Magic slots stay separate. It leaves a second Extra Attack unchecked and does not replace an existing Unarmored Defense automatically.
 
 ## Formats and where they load
 

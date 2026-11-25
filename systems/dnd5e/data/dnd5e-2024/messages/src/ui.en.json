@@ -190,14 +190,25 @@
       "source": "Source",
       "qty": "Qty",
       "equipped": "Equipped",
-      "ranged": "Ranged"
+      "ranged": "Ranged",
+      "castingClass": "Casting class"
     },
     "exhaustion": "Exhaustion level",
     "concentration": "Concentrating on",
     "rangedAttackBonus": "Ranged attack bonus",
     "orderLoreBonus": "Order lore bonus (Wisdom to Arcana, Religion or Nature)",
     "currentSpeed": "Current speed (after Exhaustion)",
-    "d20Penalty": "D20 Test penalty (Exhaustion)"
+    "d20Penalty": "D20 Test penalty (Exhaustion)",
+    "multiclass": "Other classes",
+    "hpClassAdjust": "HP from other classes' dice",
+    "multiclassRow": {
+      "name": "Class",
+      "subclass": "Subclass",
+      "level": "Class level",
+      "hitDie": "Hit die",
+      "hitDiceSpent": "Hit dice spent",
+      "spellAbility": "Spellcasting ability"
+    }
   },
   "section": {
     "front": "Character",
@@ -357,6 +368,7 @@
     "added": "Added to {list}",
     "allLevels": "All levels",
     "allClasses": "All classes",
+    "myClasses": "My classes",
     "level": "Spell level",
     "class": "Class",
     "tab": {

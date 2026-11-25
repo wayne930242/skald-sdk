@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { ImagePlus, Loader2, User } from "lucide-react";
+import { ArrowUpCircle, ImagePlus, Loader2, User } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { usePortraitActions } from "@skald/sheet-sdk/modules/character/ui/portrait/portrait-actions";
 import { useRollOptional } from "@skald/sheet-sdk/modules/rolls/ui/context/roll-context";
@@ -10,7 +10,12 @@ import { cn } from "@skald/sheet-sdk/lib/utils";
 import { EditLayer, EditSlot, usePlay } from "./play-context";
 import { displayName } from "./row-text";
 import { num, rows, text } from "./play-model";
+import { classLine } from "./class-model";
 import { CARD, CARD_TITLE } from "./card-styles";
+import { useDndRecalc } from "./use-dnd-recalc";
+
+/** The top character level: the helper is hidden there. */
+const LEVEL_CAP = 20;
 
 /** Longer than this (characters or lines) starts folded, with a toggle to read it all. */
 const FOLD_CHARS = 360;
@@ -106,9 +111,10 @@ function Summary() {
   const t = useTranslations("play.character");
   const tField = useTranslations("field");
   const tOption = useTranslations("option");
-  const { values } = usePlay();
+  const { values, editable, openLevelUp } = usePlay();
+  const recalc = useDndRecalc();
   const name = text(values.name).trim();
-  const classLine = [text(values.className), text(values.subclass)].map((part) => part.trim()).filter(Boolean).join(" · ");
+  const classText = classLine(values, { separator: " / ", level: String });
   const level = num(values.level);
   const species = [text(values.species), text(values.lineage)].map((part) => part.trim()).filter(Boolean).join(" · ");
   const alignment = text(values.alignment);
@@ -125,8 +131,20 @@ function Summary() {
           {name || t("unnamed")}
         </h2>
         <p className="mt-1 text-base text-muted-foreground">
-          {[classLine, level > 0 ? t("level", { level }) : ""].filter(Boolean).join(" · ")}
+          {[classText, level > 0 ? t("level", { level }) : ""].filter(Boolean).join(" · ")}
         </p>
+        {/* Phase 2b §4.4: one level per run, never past 20, only where the sheet can change. */}
+        {editable && openLevelUp && level < LEVEL_CAP && (
+          <button
+            type="button"
+            onClick={() => openLevelUp(recalc)}
+            className="mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border px-3 text-sm font-medium hover:bg-muted sm:min-h-9"
+            data-play-level-up
+          >
+            <ArrowUpCircle className="size-4" aria-hidden />
+            {t("levelUp")}
+          </button>
+        )}
       </div>
       <dl className="grid gap-x-3 gap-y-2 text-base sm:grid-cols-[auto_minmax(0,1fr)]">
         {facts.map(([label, value]) => (

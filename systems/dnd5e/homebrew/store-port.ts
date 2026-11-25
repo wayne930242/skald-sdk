@@ -50,6 +50,8 @@ export interface DndHomebrewStore {
   /** The pack "save as homebrew" writes to: the first pack, created as "My homebrew" (localized) when there is none. */
   defaultPack(): Promise<HomebrewResult<HomebrewPackRecord>>;
   listItems(packUuid: string): Promise<HomebrewResult<HomebrewItemRecord[]>>;
+  /** Writes then deletes, in order. Failure detail is the decimal count of committed rows. */
+  saveItems(packUuid: string, batch: HomebrewBatch, onProgress?: (done: number, total: number) => void): Promise<HomebrewResult<void>>;
   saveItem(packUuid: string, item: HomebrewItemSave): Promise<HomebrewResult<HomebrewItemRecord>>;
   deleteItem(id: string): Promise<HomebrewResult<void>>;
   /** All or nothing: a new pack with its rows, or an own pack's rows replaced. */
@@ -60,3 +62,25 @@ export interface DndHomebrewStore {
 }
 
 export const dndHomebrewStorePort = defineHostPort<DndHomebrewStore>("dnd5e.homebrewStore");
+
+export interface HomebrewBatch {
+  writes: readonly HomebrewItemSave[];
+  deletes: readonly string[];
+}
+
+export async function runHomebrewBatch(
+  batch: HomebrewBatch,
+  save: (row: HomebrewItemSave) => Promise<HomebrewResult<HomebrewItemRecord>>,
+  remove: (id: string) => Promise<HomebrewResult<void>>,
+  onProgress?: (done: number, total: number) => void,
+): Promise<HomebrewResult<void>> {
+  let done = 0;
+  const steps = [...batch.writes.map(row => () => save(row)), ...batch.deletes.map(id => () => remove(id))];
+  for (const step of steps) {
+    const result = await step();
+    if (!result.ok) return { ...result, detail: String(done) };
+    done++;
+    onProgress?.(done, steps.length);
+  }
+  return { ok: true, value: undefined };
+}

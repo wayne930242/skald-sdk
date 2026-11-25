@@ -23,6 +23,8 @@ import {
   type SlotLevel,
 } from "../sheet/play/play-model";
 import { rowBodyText } from "../sheet/play/row-body";
+import { classLine, hitDicePools, sheetClasses } from "../sheet/play/class-model";
+import { castingClasses, spellCasting } from "../sheet/play/casting-classes";
 import { inventorySummary, type CarryStatus } from "../sheet/economy/carry";
 import { catalogItem, type Catalog } from "../sheet/economy/catalog";
 
@@ -158,6 +160,8 @@ export interface DndPrintModel {
   };
   hp: { current: number | null; max: number; temp: number | null };
   hitDice: { faces: number; max: number; spent: number | null };
+  /** Every Hit Point Die pool, by die size (multiclass, CLASS-IMPL §7.2); one entry = `hitDice`. */
+  hitDicePools: Array<{ faces: number; max: number; spent: number | null }>;
   death: { successes: number; failures: number };
   /** Without exhaustion. Compact: the conditions in effect; blanks: every condition, unchecked. */
   conditions: Array<{ id: string; active: boolean }>;
@@ -170,7 +174,11 @@ export interface DndPrintModel {
   /** Whether the character casts: a spellcasting ability, spells, slots or pact slots. */
   caster: boolean;
   /** Null for a non-caster in the compact print; blanks keeps the empty boxes. */
-  spellcasting: { ability: string; mod: number | null; dc: number | null; attack: number | null; pact: SlotLevel | null } | null;
+  spellcasting: {
+    ability: string; mod: number | null; dc: number | null; attack: number | null; pact: SlotLevel | null;
+    /** A multiclass sheet: one casting line per casting class, starting class first (CLASS-IMPL §7.5 M5); absent otherwise. */
+    classes?: Array<{ name: string; ability: string; mod: number; dc: number; attack: number }>;
+  } | null;
   /** Levels 1–9. */
   slots: SlotLevel[];
   /** Every spell, by level then name: the 戲法與法術 table and the spellbook. */
@@ -312,6 +320,7 @@ export function buildDndPrintModel({ values, blanks, nameOf, compare = (a, b) =>
 
   const hp = hitPoints(values);
   const dice = hitDice(values);
+  const multiclass = sheetClasses(values).length > 1;
   const exhaustion = exhaustionLevel(values);
   const active = new Set(conditionsOf(values));
   const conditions = blanks
@@ -359,8 +368,8 @@ export function buildDndPrintModel({ values, blanks, nameOf, compare = (a, b) =>
       key: `cantrip:${index}`,
       kind: "cantrip" as const,
       name: spell.name,
-      attack: facts.attack ? num(values.spellAttack) : null,
-      dc: facts.attack ? null : num(values.spellSaveDc),
+      attack: facts.attack ? spellCasting(values, spell.row).attack : null,
+      dc: facts.attack ? null : spellCasting(values, spell.row).dc,
       dice: cantripDice(facts.dice, level),
       damageType: "",
       notes: spell.notes,
@@ -382,7 +391,8 @@ export function buildDndPrintModel({ values, blanks, nameOf, compare = (a, b) =>
   const pact = pactSlots(values);
   const casterAbility = text(values.spellAbility);
   const hasAbility = casterAbility !== "" && casterAbility !== "none";
-  const caster = hasAbility || spells.length > 0 || slots.some((slot) => slot.total > 0) || pact !== null;
+  const casters = castingClasses(values);
+  const caster = hasAbility || casters.length > 0 || spells.length > 0 || slots.some((slot) => slot.total > 0) || pact !== null;
 
   const summary = inventorySummary(values, catalog);
   const equipment = rows(values.equipment).flatMap((row, index): PrintEquipment[] => {
@@ -411,10 +421,11 @@ export function buildDndPrintModel({ values, blanks, nameOf, compare = (a, b) =>
     blanks,
     identity: {
       background: text(values.background).trim(),
-      className: text(values.className).trim(),
+      // Several classes: "Fighter 5 · Champion / Wizard 2" in the class box, the subclasses inside it.
+      className: multiclass ? classLine(values, { separator: " / ", level: String }) : text(values.className).trim(),
       species: text(values.species).trim(),
       lineage: text(values.lineage).trim(),
-      subclass: text(values.subclass).trim(),
+      subclass: multiclass ? "" : text(values.subclass).trim(),
       player: text(values.player).trim(),
       level,
       xp: Math.max(0, num(values.xp)),
@@ -437,6 +448,7 @@ export function buildDndPrintModel({ values, blanks, nameOf, compare = (a, b) =>
     },
     hp: { current: blanks ? null : hp.current, max: hp.max, temp: blanks ? null : hp.temp > 0 ? hp.temp : null },
     hitDice: { faces: dice.faces, max: dice.max, spent: blanks ? null : dice.max - dice.left },
+    hitDicePools: hitDicePools(values).map((pool) => ({ faces: pool.faces, max: pool.max, spent: blanks ? null : pool.max - pool.left })),
     death: blanks
       ? { successes: 0, failures: 0 }
       : { successes: Math.min(3, Math.max(0, num(values.deathSuccesses))), failures: Math.min(3, Math.max(0, num(values.deathFailures))) },
@@ -464,6 +476,7 @@ export function buildDndPrintModel({ values, blanks, nameOf, compare = (a, b) =>
         dc: hasAbility ? num(values.spellSaveDc) : null,
         attack: hasAbility ? num(values.spellAttack) : null,
         pact: pact && blanks ? { ...pact, used: 0 } : pact,
+        ...(casters.length > 0 ? { classes: casters.map(({ name, ability, mod, dc, attack }) => ({ name, ability, mod, dc, attack })) } : {}),
       }
       : null,
     slots,

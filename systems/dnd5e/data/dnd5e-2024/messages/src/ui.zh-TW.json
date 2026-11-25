@@ -190,14 +190,25 @@
       "source": "來源",
       "qty": "數量",
       "equipped": "已裝備",
-      "ranged": "遠程"
+      "ranged": "遠程",
+      "castingClass": "施法職業"
     },
     "exhaustion": "力竭等級",
     "concentration": "專注的法術",
     "rangedAttackBonus": "遠程攻擊加值",
     "orderLoreBonus": "職司知識加值（睿知調整值加於奧秘、宗教或自然）",
     "currentSpeed": "目前速度（計入力竭）",
-    "d20Penalty": "D20 檢定減值（力竭）"
+    "d20Penalty": "D20 檢定減值（力竭）",
+    "multiclass": "其他職業",
+    "hpClassAdjust": "其他職業生命骰的生命值",
+    "multiclassRow": {
+      "name": "職業",
+      "subclass": "子職",
+      "level": "職業等級",
+      "hitDie": "生命骰",
+      "hitDiceSpent": "已用生命骰",
+      "spellAbility": "施法屬性"
+    }
   },
   "section": {
     "front": "角色",
@@ -357,6 +368,7 @@
     "added": "已加入{list}",
     "allLevels": "所有環階",
     "allClasses": "所有職業",
+    "myClasses": "我的職業",
     "level": "法術環階",
     "class": "職業",
     "tab": {

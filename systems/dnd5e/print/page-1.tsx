@@ -191,11 +191,19 @@ export function Page1({ model, labels, paper, frames, identity: identityView }: 
           <h3>{print("hitDice.title")}</h3>
           <div>
             <span className="dnd-print-label">{print("hitDice.spent")}</span>
-            <span className="dnd-print-value">{model.hitDice.spent ?? ""}</span>
+            <span className="dnd-print-value">
+              {model.hitDicePools.length > 1
+                ? model.hitDicePools.every((pool) => pool.spent === null)
+                  ? ""
+                  : model.hitDicePools.map((pool) => `d${pool.faces} ${pool.spent ?? ""}`).join(" · ")
+                : model.hitDice.spent ?? ""}
+            </span>
           </div>
           <div>
             <span className="dnd-print-label">{print("hitDice.max")}</span>
-            <span className="dnd-print-value">{print("hitDice.dice", { max: model.hitDice.max, faces: model.hitDice.faces })}</span>
+            <span className="dnd-print-value">
+              {model.hitDicePools.map((pool) => print("hitDice.dice", { max: pool.max, faces: pool.faces })).join(" + ")}
+            </span>
           </div>
         </Box>
         <Box region="death" className="dnd-print-ds">

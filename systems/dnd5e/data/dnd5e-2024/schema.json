@@ -51,6 +51,148 @@
       "defaultValue": 1,
       "format": "integer"
     },
+    "multiclass": {
+      "id": "multiclass",
+      "type": "list",
+      "label": "{{i18n:field.multiclass}}",
+      "idPrefix": "class",
+      "emptyMessage": "{{i18n:field.emptyList}}",
+      "rowTemplate": {
+        "layout": {
+          "type": "stack",
+          "direction": "row",
+          "wrap": true,
+          "gap": "xs",
+          "align": "center"
+        },
+        "children": [
+          {
+            "id": "name",
+            "type": "text",
+            "label": "{{i18n:field.multiclassRow.name}}",
+            "defaultValue": "",
+            "layout": {
+              "width": "fill"
+            },
+            "action": {
+              "handler": "openReference",
+              "icon": "BookOpen",
+              "tooltip": "{{i18n:reference.open}}"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "subclass",
+            "type": "text",
+            "label": "{{i18n:field.multiclassRow.subclass}}",
+            "defaultValue": "",
+            "layout": {
+              "width": "8rem"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "level",
+            "type": "number",
+            "label": "{{i18n:field.multiclassRow.level}}",
+            "min": 1,
+            "max": 19,
+            "defaultValue": 1,
+            "format": "integer",
+            "layout": {
+              "width": "4rem"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "hitDie",
+            "type": "number",
+            "label": "{{i18n:field.multiclassRow.hitDie}}",
+            "min": 6,
+            "max": 12,
+            "step": 2,
+            "defaultValue": 8,
+            "format": "integer",
+            "layout": {
+              "width": "4rem"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "hitDiceSpent",
+            "type": "number",
+            "label": "{{i18n:field.multiclassRow.hitDiceSpent}}",
+            "min": 0,
+            "defaultValue": 0,
+            "format": "integer",
+            "layout": {
+              "width": "4rem"
+            },
+            "labelPosition": "top"
+          },
+          {
+            "id": "spellAbility",
+            "type": "select",
+            "label": "{{i18n:field.multiclassRow.spellAbility}}",
+            "options": [
+              {
+                "value": "none",
+                "label": "{{i18n:option.spellAbility.none}}"
+              },
+              {
+                "value": "int",
+                "label": "{{i18n:option.spellAbility.int}}"
+              },
+              {
+                "value": "wis",
+                "label": "{{i18n:option.spellAbility.wis}}"
+              },
+              {
+                "value": "cha",
+                "label": "{{i18n:option.spellAbility.cha}}"
+              }
+            ],
+            "defaultValue": "none",
+            "labelPosition": "top"
+          },
+          {
+            "id": "classId",
+            "type": "text",
+            "label": "{{i18n:field.classId}}",
+            "hidden": true,
+            "defaultValue": ""
+          },
+          {
+            "id": "ref",
+            "type": "text",
+            "label": "{{i18n:field.row.ref}}",
+            "hidden": true,
+            "defaultValue": ""
+          },
+          {
+            "id": "origin",
+            "type": "select",
+            "label": "{{i18n:field.row.origin}}",
+            "hidden": true,
+            "options": [
+              {
+                "value": "srd",
+                "label": "{{i18n:option.origin.srd}}"
+              },
+              {
+                "value": "pack",
+                "label": "{{i18n:option.origin.pack}}"
+              },
+              {
+                "value": "custom",
+                "label": "{{i18n:option.origin.custom}}"
+              }
+            ],
+            "defaultValue": "custom"
+          }
+        ]
+      }
+    },
     "xp": {
       "id": "xp",
       "type": "number",
@@ -1108,11 +1250,19 @@
       "label": "{{i18n:field.hpMaxMisc}}",
       "format": "integer"
     },
+    "hpClassAdjust": {
+      "id": "hpClassAdjust",
+      "type": "number",
+      "label": "{{i18n:field.hpClassAdjust}}",
+      "hidden": true,
+      "defaultValue": 0,
+      "format": "integer"
+    },
     "hpMax": {
       "id": "hpMax",
       "type": "computed",
       "label": "{{i18n:field.hpMax}}",
-      "formula": "=[hitDieFaces]+[conMod]+([level]-1)*(FLOOR([hitDieFaces]/2)+1+[conMod])+[level]*[hpPerLevelBonus]+[hpMaxMisc]",
+      "formula": "=[hitDieFaces]+[conMod]+([level]-1)*(FLOOR([hitDieFaces]/2)+1+[conMod])+[level]*[hpPerLevelBonus]+[hpMaxMisc]+[hpClassAdjust]",
       "format": "integer"
     },
     "hp": {
@@ -2102,6 +2252,13 @@
             "id": "ref",
             "type": "text",
             "label": "{{i18n:field.row.ref}}",
+            "hidden": true,
+            "defaultValue": ""
+          },
+          {
+            "id": "castingClass",
+            "type": "text",
+            "label": "{{i18n:field.row.castingClass}}",
             "hidden": true,
             "defaultValue": ""
           },

@@ -33,9 +33,9 @@ async function labelsOf(locale: "en" | "zh-TW") {
   };
 }
 
-type Names = Record<string, Record<string, string> | undefined>;
+export type Names = Record<string, Record<string, string> | undefined>;
 /** Built-in names: the static catalog's `ref` (spells, classes) under the lazy reference names. */
-async function namesOf(locale: "en" | "zh-TW"): Promise<Names> {
+export async function namesOf(locale: "en" | "zh-TW"): Promise<Names> {
   const [messages, lazy] = await Promise.all([
     locale === "en" ? import("@skald/system-dnd5e/data/dnd5e-2024/messages/en.json") : import("@skald/system-dnd5e/data/dnd5e-2024/messages/zh-TW.json"),
     loadReferenceNames(locale),

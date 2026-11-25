@@ -66,6 +66,8 @@ export interface ReferenceContextValue {
   homebrewOf?: (ref: string) => HomebrewStamp | undefined;
   /** Names and snapshot text of the enabled packs, in the viewer's locale. */
   packText: PackTextIndex | null;
+  /** The spell list a pack (Drive or homebrew) class borrows (`meta.spellcasting.list`), when it has one. */
+  packSpellListOf?: (classId: string) => string | undefined;
   renderContext: Omit<EntriesRenderContext, "onOpenRef">;
 }
 
@@ -251,6 +253,11 @@ export function useReferenceContext(
       packSupplier,
       homebrewOf: (ref) => packs?.homebrew?.[aliases[ref] ?? ref],
       packText,
+      packSpellListOf: (classId) => {
+        const meta = pack?.entries.find((entry) => entry.ref === `class:${classId}`)?.meta as { spellcasting?: { list?: unknown } } | undefined;
+        const list = meta && typeof meta === "object" && meta.spellcasting && typeof meta.spellcasting === "object" ? meta.spellcasting.list : undefined;
+        return typeof list === "string" && list ? list : undefined;
+      },
       renderContext: {
         resolveRef,
         label,

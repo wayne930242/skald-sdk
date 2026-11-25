@@ -1,3 +1,4 @@
+import { createContext, useContext } from "react";
 import { useTranslations } from "next-intl";
 import { Input } from "@skald/sheet-sdk/components/ui/input";
 import { Button } from "@skald/sheet-sdk/components/ui/button";
@@ -43,6 +44,9 @@ const lists: Record<string, readonly string[]> = {
     "wizard",
   ],
 };
+/** The user's own casting classes (id → name), offered after the built-in casters in the spell form's classes. */
+export const OwnClassOptions = createContext<ReadonlyArray<{ id: string; name: string }>>([]);
+
 const templates: Record<string, unknown> = {
   traits: { nameZh: "", nameEn: "", textZh: "", textEn: "" },
   items: { ref: "", displayName: "", qty: 1 },
@@ -64,8 +68,10 @@ export function Field({
   change(value: unknown): void;
 }) {
   const t = useTranslations("homebrew");
+  const own = useContext(OwnClassOptions);
   const label = t(`field.${name}`);
-  const options =
+  const ownNames = new Map(name === "classes" ? own.map((c) => [c.id, c.name]) : []);
+  const builtinOptions =
     name === "category"
       ? kind === "feat"
         ? FEAT_CATEGORIES
@@ -73,6 +79,7 @@ export function Field({
           ? MAGIC_ITEM_CATEGORIES
           : undefined
       : lists[name];
+  const options = builtinOptions && ownNames.size ? [...builtinOptions, ...[...ownNames.keys()].filter((id) => !builtinOptions.includes(id))] : builtinOptions;
   if (Array.isArray(value) && name !== "from") {
     const fixed = name === "skills" || name === "abilityOptions";
     return (
@@ -165,7 +172,7 @@ export function Field({
         >
           {options.map((opt) => (
             <option key={opt} value={opt}>
-              {opt ? t(`option.${opt.replaceAll(" ", "_")}`) : t("none")}
+              {ownNames.get(opt) ?? (opt ? t(`option.${opt.replaceAll(" ", "_")}`) : t("none"))}
             </option>
           ))}
         </select>

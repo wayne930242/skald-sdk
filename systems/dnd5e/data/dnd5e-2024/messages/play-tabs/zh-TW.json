@@ -63,7 +63,13 @@
     "castRitualDone": "{name}: cast as a Ritual, no slot spent.",
     "alwaysPrepared": "+{count} always",
     "alwaysPreparedLong": "{count} more always prepared, not counted toward the class limit",
-    "concentrationEnded": "Concentration on {name} ended."
+    "concentrationEnded": "Concentration on {name} ended.",
+    "multiclass": {
+      "castingClass": "Spellcasting class",
+      "castingClassOf": "Spellcasting class of {name}",
+      "tile": "{class} · {ability}",
+      "hint": "{class} DC {dc}, attack {attack}"
+    }
   },
   "features": {
     "class": "Class Features",

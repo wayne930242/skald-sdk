@@ -7,6 +7,7 @@ import { EditSlot, rowFieldRoll, usePlay } from "./play-context";
 import { PlayRollButton } from "./play-roll-button";
 import { OverrideMark } from "@skald/sheet-sdk/modules/character/ui/derived/override-mark";
 import { cantripDice, num, rows, signed, text, weaponAttack } from "./play-model";
+import { castingClasses } from "./casting-classes";
 import { CastButton, SlotPips, SpellDamageButtons } from "./spells-tab";
 import { Conditions, DeathSaves, HitDiceBlock, RestButtons } from "./vitals-bar";
 import { displayName, spellLine, summaryOf, useSpellFacts } from "./row-text";
@@ -139,15 +140,23 @@ function CombatSpells() {
   const leveled = rows(values.spells).filter((spell) => num(spell.level) > 0 && spell.prepared === true);
   if (leveled.length === 0) return null;
   const levels = [...new Set(leveled.map((spell) => num(spell.level)))].sort((a, b) => a - b);
+  const casters = castingClasses(values);
   return (
     <section className={CARD} aria-label={t("combat.spells")} data-play-combat-spells>
       <header className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 className={CARD_TITLE}>{t("combat.spells")}</h3>
+        {casters.length > 0 ? (
+          // A multiclass sheet: one DC and attack per casting class (CLASS-IMPL §7.5 M5).
+          <span className="text-xs text-muted-foreground" data-play-casting-hint>
+            {casters.map((caster) => t("spells.multiclass.hint", { class: caster.name, dc: caster.dc, attack: signed(caster.attack) })).join(" / ")}
+          </span>
+        ) : (
         <span className="text-xs text-muted-foreground">
           {t("combat.spellsHint", { dc: num(values.spellSaveDc), attack: signed(num(values.spellAttack)) })}
           <OverrideMark fieldId="spellSaveDc" />
           <OverrideMark fieldId="spellAttack" />
         </span>
+        )}
       </header>
       <div className="mt-2 space-y-1">
         {levels.map((level) => (

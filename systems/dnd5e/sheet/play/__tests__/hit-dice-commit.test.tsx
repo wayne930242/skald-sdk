@@ -103,4 +103,28 @@ describe("use a hit die", () => {
     expect(saved.data.hp).toEqual({ current: 11 });
     expect(saved.data.hitDiceSpent).toBe(2);
   });
+
+  it.skipIf(zhWithheld("messages/play/zh-TW.json"))("multiclass: shows each die's pool and spends the picked die from its class row", async () => {
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <NextIntlClientProvider locale="zh-TW" messages={{ ...appZh, ...systemZh }} timeZone="UTC">
+        <SystemPluginProvider catalog={{}}>{children}</SystemPluginProvider>
+      </NextIntlClientProvider>
+    );
+    const multiclass = [{ id: "class-1", classId: "wizard", ref: "class:wizard", name: "法師", subclass: "", level: 2, hitDie: 6, hitDiceSpent: 0, spellAbility: "int" }];
+    await act(async () => {
+      render(
+        <Sheet initial={{ name: "艾琳", level: 7, conMod: 2, hpMax: 56, hp: { current: 10 }, hitDieFaces: 10, hitDiceMax: 7, hitDiceSpent: 0, multiclass }} />,
+        { wrapper },
+      );
+    });
+    await screen.findByRole("tab", { name: "戰鬥" });
+    expect(screen.getAllByText("d10 5/5 · d6 2/2").length).toBeGreaterThan(0);
+
+    fireEvent.click(screen.getByRole("button", { name: "使用生命骰 d6" }));
+    await act(async () => pending.resolve({ rolled: 3 }));
+
+    expect(saved.data.hp).toEqual({ current: 13 });
+    expect(saved.data.hitDiceSpent).toBe(0);
+    expect((saved.data.multiclass as Array<{ hitDiceSpent: number }>)[0].hitDiceSpent).toBe(1);
+  });
 });

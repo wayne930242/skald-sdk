@@ -1,0 +1,47 @@
+/** The level-up helper's pure domain (phase 2b §4): read a class, plan one level, apply and undo it. */
+export {
+  classInfoOf,
+  featureLevel,
+  isPlaceholder,
+  knownSubclass,
+  levelUpPlan,
+  offeredFeatures,
+  sheetRefs,
+  LEVEL_UP_RULES,
+  type ClassInfo,
+  type ClassInfoEntry,
+  type ClassInfoInput,
+  type ClassOrigin,
+  type CountChange,
+  type LevelUpFeature,
+  type LevelUpFeatureOffer,
+  type LevelUpInput,
+  type LevelUpPlan,
+  type LevelUpSubclass,
+  type LevelUpTarget,
+  type NewClassRow,
+  type SlotsOffer,
+} from "./plan";
+export { type ArmorGain, type GainsOffer, type PlanClass } from "./multiclass";
+export {
+  applyLevelUp,
+  asiScores,
+  undoLevelUp,
+  type AsiChoice,
+  type HpChoice,
+  type LevelUpChoices,
+  type LevelUpFollowUp,
+  type LevelUpResult,
+  type LevelUpRowBuilder,
+  type LevelUpRowUndo,
+  type LevelUpUndo,
+  type UndoResult,
+} from "./apply";
+export {
+  findProgressionTable,
+  progressionAt,
+  progressionOf,
+  type ClassBlocksSource,
+  type ClassProgression,
+  type LevelProgression,
+} from "../../reference/class-progression";

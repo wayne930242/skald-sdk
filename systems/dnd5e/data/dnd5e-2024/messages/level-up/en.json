@@ -1,0 +1,109 @@
+{
+  "title": "Level up",
+  "description": "One level per run: check the choices, then apply.",
+  "classLabel": "Class",
+  "classLine": "{name} {from} → {to}",
+  "classFallback": "Class",
+  "loading": "Loading class data…",
+  "noClass": "Class data not found: only the level and hit points change.",
+  "hp": {
+    "title": "Hit points",
+    "average": "Average: {value} + Constitution modifier",
+    "roll": "Roll",
+    "rollButton": "Roll d{faces}",
+    "result": "Hit die result",
+    "delta": "The difference from the average goes to Max HP other bonus: {delta}",
+    "invalid": "Enter a result from 1 to {faces}."
+  },
+  "features": {
+    "title": "New features",
+    "none": "No new class features at this level."
+  },
+  "subclass": {
+    "title": "Subclass",
+    "known": "Subclass: {name}",
+    "later": "Choose later",
+    "none": "No subclass is available for this class yet."
+  },
+  "asi": {
+    "title": "Ability Score Improvement",
+    "abilities": "+2 to one ability or +1 to two",
+    "feat": "Another feat",
+    "later": "Decide later",
+    "increase": "{ability} +1",
+    "decrease": "{ability} −1",
+    "points": "{used} / {total} points",
+    "score": "{from} → {to}",
+    "featHint": "After applying, pick the feat from the library."
+  },
+  "epicBoon": "This level grants an Epic Boon: after applying, pick it from the library.",
+  "slots": {
+    "title": "Spell slots",
+    "apply": "Update the spell slot totals",
+    "differs": "Your spell slots differ from the class table.",
+    "level": "Level {level}: {from} → {to}",
+    "pact": "Pact slots: {from} → {to}, slot level {fromLevel} → {toLevel}"
+  },
+  "spells": {
+    "title": "Spells",
+    "cantrips": "Cantrips {from} → {to} (on the sheet: {have})",
+    "prepared": "Prepared spells {from} → {to} (on the sheet: {have})",
+    "hint": "After applying, add spells from the library."
+  },
+  "columns": {
+    "title": "Other changes",
+    "row": "{label}: {from} → {to}"
+  },
+  "apply": "Apply",
+  "cancel": "Cancel",
+  "close": "Close",
+  "done": "Now level {level}",
+  "undo": "Undo",
+  "undone": "Level up undone",
+  "undoKept": "Changed since, so kept: {items}",
+  "stale": "The level changed meanwhile. Open the helper again.",
+  "tooMuchText": "The copied text would pass the sheet's limit ({kb} KB), so nothing was changed.",
+  "result": {
+    "title": "Now level {level}",
+    "continue": "Continue to level {level}",
+    "feats": "Pick a feat",
+    "epicBoon": "Pick an Epic Boon",
+    "spells": "Add spells"
+  },
+  "multiclass": {
+    "addOption": "Add a class…",
+    "pickTitle": "Choose a class to add",
+    "pickNone": "No other class to add.",
+    "prerequisite": "Needs {ability} 13 (now {have})",
+    "abilityOr": " or ",
+    "scoreSeparator": "/",
+    "prerequisiteMet": "Meets the ability requirement",
+    "dmOverride": "The DM allows it, add anyway",
+    "characterLevel": "Character level {from} → {to}",
+    "issues": "The sheet's classes contradict each other; fix them in edit mode first: {items}",
+    "issue": {
+      "overflow": "multiclass levels add up to more than the character level",
+      "duplicate": "a class is listed twice",
+      "startClass": "a multiclass row repeats the starting class",
+      "rowLevel": "a multiclass row's level is not a positive whole number"
+    },
+    "gains": {
+      "title": "Multiclass proficiencies",
+      "unknown": "This class has no multiclass data; add its proficiencies by hand from the class text.",
+      "savesNote": "Multiclassing never gives saving throw proficiencies.",
+      "weapons": "Weapon proficiencies: {items}",
+      "skills": "Skills (choose {count})",
+      "toolGrant": "Tool: {name}",
+      "toolChoice": "Tool ({category}) {n}",
+      "martialWeapons": "Martial weapons"
+    },
+    "extraAttack": "Extra Attack does not stack",
+    "unarmored": {
+      "set": "Set Unarmored Defense: {name}",
+      "note": "Armor Class uses one method only; Unarmored Defense stays as it is."
+    },
+    "slotsUnknown": "A class has no data; adjust spell slots yourself.",
+    "rowField": "{name}'s {field}",
+    "keptRow": "{name} (a class row edited since; total level and HP adjustment kept with it)"
+  }
+}

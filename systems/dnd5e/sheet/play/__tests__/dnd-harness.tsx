@@ -6,14 +6,18 @@ import { readCompiledFormulaArtifact, type CompiledFormulaArtifact } from "@skal
 import type { Schema, Template } from "@skald/types/schema";
 import type { LoadedSystem } from "@skald/types/system";
 import appZh from "@skald/sheet-sdk/messages/zh-TW.json";
+import appEn from "@skald/sheet-sdk/messages/en.json";
 import systemZh from "@skald/system-dnd5e/data/dnd5e-2024/messages/zh-TW.json";
+import systemEn from "@skald/system-dnd5e/data/dnd5e-2024/messages/en.json";
+import type { EffectivePacks } from "../../../content-pack/domain/types";
+import type { ReferenceContextValue } from "../../use-reference-context";
 import { compileBuiltinFixtureArtifact } from "@skald/sheet-sdk/modules/templates/sheet-artifact";
 import { loadDnd5e2024Data } from "../../../data-access/builtin-local-data";
 import { TemplateRenderer } from "@skald/sheet-sdk/modules/character/ui/renderer/template-renderer";
 import { SystemPluginProvider } from "@skald/sheet-sdk/modules/systems/ui/system-plugin-provider";
 import type { BuiltinLocalSystemData } from "@skald/sheet-sdk/modules/systems";
 import { useReferenceContext } from "../../use-reference-context";
-import { DndPlayView } from "../play-view";
+import { DndPlayView, type DndPlayViewProps } from "../play-view";
 import { preloadPlayTabs } from "../lazy-tabs";
 import { loadEditMessages } from "../edit-messages";
 import { loadEconomyMessages } from "../../economy/economy-intl";
@@ -63,6 +67,15 @@ export interface MountOptions {
   overrides?: Record<string, unknown>;
   /** Default 1440 (wide layout). */
   width?: number;
+  /** Default zh-TW. */
+  locale?: "zh-TW" | "en";
+  /** The device's enabled packs the reference context reads. */
+  packs?: EffectivePacks | null;
+  /**
+   * A hook the sheet calls on every render, as the adapter would: more play view props (its
+   * openers) and the dialogs it mounts beside the sheet.
+   */
+  useHost?: (reference: ReferenceContextValue) => { playView?: Partial<DndPlayViewProps>; dialogs?: ReactNode };
 }
 
 export interface DndMounted {
@@ -101,9 +114,11 @@ export async function mountDnd(harness: DndHarness, options: MountOptions = {}):
       saved.data = data;
       saved.overrides = overrides;
     });
-    const reference = useReferenceContext(harness.system);
+    const reference = useReferenceContext(harness.system, options.packs ?? null);
+    const host = options.useHost?.(reference);
     const editable = options.editable ?? true;
     return (
+      <>
       <TemplateRenderer
         template={harness.local.template as Template}
         schema={harness.local.schema as Schema}
@@ -133,20 +148,24 @@ export async function mountDnd(harness: DndHarness, options: MountOptions = {}):
             return next;
           });
         } : undefined}
-        playView={<DndPlayView system={harness.system} reference={reference} openReference={vi.fn()} openCompendium={vi.fn()} />}
+        playView={<DndPlayView system={harness.system} reference={reference} openReference={vi.fn()} openCompendium={vi.fn()} {...host?.playView} />}
         playViewModes="both"
       />
+      {host?.dialogs}
+      </>
     );
   }
+  const locale = options.locale ?? "zh-TW";
+  const messages = locale === "en" ? { ...appEn, ...(systemEn as object) } : { ...appZh, ...(systemZh as object) };
   const wrapper = ({ children }: { children: ReactNode }) => (
-    <NextIntlClientProvider locale="zh-TW" messages={{ ...appZh, ...(systemZh as object) }} timeZone="UTC">
+    <NextIntlClientProvider locale={locale} messages={messages} timeZone="UTC">
       <SystemPluginProvider catalog={{}}>{children}</SystemPluginProvider>
     </NextIntlClientProvider>
   );
   await act(async () => {
     render(<Sheet />, { wrapper });
   });
-  await screen.findByRole("tab", { name: "戰鬥" });
+  await screen.findByRole("tab", { name: locale === "en" ? "Combat" : "戰鬥" });
   await act(async () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
   });

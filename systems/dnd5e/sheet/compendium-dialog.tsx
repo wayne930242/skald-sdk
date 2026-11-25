@@ -13,11 +13,8 @@ import { ScrollArea } from "@skald/sheet-sdk/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@skald/sheet-sdk/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@skald/sheet-sdk/components/ui/tabs";
 import { splitRef, type DndKind } from "../reference/tags";
-import { PACK_LIMITS } from "../content-pack/domain/limits";
-import { stampOf } from "../homebrew/domain/rows";
-import { packSnapshotBytes } from "../content-pack/domain/overlay";
 import { packLabel } from "./pack-label";
-import { buildCompendiumRow, type CompendiumDialogTab, type CompendiumStart, type CompendiumTab } from "./compendium-rows";
+import { appendCompendiumRows, buildCompendiumRow, type CompendiumDialogTab, type CompendiumStart, type CompendiumTab } from "./compendium-rows";
 import type { ReferenceContextValue } from "./use-reference-context";
 import { loadEnglishCorpus } from "../reference/load-corpus";
 import { appendAttack, attackLabels } from "./play/attack-rows";
@@ -112,6 +109,8 @@ function bundledSingles(ids: Iterable<string>): Set<string> {
 const VERTICAL_LIST = "pr-3 [&_[data-slot=scroll-area-viewport]>div]:block!";
 const LIST_LIMIT = 200;
 const ALL = "__all__";
+/** 「我的職業」: the union of the sheet's classes (`start.classIds`). */
+const MINE = "__mine__";
 
 export type CharacterUpdater = (updater: (previous: Record<string, unknown>) => Record<string, unknown>) => void;
 
@@ -173,7 +172,8 @@ function CompendiumDialogBody({
   const [tab, setTab] = useState<DialogTab>(start?.tab ?? "spells");
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState(ALL);
-  const [classId, setClassId] = useState(start?.classId ?? ALL);
+  const mine = start?.classIds && start.classIds.length > 0 ? start.classIds : null;
+  const [classId, setClassId] = useState(mine ? MINE : (start?.classId ?? ALL));
   const [category, setCategory] = useState(start?.category ?? ALL);
   // Opened from 戰鬥: a weapon is added as an attack first (its main action).
   const attackIntent = start?.intent === "attack" && tab === "equipment";
@@ -191,7 +191,7 @@ function CompendiumDialogBody({
 
   const known = useMemo(() => Object.keys(context.names.class ?? context.englishNames.class ?? {}).sort(), [context]);
   // A preset class the catalog does not name (a pack class) still shows as the selected filter.
-  const classes = classId !== ALL && !known.includes(classId) ? [...known, classId] : known;
+  const classes = [...known, ...[...(mine ?? []), ...(classId !== ALL && classId !== MINE ? [classId] : [])].filter((id, index, all) => !known.includes(id) && all.indexOf(id) === index)];
 
   const candidates = useMemo<Candidate[]>(() => {
     const out: Candidate[] = [];
@@ -236,12 +236,13 @@ function CompendiumDialogBody({
       }
       if (tab === "feats" && category !== ALL && featCategories.get(candidate.ref) !== category) return false;
       if (classId !== ALL) {
-        if (tab === "spells" && !candidate.classes?.includes(classId)) return false;
-        if (tab === "features" && candidate.classId !== undefined && candidate.classId !== classId) return false;
+        const wanted = classId === MINE ? (mine ?? []) : [classId];
+        if (tab === "spells" && !candidate.classes?.some((id) => wanted.includes(id))) return false;
+        if (tab === "features" && candidate.classId !== undefined && !wanted.includes(candidate.classId)) return false;
       }
       return true;
     });
-  }, [candidates, category, classId, context.packRefs, featCategories, itemTypes, level, query, tab]);
+  }, [candidates, category, classId, mine, context.packRefs, featCategories, itemTypes, level, query, tab]);
 
   const addAttack = (candidate: Candidate) => {
     const weapon = weapons.get(candidate.ref);
@@ -254,20 +255,20 @@ function CompendiumDialogBody({
     if (!onUpdate || !listTab) return;
     const built = buildCompendiumRow(listTab, candidate.ref, candidate.name, system, context, !inTable);
     if (!built) return;
+    // A multiclass sheet's spell added while one class's list is filtered belongs to that class.
+    const castingClass = listTab === "spells" && classId !== ALL && classId !== MINE ? start?.castingClassOf?.[classId] : undefined;
+    if (castingClass) built.row.castingClass = castingClass;
     onUpdate((previous) => {
-      const rows = Array.isArray(previous[built.list]) ? (previous[built.list] as unknown[]) : [];
       // A feat's own sheet fields come with its row (Archery: the ranged attack bonus the attack formula reads).
-      const next = { ...previous, ...(listTab === "feats" ? featSheetPatch(candidate.ref) : undefined), [built.list]: [...rows, built.row] };
+      const patch = listTab === "feats" ? featSheetPatch(candidate.ref) : undefined;
       // Snapshot cap (§5b): the picker refuses a pack row that would pass 200 KB of pack text.
-      if ((built.row.origin === "pack" && !inTable) || stampOf(built.row)) {
-        const bytes = packSnapshotBytes(next);
-        if (bytes > PACK_LIMITS.snapshotBytes) {
-          queueMicrotask(() => toast.error(tPack("tooMuchText", { kb: Math.ceil(bytes / 1024) })));
-          return previous;
-        }
+      const appended = appendCompendiumRows(previous, [built], { ...(patch ? { patch } : {}), inTable });
+      if (!appended.ok) {
+        queueMicrotask(() => toast.error(tPack("tooMuchText", { kb: Math.ceil(appended.bytes / 1024) })));
+        return previous;
       }
       queueMicrotask(() => toast.success(t("added", { list: tField(built.list) })));
-      return next;
+      return appended.data;
     });
   };
 
@@ -355,6 +356,7 @@ function CompendiumDialogBody({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={ALL}>{t("allClasses")}</SelectItem>
+                {mine && <SelectItem value={MINE}>{t("myClasses")}</SelectItem>}
                 {classes.map((id) => (
                   <SelectItem key={id} value={id}>
                     {context.nameOf(`class:${id}`)}

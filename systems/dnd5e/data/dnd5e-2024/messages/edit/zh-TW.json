@@ -53,5 +53,14 @@
     "skills": "Skill proficiencies",
     "combat": "Attack bonuses",
     "items": "Equipment rows"
+  },
+  "classes": {
+    "startLevel": "Starting class level {level}",
+    "issue": {
+      "overflow": "Other classes' levels must add up to less than the character level.",
+      "duplicate": "List each class only once.",
+      "startClass": "Another class can't be the starting class.",
+      "rowLevel": "Each other class needs a whole level of at least 1."
+    }
   }
 }

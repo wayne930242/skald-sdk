@@ -67,24 +67,36 @@ export function Page2({ model, labels, paper, frames, portrait, attribution, car
           {casting ? (
             <>
               <div className="dnd-print-p2-cast">
+{casting.classes ? (
+                  // A multiclass sheet: one line per casting class (CLASS-IMPL §7.5 M5).
+                  <Box region="casting" className="dnd-print-cast">
+                    {casting.classes.map((line) => (
+                      <div key={line.name} className="dnd-print-cast-ability" data-print-casting-line>
+                        <span className="dnd-print-label">{`${line.name} · ${sheet(`option.spellAbility.${line.ability}`)} ${signed(line.mod)}`}</span>
+                        <span className="dnd-print-value">{`DC ${line.dc} · ${signed(line.attack)}`}</span>
+                      </div>
+                    ))}
+                  </Box>
+                ) : (
                 <Box region="casting" className="dnd-print-cast">
-                  <div className="dnd-print-cast-ability">
-                    <span className="dnd-print-label">{print("spells.ability")}</span>
-                    <span className="dnd-print-value">{casting.ability ? sheet(`option.spellAbility.${casting.ability}`) : ""}</span>
-                  </div>
-                  <div>
-                    <span className="dnd-print-label">{print("spells.mod")}</span>
-                    <span className="dnd-print-value">{casting.mod === null ? "" : signed(casting.mod)}</span>
-                  </div>
-                  <div>
-                    <span className="dnd-print-label">{print("spells.dc")}</span>
-                    <span className="dnd-print-value">{casting.dc ?? ""}</span>
-                  </div>
-                  <div>
-                    <span className="dnd-print-label">{print("spells.attack")}</span>
-                    <span className="dnd-print-value">{casting.attack === null ? "" : signed(casting.attack)}</span>
-                  </div>
-                </Box>
+                    <div className="dnd-print-cast-ability">
+                      <span className="dnd-print-label">{print("spells.ability")}</span>
+                      <span className="dnd-print-value">{casting.ability ? sheet(`option.spellAbility.${casting.ability}`) : ""}</span>
+                    </div>
+                    <div>
+                      <span className="dnd-print-label">{print("spells.mod")}</span>
+                      <span className="dnd-print-value">{casting.mod === null ? "" : signed(casting.mod)}</span>
+                    </div>
+                    <div>
+                      <span className="dnd-print-label">{print("spells.dc")}</span>
+                      <span className="dnd-print-value">{casting.dc ?? ""}</span>
+                    </div>
+                    <div>
+                      <span className="dnd-print-label">{print("spells.attack")}</span>
+                      <span className="dnd-print-value">{casting.attack === null ? "" : signed(casting.attack)}</span>
+                    </div>
+                  </Box>
+                )}
                 <Slots model={model} labels={labels} />
               </div>
               <Box region="spells" className="dnd-print-spelltable" title={print("spells.title")} note={print("spells.legend")}>

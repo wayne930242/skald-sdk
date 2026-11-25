@@ -25,8 +25,26 @@ export interface PlayContextValue {
   openReference: (row: Record<string, unknown>) => void;
   /** Opens the compendium on `start`'s tab and filters (the last tab when absent). */
   openCompendium: ((start?: CompendiumStart) => void) | null;
+  /**
+   * Opens the level-up helper (phase 2b §4.4) with the caller's recalc notice (`useDndRecalc`, which
+   * needs this context); null where the sheet cannot change or has no helper.
+   */
+  openLevelUp: ((recalc: LevelUpRequest["recalc"]) => void) | null;
   system: LoadedSystem;
   schema: Schema;
+}
+
+/**
+ * What the level-up helper gets from the play view (phase 2b §4.4): it is mounted by the adapter,
+ * outside the play view's contexts, so the view hands over its write path, a reader of the stored
+ * data now, its recalc notice and its compendium opener.
+ */
+export interface LevelUpRequest {
+  update: (updater: (previous: Record<string, unknown>) => Record<string, unknown>) => void;
+  current: () => Record<string, unknown>;
+  /** B-024: the notice of what the change recalculated. */
+  recalc: (before: Record<string, unknown>, after: Record<string, unknown>) => void;
+  openCompendium: ((start: CompendiumStart) => void) | null;
 }
 
 export const PlayContext = createContext<PlayContextValue | null>(null);

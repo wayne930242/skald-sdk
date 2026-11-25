@@ -7,6 +7,7 @@ import { canonicalJson } from "../../content-pack/domain/canonical-json";
 import { PACK_ID_PATTERN } from "../../content-pack/domain/limits";
 import { HOMEBREW_KEY_MAX_CHARS, HOMEBREW_LIMITS, homebrewPayloadBytes, isHomebrewItemKind } from "../domain/limits";
 import type { HomebrewItemKind, HomebrewItemRecord, HomebrewPackRecord, HomebrewPayload } from "../domain/types";
+import { runHomebrewBatch } from "../store-port";
 import type {
   DndHomebrewStore, HomebrewErrorCode, HomebrewImport, HomebrewItemSave, HomebrewOwner, HomebrewPackPatch, HomebrewResult, HomebrewUsage,
 } from "../store-port";
@@ -57,8 +58,10 @@ export function createMemoryHomebrewStore(options: MemoryHomebrewOptions = {}): 
   let packs: HomebrewPackRecord[] = clone(options.initial?.packs ?? []);
   let items: HomebrewItemRecord[] = clone(options.initial?.items ?? []);
 
+  // A batch writes through `saveItem` / `deleteItem` (so tests can wrap them) and notifies once at its end.
+  let batching = false;
   const written = async () => {
-    await options.onWrite?.();
+    if (!batching) await options.onWrite?.();
   };
   const signedIn = () => owner === "account";
   const sortedPacks = () => [...packs].sort((a, b) => a.position - b.position || compare(a.id, b.id));
@@ -169,6 +172,15 @@ export function createMemoryHomebrewStore(options: MemoryHomebrewOptions = {}): 
       return ok(clone(rows));
     },
 
+    async saveItems(pack, batch, progress) {
+      batching = true;
+      try {
+        return await runHomebrewBatch(batch, (row) => store.saveItem(pack, row), (id) => store.deleteItem(id), progress);
+      } finally {
+        batching = false;
+        await written();
+      }
+    },
     async saveItem(packUuid, input: HomebrewItemSave) {
       if (!signedIn()) return fail("signIn");
       if (!packs.some((pack) => pack.id === packUuid)) return fail("notFound");

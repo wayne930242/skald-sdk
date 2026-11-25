@@ -16,7 +16,7 @@ import { slugId } from "../../reference/tags";
 import { backgroundRefs, BackgroundChoices } from "./background-refs";
 import { ImportedBlocks } from "./imported-blocks";
 import type { HomebrewPackRecord } from "../domain/types";
-import { Field } from "./form-fields";
+import { Field, OwnClassOptions } from "./form-fields";
 
 type Props<K extends HomebrewFormKind> = {
   kind: K;
@@ -60,6 +60,10 @@ export function ItemEditor<K extends HomebrewFormKind>({
       (slugId(draft.nameEn) ? newHomebrewId(draft.nameEn) : fallback),
   };
   const issues = codec.issues(form);
+  // Own classes that cast (any pack): a spell can name them under its classes.
+  const ownClasses = allRows
+    .filter((r) => r.kind === "class" && r.payload.entry?.meta?.spellcasting)
+    .map((r) => ({ id: r.key, name: (zh && r.payload.zhTW?.name) || r.payload.entry!.name }));
   const preview = issues.length ? null : codec.toPayload(form);
   if (!original.lossless && row)
     return (
@@ -190,11 +194,13 @@ export function ItemEditor<K extends HomebrewFormKind>({
         {t(`kind.${kind as HomebrewFormKind}`)}
       </h3>
       {kind === "background" && <BackgroundChoices rows={allRows} />}
+      <OwnClassOptions.Provider value={ownClasses}>
       <div className="grid gap-4 sm:grid-cols-2">{fields(true)}</div>
       <details>
         <summary className="cursor-pointer font-medium">{t("details")}</summary>
         <div className="mt-3 grid gap-4 sm:grid-cols-2">{fields(false)}</div>
       </details>
+      </OwnClassOptions.Provider>
       {preview?.entry && (
         <section className="rounded bg-muted p-4">
           <h4 className="text-sm text-muted-foreground">{t("preview")}</h4>

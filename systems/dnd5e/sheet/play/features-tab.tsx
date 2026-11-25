@@ -13,6 +13,7 @@ import { SnapshotText } from "../../reference/snapshot-text";
 import type { CompendiumStart } from "../compendium-rows";
 import type { CustomList } from "../custom-rows";
 import { EditIntl } from "./edit-messages";
+import { sheetClasses } from "./class-model";
 import { AddControls, CustomLink, RowEditorHost, RowMenu, useOpenRowEditor, useRowWrites } from "./row-actions";
 
 const DICE_ROLL: RollConfig = { expression: "{{@dice}}", system: "dnd5e" as RollConfig["system"] };
@@ -175,13 +176,20 @@ export function FeaturesTab() {
   );
 }
 
+/** The 特性 library preset: the class, or on a multiclass sheet 「我的職業」 (every sheet class, CLASS-IMPL §7.5 M5). */
+function featureLibrary(values: Record<string, unknown>, classId: string): CompendiumStart {
+  const classIds = rows(values.multiclass).length > 0 ? [...new Set(sheetClasses(values).map((sheetClass) => sheetClass.classId).filter(Boolean))] : [];
+  if (classIds.length > 1) return { tab: "features", classIds };
+  return { tab: "features", ...(classId ? { classId } : {}) };
+}
+
 function FeaturesTabBody() {
   const t = useTranslations("play");
   const { values } = usePlay();
   const classId = text(values.classId);
   return (
     <div className="space-y-3" data-play-features-tab>
-      <RuleSection title={t("features.class")} id="features" list={rows(values.features)} library={{ tab: "features", ...(classId ? { classId } : {}) }} />
+      <RuleSection title={t("features.class")} id="features" list={rows(values.features)} library={featureLibrary(values, classId)} />
       <RuleSection title={t("features.species")} id="speciesTraits" list={rows(values.speciesTraits)} />
       <RuleSection title={t("features.feats")} id="feats" list={rows(values.feats)} library={{ tab: "feats" }} />
       <Training />

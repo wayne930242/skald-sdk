@@ -1,6 +1,7 @@
 "use client";
 
 import type { FieldReference } from "@skald/types/schema";
+import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@skald/sheet-sdk/components/ui/dialog";
 import { FieldRenderer } from "@skald/sheet-sdk/modules/character/ui/renderer/field-renderer";
@@ -8,6 +9,7 @@ import { DerivedValue } from "@skald/sheet-sdk/modules/character/ui/derived/deri
 import { useSchemaI18n } from "@skald/sheet-sdk/lib/i18n/use-schema-i18n";
 import { cn } from "@skald/sheet-sdk/lib/utils";
 import { CARD, CARD_TITLE } from "./card-styles";
+import { classDerivedPatch, classIssues, sheetClasses } from "./class-model";
 import { EditIntl } from "./edit-messages";
 import { usePlay } from "./play-context";
 import { ABILITIES, SKILLS, signed, text, type Ability } from "./play-model";
@@ -26,7 +28,7 @@ const slots = Array.from({ length: 9 }, (_, index) => `slot${index + 1}Total`);
 
 /** The fields each part edits, in order. The coverage guard reads them. */
 export const EDIT_PARTS = {
-  identity: ["name", "player", "className", "subclass", "level", "xp", "species", "lineage", "size", "background", "alignment"],
+  identity: ["name", "player", "className", "subclass", "level", "multiclass", "xp", "species", "lineage", "size", "background", "alignment"],
   vitals: [
     "hitDieFaces", "hpPerLevelBonus", "hpMaxMisc", "hpMax",
     "armorType", "armorBase", "shield", "unarmoredDefense", "acMisc", "ac",
@@ -163,6 +165,44 @@ function Abilities() {
   );
 }
 
+/**
+ * Multiclass (CLASS-IMPL §7.2): keeps `hpClassAdjust` current, one write after `multiclass` or
+ * `hitDieFaces` changes from any editor (the 角色 tab's rows, the HP / hit dice editor on 戰鬥).
+ * Mounted for the whole edit session by `RecalcOnEditExit`.
+ */
+function useClassDerivedSync() {
+  const { values, editable, write } = usePlay();
+  const multiclass = values.multiclass;
+  const hitDieFaces = values.hitDieFaces;
+  const stored = values.hpClassAdjust;
+  useEffect(() => {
+    if (!editable) return;
+    const patch = classDerivedPatch({ multiclass, hitDieFaces, hpClassAdjust: stored });
+    if (Object.keys(patch).length > 0) write(patch);
+    // Only a change of the classes or the starting die writes; `write` is a fresh closure per render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [multiclass, hitDieFaces, editable]);
+}
+
+/** Multiclass (CLASS-IMPL §7.2): the starting class's derived level and the broken invariants. Display only. */
+function ClassesNote() {
+  const t = useTranslations("edit.classes");
+  const { values } = usePlay();
+  const classes = sheetClasses(values);
+  if (classes.length === 1) return null;
+  const issues = classIssues(values);
+  return (
+    <div className="space-y-1 text-sm" data-play-classes>
+      <p className="text-muted-foreground" data-play-start-level>{t("startLevel", { level: classes[0].level })}</p>
+      {issues.map((issue) => (
+        <p key={issue} role="alert" className="text-destructive" data-class-issue={issue}>
+          {t(`issue.${issue}`)}
+        </p>
+      ))}
+    </div>
+  );
+}
+
 function TextEditor({ field, onDone }: { field: NonNullable<EditPartProps["field"]>; onDone: () => void }) {
   const tField = useTranslations("field");
   const { values, write } = usePlay();
@@ -199,6 +239,7 @@ function Part({ part, field = "notes", onDone = () => {} }: EditPartProps) {
       return (
         <div className="min-w-0 space-y-2" data-play-edit="identity">
           <Fields ids={EDIT_PARTS.identity} />
+          <ClassesNote />
         </div>
       );
     case "vitals":
@@ -307,9 +348,11 @@ function Editor({ target, onClose }: { target: EditTarget; onClose: () => void }
 /**
  * B-024 q3: leaving edit mode after a level or ability score change shows what was recalculated.
  * `DndEditorHost` mounts this from the first edit entry on (it loads with the edit layer) and
- * keeps it mounted, so it sees each entry and exit.
+ * keeps it mounted, so it sees each entry and exit. It also keeps `hpClassAdjust` current
+ * (`useClassDerivedSync`) whichever tab's editor changed the classes or the starting die.
  */
 export function RecalcOnEditExit() {
+  useClassDerivedSync();
   useRecalcOnEditExit({ triggers: RECALC_TRIGGERS, ...useDndRecalcText() });
   return null;
 }

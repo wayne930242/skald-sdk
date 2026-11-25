@@ -1,5 +1,7 @@
 import type { LoadedSystem } from "@skald/types/system";
-import { asHomebrewRow } from "../homebrew/domain/rows";
+import { asHomebrewRow, stampOf } from "../homebrew/domain/rows";
+import { PACK_LIMITS } from "../content-pack/domain/limits";
+import { packSnapshotBytes } from "../content-pack/domain/overlay";
 import type { ListField } from "@skald/types/schema";
 import type { GameSpell, ReferenceContextValue } from "./use-reference-context";
 
@@ -19,6 +21,13 @@ export interface CompendiumStart {
   category?: string;
   /** A class id: the spells and features class filter. */
   classId?: string;
+  /**
+   * A multiclass sheet's classes (spell list ids on 法術, class ids on 特性): the filter opens on
+   * 「我的職業」, their union (CLASS-IMPL §7.5 M5). Takes the place of `classId`.
+   */
+  classIds?: string[];
+  /** 法術 on a multiclass sheet: a filtered list id → the `castingClass` a spell added from it gets. */
+  castingClassOf?: Record<string, string>;
   intent?: "attack";
 }
 
@@ -95,4 +104,29 @@ export function buildCompendiumRow(
   }
   const stamp = context.homebrewOf?.(ref);
   return { list: listId, row: stamp && context.packText?.has(ref) ? asHomebrewRow(row, context.packText.text(ref), stamp) : row };
+}
+
+export type AppendResult = { ok: true; data: Record<string, unknown> } | { ok: false; bytes: number };
+
+/**
+ * `previous` with `rows` appended to their lists and `patch` written (a feat's own sheet fields),
+ * or the snapshot cap (§5b) refusing it: a pack row with copied text (outside a table's copy) or a
+ * homebrew row may not take the sheet past 200 KB of pack text. The compendium's add and the
+ * level-up helper's follow-ups share it.
+ */
+export function appendCompendiumRows(
+  previous: Record<string, unknown>,
+  rows: ReadonlyArray<{ list: string; row: Record<string, unknown> }>,
+  { patch, inTable = false }: { patch?: Record<string, unknown>; inTable?: boolean } = {},
+): AppendResult {
+  const next: Record<string, unknown> = { ...previous, ...patch };
+  for (const { list, row } of rows) {
+    const current = Array.isArray(next[list]) ? (next[list] as unknown[]) : [];
+    next[list] = [...current, row];
+  }
+  if (rows.some(({ row }) => (row.origin === "pack" && !inTable) || stampOf(row))) {
+    const bytes = packSnapshotBytes(next);
+    if (bytes > PACK_LIMITS.snapshotBytes) return { ok: false, bytes };
+  }
+  return { ok: true, data: next };
 }

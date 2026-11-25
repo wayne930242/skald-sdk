@@ -37,6 +37,23 @@ describe("D&D print model: the official sheet's regions", () => {
     expect(print.size).toBe("medium");
   });
 
+  it("multiclass: the class box lists every class with its level, hit dice print per die (CLASS-IMPL §7.2)", () => {
+    // Wizard 3 (d6) / Fighter 2 (d10) at level 5; one Fighter die spent.
+    const multiclass = [{ id: "class-1", classId: "fighter", ref: "class:fighter", origin: "srd", name: "戰士", subclass: "", level: 2, hitDie: 10, hitDiceSpent: 1, spellAbility: "none" }];
+    const print = model("wizard", false, { multiclass, hitDiceSpent: 0 });
+    expect(print.identity).toMatchObject({ className: "法師 3 · 塑能師 / 戰士 2", subclass: "", level: 5 });
+    expect(print.hitDicePools).toEqual([
+      { faces: 6, max: 3, spent: 0 },
+      { faces: 10, max: 2, spent: 1 },
+    ]);
+    expect(model("wizard", true, { multiclass }).hitDicePools).toEqual([
+      { faces: 6, max: 3, spent: null },
+      { faces: 10, max: 2, spent: null },
+    ]);
+    // A single-class sheet: one pool, the same as hitDice.
+    expect(model("wizard").hitDicePools).toEqual([{ faces: 6, max: 5, spent: 1 }]);
+  });
+
   it("abilities carry their saves and their skills, grouped as the 2024 sheet groups them", () => {
     expect(SHEET_ABILITY_COLUMNS).toEqual([["str", "dex", "con"], ["int", "wis", "cha"]]);
     expect(ABILITY_SKILLS).toEqual({

@@ -58,6 +58,25 @@ describe("the in-memory homebrew store", () => {
     expect(await store.deleteItem("nope")).toEqual({ ok: false, error: "notFound" });
   });
 
+  it("reports the committed prefix when a batch reaches the item limit", async () => {
+    const store = createMemoryHomebrewStore({ limits: { items: 1 } });
+    const pack = await value(store.createPack({ packId: "p", name: "P" }));
+    const writes = ["a", "b", "c"].map(key => ({ kind: "feat" as const, key, payload: payload(key) }));
+    expect(await store.saveItems(pack.id, { writes, deletes: [] })).toMatchObject({ error: "limitItems", detail: "1" });
+    expect((await value(store.listItems(pack.id))).map(row => row.key)).toEqual(["a"]);
+  });
+
+  it("notifies once per batch, not once per row", async () => {
+    let writes = 0;
+    const store = createMemoryHomebrewStore({ onWrite: () => void (writes += 1) });
+    const pack = await value(store.createPack({ packId: "p", name: "P" }));
+    const old = await value(store.saveItem(pack.id, { kind: "feat", key: "old", payload: payload("old") }));
+    writes = 0;
+    const rows = ["a", "b", "c"].map(key => ({ kind: "feat" as const, key, payload: payload(key) }));
+    expect((await store.saveItems(pack.id, { writes: rows, deletes: [old.id] })).ok).toBe(true);
+    expect(writes).toBe(1);
+  });
+
   it("holds the item, byte and pack limits of an account", async () => {
     const store = createMemoryHomebrewStore({ limits: { items: 2, bytes: 400, packs: 2 } });
     const pack = await value(store.createPack({ packId: "p", name: "P" }));

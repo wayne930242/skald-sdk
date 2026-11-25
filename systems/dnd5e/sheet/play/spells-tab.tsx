@@ -29,6 +29,11 @@ import {
 } from "./play-model";
 import { displayName, spellLine, summaryOf, useRowText, useSpellFacts, type SpellFacts } from "./row-text";
 import { ConcentrationChip } from "./vitals-bar";
+import { castingClasses, isMulticlass, spellCasting } from "./casting-classes";
+import { CastingClassControl, CastingTiles, TILE } from "./casting-tiles";
+import { sheetClasses } from "./class-model";
+import type { CompendiumStart } from "../compendium-rows";
+import type { ReferenceContextValue } from "../use-reference-context";
 import { EditIntl } from "./edit-messages";
 import { AddControls, CustomLink, PrepareToggle, RowEditorHost, RowMenu, useOpenRowEditor } from "./row-actions";
 
@@ -118,7 +123,7 @@ export function CastButton({ spell, onCast }: { spell: Record<string, unknown>; 
     write(patch);
     const level = via === "ritual" ? num(spell.level) : via.level;
     onCast?.(level);
-    const atLevel = facts ? castFacts(facts, num(spell.level), level, num(values.spellMod)) : null;
+    const atLevel = facts ? castFacts(facts, num(spell.level), level, spellCasting(values, spell).mod) : null;
     const dice = atLevel?.dice ?? atLevel?.heal;
     const done =
       via === "ritual"
@@ -171,13 +176,15 @@ export function SpellDamageButtons({ spell, facts, compact = false }: { spell: R
   const open = useOpenDndEditor();
   const openRow = useOpenRowEditor();
   const name = displayName(reference, spell);
-  const attack = num(values.spellAttack);
+  // A multiclass sheet's row rolls with its own class's attack bonus (CLASS-IMPL §7.5 M5).
+  const attack = spellCasting(values, spell).attack;
+  const attackData = isMulticlass(values) ? { ...values, spellAttack: attack } : values;
   // B-023: in edit mode the attack opens spellcasting, the dice the spell's fields
   const editFields = () => openRow({ kind: "fields", list: "spells", row: spell, name });
   return (
     <>
       {facts.attack ? (
-        <PlayRollButton onEdit={() => open("spellcasting")} roll={fieldRoll(schema, "spellAttack")} data={values} label={t("combat.attackRoll", { name })} aria-label={`${t("combat.attackRoll", { name })} ${signed(attack)}`} className="justify-start">
+        <PlayRollButton onEdit={() => open("spellcasting")} roll={fieldRoll(schema, "spellAttack")} data={attackData} label={t("combat.attackRoll", { name })} aria-label={`${t("combat.attackRoll", { name })} ${signed(attack)}`} className="justify-start">
           {compact ? t("combat.hitValue", { value: signed(attack) }) : signed(attack)}
           <OverrideMark fieldId="spellAttack" />
         </PlayRollButton>
@@ -214,7 +221,7 @@ function SpellRow({ spell }: { spell: Record<string, unknown> }) {
   const [castLevel, setCastLevel] = useState(level);
   const unprepared = level > 0 && spell.prepared !== true;
   const castable = level > 0 && (!unprepared || canCastRitual(values, spell));
-  const scaled = facts && level > 0 ? castFacts(facts, level, castLevel, num(values.spellMod)) : facts;
+  const scaled = facts && level > 0 ? castFacts(facts, level, castLevel, spellCasting(values, spell).mod) : facts;
   const dice = scaled?.dice ? (level === 0 ? cantripDice(scaled.dice, num(values.level, 1)) : scaled.dice) : null;
   const heal = scaled?.heal ?? null;
   const rollable = facts && (facts.attack || dice || heal);
@@ -229,6 +236,7 @@ function SpellRow({ spell }: { spell: Record<string, unknown> }) {
           {spell.ritual === true && <Tag>{t("spells.ritual")}</Tag>}
           {spell.material === true && <Tag>{t("spells.material")}</Tag>}
           {unprepared && <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{t("spells.unprepared")}</span>}
+          <CastingClassControl spell={spell} name={name} />
         </div>
         <p className="mt-0.5 text-sm text-muted-foreground">
           {spellLine(reference, spell)}
@@ -262,6 +270,43 @@ function preparedLimit(system: ReturnType<typeof usePlay>["system"], values: Rec
   return typeof prepared === "number" && prepared > 0 ? prepared : null;
 }
 
+/**
+ * The spell list the class casts from (phase 2b §3): a class that borrows another's list (`w.spellList`
+ * on its wizard item, or `meta.spellcasting.list` on a Drive-pack or homebrew class entry) presets the
+ * library to that list, else to its own id.
+ */
+export function classSpellList(system: ReturnType<typeof usePlay>["system"], classId: string, reference?: Pick<ReferenceContextValue, "packSpellListOf">): string {
+  const fromPack = reference?.packSpellListOf?.(classId);
+  if (fromPack) return fromPack;
+  const classes = Array.isArray(system.gameData?.classes) ? (system.gameData.classes as Array<Record<string, unknown>>) : [];
+  const borrowed = (classes.find((item) => item.id === classId)?.w as { spellList?: unknown } | undefined)?.spellList;
+  return typeof borrowed === "string" && borrowed ? borrowed : classId;
+}
+
+
+/**
+ * The 法術 library preset. Single class: that class's list, as before. Multiclass: 「我的職業」, the
+ * union of every sheet class's list (borrowed lists respected); a spell added while one list is
+ * filtered records the class that casts from it (`castingClass`, CLASS-IMPL §7.5 M5).
+ */
+export function spellLibrary(
+  system: ReturnType<typeof usePlay>["system"],
+  values: Record<string, unknown>,
+  reference?: Pick<ReferenceContextValue, "packSpellListOf">,
+): CompendiumStart {
+  if (!isMulticlass(values)) {
+    const classId = text(values.classId);
+    return { tab: "spells", ...(classId ? { classId: classSpellList(system, classId, reference) } : {}) };
+  }
+  const castingClassOf: Record<string, string> = {};
+  for (const sheetClass of sheetClasses(values)) {
+    if (!sheetClass.classId) continue;
+    const list = classSpellList(system, sheetClass.classId, reference);
+    if (!(list in castingClassOf)) castingClassOf[list] = sheetClass.start ? "" : sheetClass.classId;
+  }
+  return { tab: "spells", classIds: Object.keys(castingClassOf), castingClassOf };
+}
+
 export function SpellsTab() {
   return (
     <EditIntl>
@@ -276,7 +321,7 @@ function SpellsTabBody() {
   const t = useTranslations("play");
   const tAbility = useTranslations("ability");
   const tRenderer = useTranslations("renderer");
-  const { values, schema, system } = usePlay();
+  const { values, schema, system, reference } = usePlay();
   const open = useOpenDndEditor();
   const editing = usePlayEditing();
   const spells = rows(values.spells);
@@ -288,9 +333,29 @@ function SpellsTabBody() {
   const attack = num(values.spellAttack);
   const slotLevels = new Set([...spellSlots(values).map((slot) => slot.level), ...(pactSlots(values) ? [pactSlots(values)!.level] : [])]);
   const levels = [...new Set([...groups.map((group) => group.level), ...slotLevels])].sort((a, b) => a - b);
-  const tile = "flex flex-col items-center justify-center gap-1 rounded-xl bg-muted/50 px-2 py-2 text-center";
+  const casters = castingClasses(values);
+  const preparedTile = (
+    <div className={TILE} data-play-stat="prepared">
+      <span className="text-xs text-muted-foreground">{t("spells.preparedLong")}</span>
+      <span className="text-xl font-semibold tabular-nums">{limit ? `${prepared} / ${limit}` : prepared}</span>
+      {always > 0 && (
+        <span className="text-xs text-muted-foreground" title={t("spells.alwaysPreparedLong", { count: always })} data-play-always-prepared>
+          {t("spells.alwaysPrepared", { count: always })}
+        </span>
+      )}
+    </div>
+  );
+  const tile = TILE;
   return (
     <div className="space-y-3" data-play-spells-tab>
+      {casters.length > 0 ? (
+        <>
+          {casters.map((caster) => (
+            <CastingTiles key={caster.castingClass || "start"} caster={caster} />
+          ))}
+          <div className="grid grid-cols-3 gap-2 @[34rem]:grid-cols-4">{preparedTile}</div>
+        </>
+      ) : (
       <div className="grid grid-cols-3 gap-2 @[34rem]:grid-cols-4">
         {ability && ability !== "none" && (
           <div className={cn(tile, "hidden @[34rem]:flex")}>
@@ -318,20 +383,13 @@ function SpellsTabBody() {
             <span className="text-xl font-semibold">{signed(attack)}<OverrideMark fieldId="spellAttack" /></span>
           </span>
         </PlayRollButton>
-        <div className={tile} data-play-stat="prepared">
-          <span className="text-xs text-muted-foreground">{t("spells.preparedLong")}</span>
-          <span className="text-xl font-semibold tabular-nums">{limit ? `${prepared} / ${limit}` : prepared}</span>
-          {always > 0 && (
-            <span className="text-xs text-muted-foreground" title={t("spells.alwaysPreparedLong", { count: always })} data-play-always-prepared>
-              {t("spells.alwaysPrepared", { count: always })}
-            </span>
-          )}
-        </div>
+        {preparedTile}
       </div>
+      )}
       <ConcentrationChip />
       <EditSlot part="spellcasting" />
       <div className="flex flex-wrap items-center justify-between gap-x-3">
-        <AddControls list="spells" library={{ tab: "spells", ...(text(values.classId) ? { classId: text(values.classId) } : {}) }} />
+        <AddControls list="spells" library={spellLibrary(system, values, reference)} />
         <CustomLink list="spells" />
       </div>
       <section className="space-y-2 rounded-xl border border-border bg-card p-2">

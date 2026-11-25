@@ -23,11 +23,13 @@ import { formKindOf } from "../domain/forms";
 import { TransferSlot } from "./transfer-slot";
 import { ItemEditor } from "./item-editor";
 import { SubclassEditor } from "./subclass-editor";
+import { ClassEditor } from "./class-editor";
 import { subclassCodec } from "../domain/subclass";
+import { classCodec } from "../domain/class";
 
-type EditorKind = HomebrewFormKind | "subclass";
+type EditorKind = HomebrewFormKind | "class" | "subclass";
 /** Kinds with an editor, in list order. */
-const EDITOR_KINDS: readonly EditorKind[] = [...HOMEBREW_FORM_KINDS, "subclass"];
+const EDITOR_KINDS: readonly EditorKind[] = [...HOMEBREW_FORM_KINDS, "class", "subclass"];
 
 async function load(store: DndHomebrewStore) {
   if ((await store.owner()) !== "account") return { error: "signIn" } as const;
@@ -133,9 +135,12 @@ function AccountWorkspace({
   const rows = pack ? data.items[pack.id] : [];
   const selected = rows.find((r) => r.id === selection?.id);
   const subclassKeys = new Set(rows.filter((r) => r.kind === "subclass").map((r) => r.key));
-  /** A feature row of a subclass in this pack is listed under it, not on its own. */
+  const classKeys = new Set(rows.filter((r) => r.kind === "class").map((r) => r.key));
+  /** A feature row of a class or subclass in this pack is listed under it, not on its own. */
   const grouped = (r: HomebrewItemRecord) =>
-    r.kind === "subclassFeature" && subclassKeys.has(r.key.split("/").slice(0, 2).join("/"));
+    (r.kind === "subclassFeature" && subclassKeys.has(r.key.split("/").slice(0, 2).join("/"))) ||
+    (r.kind === "classFeature" && classKeys.has(r.key.split("/")[0]));
+  const allRows = Object.values(data.items).flat();
   const rowName = (r: HomebrewItemRecord) =>
     (zh && r.payload.zhTW?.name) || r.payload.entry?.name || r.key;
   const open = (id: string) => {
@@ -304,8 +309,14 @@ function AccountWorkspace({
                       ),
                   )
                   .map((r) => {
-                    const features = r.kind === "subclass" ? subclassCodec.rowsOf(r.key, rows) : [];
-                    const k: EditorKind | null = r.kind === "subclass" ? "subclass" : formKindOf(r.payload);
+                    const features =
+                      r.kind === "subclass" ? subclassCodec.rowsOf(r.key, rows) : r.kind === "class" ? classCodec.rowsOf(r.key, rows) : [];
+                    const k: EditorKind | null = r.kind === "subclass" || r.kind === "class" ? r.kind : formKindOf(r.payload);
+                    // Subclasses in any own pack whose parent this class is: they stay, orphaned.
+                    const children =
+                      r.kind === "class"
+                        ? allRows.filter((x) => x.kind === "subclass" && x.payload.entry?.meta?.parent === r.key).map(rowName)
+                        : [];
                     return (
                       <div
                         key={r.id}
@@ -317,9 +328,9 @@ function AccountWorkspace({
                         >
                           {rowName(r)}
                         </button>
-                        {r.kind === "subclass" && (
+                        {(r.kind === "subclass" || r.kind === "class") && (
                           <span className="ml-1 mr-auto text-xs text-muted-foreground" data-feature-count>
-                            {t("subclass.features", { count: features.length })}
+                            {t(`${r.kind}.features`, { count: features.length })}
                           </span>
                         )}
                         <Button
@@ -327,9 +338,11 @@ function AccountWorkspace({
                           variant="ghost"
                           onClick={() => {
                             const message =
-                              r.kind === "subclass"
-                                ? t("subclass.confirmDelete", { name: rowName(r), count: features.length })
-                                : t("confirm", { name: rowName(r) });
+                              r.kind === "class" && children.length
+                                ? t("class.confirmDeleteSubclasses", { name: rowName(r), count: features.length, subclasses: children.join(", ") })
+                                : r.kind === "subclass" || r.kind === "class"
+                                  ? t(`${r.kind}.confirmDelete`, { name: rowName(r), count: features.length })
+                                  : t("confirm", { name: rowName(r) });
                             if (window.confirm(message))
                               void run(async () => {
                                 // Features first: a stopped delete leaves the subclass row listed, so deleting again finishes.
@@ -349,26 +362,38 @@ function AccountWorkspace({
               </section>
             ))}
           </aside>
+          {selection?.kind === "class" && (!selection.id || selected) && (
+            <ClassEditor
+              key={`${editorGeneration}/${pack.id}/class/${selected?.id ?? "new"}`}
+              row={selected}
+              pack={pack}
+              rows={rows}
+              allRows={allRows}
+              store={store}
+              run={run}
+              reload={() => select(null)}
+            />
+          )}
           {selection?.kind === "subclass" && (!selection.id || selected) && (
             <SubclassEditor
               key={`${editorGeneration}/${pack.id}/subclass/${selected?.id ?? "new"}`}
               row={selected}
               pack={pack}
               rows={rows}
-              allRows={Object.values(data.items).flat()}
+              allRows={allRows}
               store={store}
               run={run}
               reload={() => select(null)}
             />
           )}
-          {selection && selection.kind !== "subclass" && (!selection.id || selected) && (
+          {selection && selection.kind !== "subclass" && selection.kind !== "class" && (!selection.id || selected) && (
             <ItemEditor
               key={`${editorGeneration}/${pack.id}/${selection.kind}/${selected?.id ?? "new"}`}
               kind={selection.kind}
               row={selected}
               pack={pack}
               rows={rows}
-              allRows={Object.values(data.items).flat()}
+              allRows={allRows}
               store={store}
               run={run}
               reload={() => select(null)}
