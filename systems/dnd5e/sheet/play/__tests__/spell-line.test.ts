@@ -16,6 +16,11 @@ function context(gameSpells: Array<{ id: string; castingTime?: string; range?: s
 }
 
 describe("spell row line (B-014)", () => {
+  it("keeps the copied time and range until the player updates a stamped spell", () => {
+    const loaded = context([{ id: "bolt", castingTime: "new time", range: "new range" }]);
+    expect(spellLine(loaded, { ref: "spell:bolt", origin: "custom", homebrewPack: "p", homebrewItem: "i", homebrewRev: 1, castingTime: "old time", range: "old range" })).toBe("old time · old range");
+  });
+
   it("reads the message tokens a pack row saved", () => {
     const row = { ref: "spell:sample-bolt", origin: "pack", castingTime: "{{i18n:spellCastingTime.1-action}}", range: "{{i18n:spellRange.point-60-feet}}" };
     expect(spellLine(context(), row)).toBe("1 個動作 · 60呎");

@@ -5,6 +5,8 @@
   "done": "Done",
   "addTo": "Add {list}",
   "custom": {
+    "alsoHomebrew": "Also save to my homebrew",
+    "homebrewFailed": "Could not save to your homebrew.",
     "link": "Can't find it? Add a custom entry to {list}",
     "title": "Custom entry: {list}",
     "editTitle": "Edit {name}",
@@ -18,6 +20,8 @@
     "attack": "attacks"
   },
   "row": {
+    "saveHomebrew": "Save as homebrew",
+    "updateHomebrew": "Update to latest",
     "menu": "Options for {name}",
     "editText": "Edit text",
     "editFields": "Edit fields",

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { LoadedSystem } from "@skald/types/system";
 import { loadDnd5e2024Data } from "../../data-access/builtin-local-data";
+import { PackTextIndex } from "../../content-pack/domain/overlay";
 import { buildCompendiumRow } from "../compendium-rows";
 import { collectReferenceRows } from "../dnd-sheet-adapter";
 import type { GameSpell } from "../use-reference-context";
@@ -24,6 +25,25 @@ describe("dnd5e-2024 compendium and reference rows", () => {
     expect(feat?.row).toMatchObject({ category: "origin", origin: "srd" });
     const feature = buildCompendiumRow("features", "classFeature:fighter/second-wind-l1", "Second Wind", system, { gameSpells, token });
     expect(feature?.row).toMatchObject({ level: 1 });
+  });
+
+  it("keeps a built-in spell as SRD when a homebrew overlay supplies a stamp", async () => {
+    const { schema } = await loadDnd5e2024Data();
+    const ref = "spell:light";
+    const packText = new PackTextIndex({ entries: [], overlays: { [ref]: { en: { entries: ["Lantern light."] } } }, wizard: {}, zhTW: {} }, "en");
+    const built = buildCompendiumRow("spells", ref, "Light", { schema } as LoadedSystem, {
+      gameSpells: new Map(), token: String, packText, homebrewOf: () => ({ pack: "p", item: "overlay", rev: 1 }),
+    });
+    expect(built?.row).toMatchObject({ ref, origin: "srd" });
+    expect(built?.row).not.toHaveProperty("homebrewItem");
+  });
+
+  it.each([true, false])("copies homebrew even with snapshotText=%s", async (snapshotText) => {
+    const { schema } = await loadDnd5e2024Data();
+    const ref = "spell:ember";
+    const packText = new PackTextIndex({ entries: [{ ref, id: "ember", kind: "spell", name: "Ember", entries: ["A spark."], meta: {} }], overlays: {}, wizard: {}, zhTW: {} }, "en");
+    const built = buildCompendiumRow("spells", ref, "Ember", { schema } as LoadedSystem, { packRefs: new Set([ref]), gameSpells: new Map(), token: String, packText, homebrewOf: () => ({ pack: "p", item: "i", rev: 2 }) }, snapshotText);
+    expect(built?.row).toMatchObject({ ref, origin: "custom", text: "A spark.", homebrewPack: "p", homebrewItem: "i", homebrewRev: 2 });
   });
 
   it("collects the character's named rows for the reference browser", () => {

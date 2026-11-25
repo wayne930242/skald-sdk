@@ -3,7 +3,8 @@ import { readFileSync } from "node:fs";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import appSchema from "@skald/system-dnd5e/data/dnd5e-2024/schemas/content-pack.v2.schema.json";
 import committedSchema from "@skald/system-dnd5e/data/dnd5e-2024/schemas/pack.v1.schema.json";
-import { applyOverlay, type ResolvedReference } from "../../../reference/sources";
+import { overlayGameData } from "../../domain/overlay";
+import { createPackSource, applyOverlay, type ResolvedReference } from "../../../reference/sources";
 import { runPackCli, type PackCliIo } from "../cli";
 import type { OpenPack } from "../format";
 import { loadBuiltinIdentity, loadOpenPackSchemaCheck } from "../load";
@@ -46,6 +47,8 @@ describe("the SDK pack format (skald/pack/v1)", () => {
     expect(result.name).toBe("Lantern Table house rules");
     expect(result.report).toMatchObject({ counts: { feat: 1 }, dropped: [], droppedByName: [], droppedOverlays: [], builtinMismatch: false });
     expect(result.pack.entries).toEqual([expect.objectContaining({ ref: "feat:lantern-watcher", meta: { category: "general", grants: {}, repeatable: false } })]);
+    expect(await createPackSource(result.pack.entries, result.pack.zhTW).resolve("feat:lantern-watcher", "en")).toMatchObject({ name: "Lantern Watcher" });
+    expect(overlayGameData({ feats: [] }, result.pack, "en").feats).toEqual([expect.objectContaining({ ref: "feat:lantern-watcher" })]);
     expect(result.pack.entries[0]).not.toHaveProperty("source");
     expect(result.pack.zhTW["feat:lantern-watcher"].name).toBe("守燈人");
     expect(result.pack.wizard.feats.map((item) => item.ref)).toEqual(["feat:lantern-watcher"]);

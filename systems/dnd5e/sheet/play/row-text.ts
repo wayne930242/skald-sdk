@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { entriesToText, type EntriesTextOptions } from "../../reference/entries-to-text";
+import { stampOf } from "../../homebrew/domain/rows";
 import { slugId, splitRef } from "../../reference/tags";
 import type { ReferenceContextValue } from "../use-reference-context";
 import { usePlay } from "./play-context";
@@ -219,6 +220,7 @@ export function displayName(context: ReferenceContextValue, row: Record<string, 
  * pack is loaded here (B-014); none for a custom spell or an unloaded pack.
  */
 export function gameSpellOf(context: ReferenceContextValue, spell: Record<string, unknown>) {
+  if (stampOf(spell)) return undefined;
   const ref = text(spell.ref);
   return ref.startsWith("spell:") ? context.gameSpells.get(ref.slice(6)) : undefined;
 }

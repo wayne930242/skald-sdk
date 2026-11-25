@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger } from "@skald/sheet-sdk/components/ui/tabs";
 import { splitRef, type DndKind } from "../reference/tags";
 import { PACK_LIMITS } from "../content-pack/domain/limits";
+import { stampOf } from "../homebrew/domain/rows";
 import { packSnapshotBytes } from "../content-pack/domain/overlay";
 import { packLabel } from "./pack-label";
 import { buildCompendiumRow, type CompendiumDialogTab, type CompendiumStart, type CompendiumTab } from "./compendium-rows";
@@ -251,7 +252,7 @@ function CompendiumDialogBody({
       // A feat's own sheet fields come with its row (Archery: the ranged attack bonus the attack formula reads).
       const next = { ...previous, ...(listTab === "feats" ? featSheetPatch(candidate.ref) : undefined), [built.list]: [...rows, built.row] };
       // Snapshot cap (§5b): the picker refuses a pack row that would pass 200 KB of pack text.
-      if (built.row.origin === "pack" && !inTable) {
+      if ((built.row.origin === "pack" && !inTable) || stampOf(built.row)) {
         const bytes = packSnapshotBytes(next);
         if (bytes > PACK_LIMITS.snapshotBytes) {
           queueMicrotask(() => toast.error(tPack("tooMuchText", { kb: Math.ceil(bytes / 1024) })));

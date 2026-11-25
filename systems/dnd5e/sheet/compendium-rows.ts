@@ -1,6 +1,7 @@
 import type { LoadedSystem } from "@skald/types/system";
+import { asHomebrewRow } from "../homebrew/domain/rows";
 import type { ListField } from "@skald/types/schema";
-import type { ReferenceContextValue } from "./use-reference-context";
+import type { GameSpell, ReferenceContextValue } from "./use-reference-context";
 
 /** The four lists the compendium appends to (design §3.6); each tab is named after its list field. */
 export type CompendiumTab = "spells" | "feats" | "equipment" | "features";
@@ -29,6 +30,17 @@ export function newEntryId(prefix: string): string {
   return `${prefix}_${suffix}`;
 }
 
+export function copySpellFields(spell: GameSpell, token: ReferenceContextValue["token"]) {
+  return {
+    level: spell.level,
+    castingTime: token(spell.castingTime),
+    range: token(spell.range),
+    concentration: spell.concentration === true,
+    ritual: spell.ritual === true,
+    material: spell.material === true,
+  };
+}
+
 /** Row template defaults, so a picked row looks like one added with the list's own "Add" button. */
 export function rowDefaults(list: ListField | undefined): Record<string, unknown> {
   const defaults: Record<string, unknown> = {};
@@ -49,7 +61,7 @@ export function buildCompendiumRow(
   ref: string,
   name: string,
   system: LoadedSystem,
-  context: Pick<ReferenceContextValue, "gameSpells" | "token"> & Partial<Pick<ReferenceContextValue, "packRefs" | "packText">>,
+  context: Pick<ReferenceContextValue, "gameSpells" | "token"> & Partial<Pick<ReferenceContextValue, "packRefs" | "packText" | "homebrewOf">>,
   snapshotText = true,
 ): { list: string; row: Record<string, unknown> } | null {
   const listId = tab;
@@ -72,17 +84,7 @@ export function buildCompendiumRow(
   }
   if (tab === "spells") {
     const spell = context.gameSpells.get(id);
-    if (spell) {
-      Object.assign(row, {
-        level: spell.level,
-        castingTime: context.token(spell.castingTime),
-        range: context.token(spell.range),
-        concentration: spell.concentration === true,
-        ritual: spell.ritual === true,
-        material: spell.material === true,
-        source: "other",
-      });
-    }
+    if (spell) Object.assign(row, copySpellFields(spell, context.token), { source: "other" });
   } else if (tab === "feats") {
     const feats = Array.isArray(system.gameData?.feats) ? (system.gameData.feats as Array<{ id?: string; category?: string }>) : [];
     const category = feats.find((feat) => feat.id === id)?.category;
@@ -91,5 +93,6 @@ export function buildCompendiumRow(
     const level = /-l(\d+)$/.exec(id)?.[1];
     if (level && kind !== "optionalFeature") row.level = Number(level);
   }
-  return { list: listId, row };
+  const stamp = context.homebrewOf?.(ref);
+  return { list: listId, row: stamp && context.packText?.has(ref) ? asHomebrewRow(row, context.packText.text(ref), stamp) : row };
 }

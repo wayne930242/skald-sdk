@@ -1,3 +1,4 @@
+import type { HomebrewStamp } from "../../homebrew/domain/rows";
 import type { DndKind } from "../../reference/tags";
 
 /** The book a pack entry or overlay comes from (pack format v2). */
@@ -60,6 +61,7 @@ export interface PackOverlay {
 export type PackWizardItem = Record<string, unknown> & { id: string; ref?: string; origin: "pack" };
 
 export interface PackManifest {
+  name?: string;
   systemId: string;
   packId: string;
   packVersion: string;
@@ -105,6 +107,12 @@ export interface EffectivePacks {
   aliases: Record<string, string>;
   /** Per pack, what it carries that a higher pack supplies. */
   shadowed: Record<string, ShadowedEntry[]>;
+  /**
+   * The stamp of every ref a homebrew pack supplies in this view, after the merge (a shadowed
+   * homebrew entry has none). `mergePacks` and `singlePackView` leave it unset; the host fills it.
+   * A view without it has no homebrew.
+   */
+  homebrew?: Record<string, HomebrewStamp>;
 }
 
 export interface PackReport {

@@ -20,7 +20,7 @@ Read the policy before you contribute anything it covers, and link it in the pul
 [CONTRIBUTING.md](../CONTRIBUTING.md) has the full rule.
 
 **Content packs** hold the rest: text you may use at your own table but may not redistribute, such as material from a book you own, your notes on it, or your table's house rules.
-A pack is a file you keep. Skald reads it on your device and shows its text next to the built-in content.
+For a file-based pack, you keep the file. Skald reads it on your device and shows its text next to the built-in content.
 
 ## What a content pack is
 
@@ -31,11 +31,19 @@ A content pack is one JSON file for one system. It can:
 - show other wording over a built-in entry (an overlay), with a switch back to the built-in text;
 - carry a Traditional Chinese layer next to the English text.
 
-A content pack is not:
+A file-based pack is not:
 
 - hosted, listed or shared by Skald;
 - part of this repository: never commit a pack file or text from one here, not even in a test. `bun run ci` fails when the repository holds a pack file other than the example below;
 - a way to change built-in entries for everyone: an overlay shows only where the pack is loaded.
+
+## Write homebrew in Skald
+
+Sign in and open the [D&D 2024 homebrew editor](https://skald.tw/en/sheets/dnd5e-2024/homebrew). Unlike a pack you load from Drive, a homebrew pack holds your own content in your Skald account. Guests cannot create packs. Name a pack, then add a feat, spell, magic item, species or background. You can keep up to 20 named packs; together they can hold up to 300 entries and 1 MB per account.
+
+Enable a pack in the content pack panel to use it on a sheet. Adding an entry copies its text onto the sheet. If you bring the character to a table, members of that table can read the text in the table copy. Editing the original does not rewrite the sheet: choose **Update to latest** on the sheet row when you want the new version.
+
+To move a pack, export it as a sealed `skald/pack/v1` JSON file. Import that file directly in the editor, without a Drive link. If a pack with the same ID already exists, choose whether to replace it or create another pack.
 
 ## Formats and where they load
 
@@ -43,12 +51,10 @@ Only D&D 2024 (`dnd5e-2024`) reads content packs today.
 
 | Format | What it is | Where it loads |
 | --- | --- | --- |
-| `skald/pack/v1` | The SDK format this page describes. Any author can write it: no build pins, no fixed list of books, and homebrew is valid. | The `pack` command and the previewer in this repository. |
+| `skald/pack/v1` | The SDK format this page describes. Any author can write it: no build pins, no fixed list of books, and homebrew is valid. | skald.tw, the `pack` command and the previewer in this repository. |
 | `skald/content-pack/v2` | The format Skald's own pack builder writes. | skald.tw. |
 
-skald.tw does not read `skald/pack/v1` yet.
-The plan is that its pack panel sends a `skald/pack/v1` file through the same check the `pack` command runs (`content-pack/open/validate-open-pack.ts`) and shows the pack's `name`; the app's own format stays as it is.
-Until then, check and preview your pack with the tools here.
+skald.tw accepts both formats through Google Drive links.
 
 The files:
 
@@ -177,7 +183,7 @@ Its feats, spells and other entries appear in the sheet's compendium and referen
 
 ## On skald.tw
 
-These rules hold for packs that skald.tw loads (today in its own format):
+These rules hold for packs that skald.tw loads:
 
 - The pack panel is on the D&D 2024 system page (`skald.tw/en/sheets/dnd5e-2024`). You paste a link to the file in your own Google Drive, shared as "Anyone with the link".
 - Skald's server fetches the file from Google Drive for your browser, because Drive does not let a browser download it directly; the server does not store or log the file. Your browser checks the file and keeps a copy on this device. With an account, Skald keeps your list of links so your other devices can download the packs.

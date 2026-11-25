@@ -15,6 +15,11 @@ import classes from "@skald/system-dnd5e/data/dnd5e-2024/game/classes.json";
 import languages from "@skald/system-dnd5e/data/dnd5e-2024/game/languages.json";
 import { TemplateRenderer } from "@skald/sheet-sdk/modules/character/ui/renderer/template-renderer";
 import { SystemPluginProvider } from "@skald/sheet-sdk/modules/systems/ui/system-plugin-provider";
+import { HostPortsProvider, bindHostPort } from "@skald/sheet-sdk/modules/systems/ui/host-ports";
+import { dndHomebrewStorePort, type DndHomebrewStore } from "../../../homebrew/store-port";
+import { createMemoryHomebrewStore } from "../../../homebrew/testing/memory-store";
+import type { EffectivePacks } from "../../../content-pack/domain/types";
+import { mergePacks } from "../../../content-pack/domain/merge-packs";
 import { useReferenceContext } from "../../use-reference-context";
 import { buildCustomRow, formFields, removeRow, restoreRow } from "../../custom-rows";
 import { rowDefaults } from "../../compendium-rows";
@@ -62,12 +67,12 @@ const openReference = vi.fn();
 const openCompendium = vi.fn();
 const saved: { data: Record<string, unknown> } = { data: {} };
 
-function Sheet({ initial, editable }: { initial: Record<string, unknown>; editable: boolean }) {
+function Sheet({ initial, editable, packs }: { initial: Record<string, unknown>; editable: boolean; packs?: EffectivePacks }) {
   const [data, setData] = useState(initial);
   useEffect(() => {
     saved.data = data;
   });
-  const reference = useReferenceContext(system);
+  const reference = useReferenceContext(system, packs);
   return (
     <TemplateRenderer
       template={template}
@@ -85,14 +90,14 @@ function Sheet({ initial, editable }: { initial: Record<string, unknown>; editab
 }
 
 let width = 1440;
-async function mount(initial = fighter, editable = true) {
+async function mount(initial = fighter, editable = true, packs?: EffectivePacks, store?: DndHomebrewStore) {
   const wrapper = ({ children }: { children: ReactNode }) => (
     <NextIntlClientProvider locale="zh-TW" messages={{ ...appZh, ...systemZh }} timeZone="UTC">
-      <SystemPluginProvider catalog={{}}>{children}</SystemPluginProvider>
+      <SystemPluginProvider catalog={{}}><HostPortsProvider ports={store ? [bindHostPort(dndHomebrewStorePort, store)] : []}>{children}</HostPortsProvider></SystemPluginProvider>
     </NextIntlClientProvider>
   );
   await act(async () => {
-    render(<Sheet initial={initial} editable={editable} />, { wrapper });
+    render(<Sheet initial={initial} editable={editable} packs={packs} />, { wrapper });
   });
   await screen.findByRole("tab", { name: "戰鬥" });
 }
@@ -173,6 +178,51 @@ describe("＋ 新增 opens the library on the calling list (plan-uat2 §3.2)", (
 });
 
 describe("custom entries", () => {
+  it.skipIf(zhWithheld("messages/edit/zh-TW.json", "messages/play/zh-TW.json"))("does not offer save as homebrew without the store", async () => {
+    await mount();
+    await openTab("法術");
+    expect(within(await openMenu("護盾術")).queryByRole("menuitem", { name: "存成自製" })).toBeNull();
+  });
+
+  it.skipIf(zhWithheld("messages/edit/zh-TW.json", "messages/play/zh-TW.json", "messages/zh-TW.json"))("can add a custom feat and save it to the account in one step", async () => {
+    const store = createMemoryHomebrewStore();
+    await mount(fighter, true, undefined, store);
+    await openTab("特性");
+    await act(async () => { fireEvent.click(screen.getByRole("button", { name: "找不到？自訂一筆專長" })); });
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.change(within(dialog).getByLabelText("名稱"), { target: { value: "Steady footing" } });
+    fireEvent.click(within(dialog).getByRole("checkbox", { name: "同時存進我的自製內容" }));
+    await act(async () => { fireEvent.click(within(dialog).getByRole("button", { name: "加入" })); });
+    await waitFor(() => expect(store.snapshot().items).toMatchObject([{ kind: "feat", key: "steady-footing" }]));
+    expect((saved.data.feats as object[]).at(-1)).toMatchObject({ ref: "feat:steady-footing", homebrewRev: 1, origin: "custom" });
+  });
+
+  it.skipIf(zhWithheld("messages/edit/zh-TW.json", "messages/play/zh-TW.json"))("saves a custom spell and links its existing sheet row to the stored item", async () => {
+    const store = createMemoryHomebrewStore();
+    await mount({ ...fighter, spells: [{ id: "s", name: "Ember", origin: "custom", text: "A spark.", level: 1, castingTime: "At dawn", range: "A valley" }] }, true, undefined, store);
+    await openTab("法術");
+    const menu = await openMenu("Ember");
+    await act(async () => { fireEvent.click(within(menu).getByRole("menuitem", { name: "存成自製" })); });
+    await waitFor(() => expect(store.snapshot().items).toHaveLength(1));
+    const [item] = store.snapshot().items;
+    expect(item.payload).toMatchObject({ entry: { name: "Ember", entries: ["A spark."] }, wizard: { spells: [{ level: 1, w: { castingTime: "At dawn", range: "A valley" } }] } });
+    expect(saved.data.spells).toMatchObject([{ id: "s", ref: "spell:ember", origin: "custom", homebrewItem: item.id, homebrewRev: item.revision }]);
+  });
+
+  it.skipIf(zhWithheld("messages/edit/zh-TW.json", "messages/play/zh-TW.json"))("updates only on request and only once per revision", async () => {
+    const ref = "spell:ember";
+    const packs = mergePacks([{ key: "homebrew/p", pack: { entries: [{ kind: "spell", id: "ember", ref, name: "Ember", entries: ["New body"], meta: {} }], wizard: { spells: [{ id: "ember", ref, origin: "pack", level: 2, w: { range: "new range" } }] }, zhTW: {}, overlays: {} } }])!;
+    packs.homebrew = { [ref]: { pack: "p", item: "i", rev: 2 } };
+    const row = { id: "s", name: "Ember", ref, origin: "custom", level: 1, text: "Old body", playerText: "My text", homebrewPack: "p", homebrewItem: "i", homebrewRev: 1 };
+    await mount({ ...fighter, spells: [row] }, true, packs, createMemoryHomebrewStore());
+    await openTab("法術");
+    expect(screen.getByText("自製")).toBeVisible();
+    const menu = await openMenu("Ember");
+    expect(saved.data.spells).toEqual([row]);
+    await act(async () => { fireEvent.click(within(menu).getByRole("menuitem", { name: "更新為最新版" })); });
+    expect(saved.data.spells).toMatchObject([{ text: "New body", playerText: "My text", level: 2, range: "new range", homebrewRev: 2 }]);
+    expect(within(await openMenu("Ember")).queryByRole("menuitem", { name: "更新為最新版" })).toBeNull();
+  });
   it("a custom row is the list's template defaults plus the form's values and origin custom", () => {
     const row = buildCustomRow(schema, "features", { name: "家傳劍術", level: 2, text: "自訂。", origin: "srd", ref: "x" });
     const { id, ...rest } = row;

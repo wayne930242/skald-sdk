@@ -4,6 +4,13 @@ import { useId, useState } from "react";
 import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { ListRowField, Schema } from "@skald/types/schema";
+import { newHomebrewId } from "../homebrew/domain/forms/common";
+import { nameKey } from "../content-pack/domain/identity";
+import { loadBuiltinIdentity } from "../content-pack/open/load";
+import { wizardItemsOf } from "../homebrew/domain/wizard-items";
+import type { DndHomebrewStore } from "../homebrew/store-port";
+import type { OpenPackEntry } from "../content-pack/open/format";
+import { asHomebrewRow } from "../homebrew/domain/rows";
 import { Button } from "@skald/sheet-sdk/components/ui/button";
 import { Checkbox } from "@skald/sheet-sdk/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@skald/sheet-sdk/components/ui/dialog";
@@ -17,6 +24,37 @@ import { PLAYER_TEXT_MAX_CHARS } from "./play/row-body";
 import { formFields, formValues, type CustomList } from "./custom-rows";
 
 type Row = Record<string, unknown>;
+
+export async function saveCustomHomebrew(store: DndHomebrewStore, list: "feats" | "spells", row: Row, locale: string) {
+  const name = String(row.name ?? "").trim();
+  if (!name) throw new Error("Missing homebrew name");
+  const body = String(row.text ?? "");
+  const kind = list === "spells" ? "spell" : "feat";
+  const slug = newHomebrewId(name);
+  const identity = await loadBuiltinIdentity();
+  const folded = nameKey(kind, slug, name);
+  // Names compare within their id's parent. A fresh parent keeps both the ref and name distinct.
+  const key = identity.refs.has(`${kind}:${slug}`) || (folded && identity.nameKeys.has(folded))
+    ? `${newHomebrewId("")}/${slug}`.slice(0, 200) : slug;
+  const ref = `${kind}:${key}`;
+  const entry: OpenPackEntry = { kind, id: key, ref, name, source: "homebrew", entries: body ? [body] : [],
+    meta: kind === "feat" ? { category: row.category || "general" } : { level: Number(row.level ?? 0), classes: [], components: { m: row.material === true }, concentration: row.concentration === true, ritual: row.ritual === true },
+  };
+  const zhTW = locale === "zh-TW" ? { name, entries: entry.entries } : undefined;
+  const wizard = wizardItemsOf(entry, zhTW);
+  for (const pick of wizard.spells ?? []) {
+    // Sheet spells have free-form time and range, not the editor's coded units.
+    const fields = { castingTime: String(row.castingTime ?? ""), range: String(row.range ?? "") };
+    Object.assign(pick, fields, { w: { ...pick.w as Row, ...fields } });
+    delete pick.castingTimeCode;
+    delete pick.rangeCode;
+  }
+  const pack = await store.defaultPack();
+  if (!pack.ok) throw new Error(pack.error);
+  const saved = await store.saveItem(pack.value.id, { kind, key, payload: { entry, ...(zhTW ? { zhTW } : {}), wizard } });
+  if (!saved.ok) throw new Error(saved.error);
+  return asHomebrewRow({ ref }, body, { pack: pack.value.id, item: saved.value.id, rev: saved.value.revision });
+}
 
 export interface CustomEntryDialogProps {
   schema: Schema;
@@ -32,7 +70,8 @@ export interface CustomEntryDialogProps {
   /** SRD picks shown as chips above the form (語言): picking one adds it at once. */
   chips?: Array<{ ref: string; name: string }>;
   onPick?: (chip: { ref: string; name: string }) => void;
-  onSubmit: (values: Row) => void;
+  allowHomebrew?: boolean;
+  onSubmit: (values: Row, alsoHomebrew?: boolean) => void | Promise<void>;
   onClose: () => void;
 }
 
@@ -86,15 +125,18 @@ function FieldControl({ field, value, onChange, id }: { field: ListRowField; val
   return <Input id={id} value={typeof value === "string" ? value : ""} onChange={(event) => onChange(event.target.value)} />;
 }
 
-function EntryForm({ schema, list, listLabel, row, rowName, locked, chips, onPick, onSubmit, onClose }: CustomEntryDialogProps) {
+function EntryForm({ schema, list, listLabel, row, rowName, locked, chips, onPick, onSubmit, onClose, allowHomebrew }: CustomEntryDialogProps) {
   const t = useTranslations("edit.custom");
   const { resolveI18n } = useSchemaI18n();
   const base = useId();
   const fields = formFields(schema, list, row, locked);
   const [values, setValues] = useState<Row>(() => formValues(schema, list, row, locked));
   const [missingName, setMissingName] = useState(false);
+  const [alsoHomebrew, setAlsoHomebrew] = useState(false);
+  const [saving, setSaving] = useState(false);
   const named = fields.some((field) => field.id === "name");
-  const submit = () => {
+  const submit = async () => {
+    if (saving) return;
     if (named && (typeof values.name !== "string" || values.name.trim() === "")) {
       setMissingName(true);
       return;
@@ -103,7 +145,12 @@ function EntryForm({ schema, list, listLabel, row, rowName, locked, chips, onPic
     // row leaves it out, an edited row clears its old value.
     const blank = fields.filter((field) => field.type === "number" && typeof values[field.id] !== "number").map((field) => field.id);
     const own = Object.entries(named ? { ...values, name: String(values.name).trim() } : values).filter(([key]) => !blank.includes(key));
-    onSubmit(Object.fromEntries(row ? [...own, ...blank.map((key) => [key, undefined])] : own));
+    setSaving(true);
+    try {
+      await onSubmit(Object.fromEntries(row ? [...own, ...blank.map((key) => [key, undefined])] : own), allowHomebrew && alsoHomebrew);
+    } finally {
+      setSaving(false);
+    }
   };
   const title = row ? t("editTitle", { name: rowName ?? String(row.name ?? "") }) : t("title", { list: listLabel });
   return (
@@ -168,11 +215,12 @@ function EntryForm({ schema, list, listLabel, row, rowName, locked, chips, onPic
               </div>
             );
           })}
+          {allowHomebrew && <label className="flex items-center gap-2 sm:col-span-2"><Checkbox checked={alsoHomebrew} onCheckedChange={(checked) => setAlsoHomebrew(checked === true)} />{t("alsoHomebrew")}</label>}
           <DialogFooter className="sm:col-span-2">
             <Button type="button" variant="outline" onClick={onClose}>
               {t("cancel")}
             </Button>
-            <Button type="submit">{row ? t("save") : t("add")}</Button>
+            <Button type="submit" disabled={saving}>{row ? t("save") : t("add")}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

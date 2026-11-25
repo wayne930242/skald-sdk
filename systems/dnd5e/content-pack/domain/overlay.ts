@@ -5,6 +5,7 @@
  * validation and dry run never see the overlay; the engine is unchanged.
  */
 import { PACK_ORIGIN } from "@skald/sheet-sdk/modules/character/pack-text";
+import { stampOf } from "../../homebrew/domain/rows";
 import { entriesToText } from "../../reference/entries-to-text";
 import { PACK_LIMITS } from "./limits";
 import type { PackContent, PackEntry, PackWizardItem } from "./types";
@@ -217,13 +218,18 @@ export function overlayGameData(
   return out;
 }
 
-/** UTF-8 bytes of the names and texts of every pack row in `data`, the quantity the 200 KB cap bounds. */
+/** A row whose copied text the 200 KB cap counts: a pack row, or a homebrew row (its stamp; ADR 0018). */
+function copiedText(row: unknown): row is Item {
+  return isItem(row) && (row.origin === PACK_ORIGIN || stampOf(row) !== null);
+}
+
+/** UTF-8 bytes of the names and texts of every pack and homebrew row in `data`, the quantity the 200 KB cap bounds. */
 export function packSnapshotBytes(data: Record<string, unknown>): number {
   let bytes = 0;
   for (const value of Object.values(data)) {
     if (!Array.isArray(value)) continue;
     for (const row of value) {
-      if (!isItem(row) || row.origin !== PACK_ORIGIN) continue;
+      if (!copiedText(row)) continue;
       bytes += utf8Length(String(row.name ?? "")) + utf8Length(typeof row.text === "string" ? row.text : "");
     }
   }
@@ -239,7 +245,7 @@ function utf8Length(text: string): number {
 /**
  * Copies pack text into every row of `data` that came from the pack and has
  * no text yet, so any viewer renders it without the pack (§1.8). Refuses when
- * the pack names and texts of the character pass 200 KB.
+ * the pack and homebrew names and texts of the character pass 200 KB.
  */
 export function snapshotPackRows(
   data: Record<string, unknown>,
@@ -255,7 +261,11 @@ export function snapshotPackRows(
       continue;
     }
     out[key] = value.map((row) => {
-      if (!isItem(row) || row.origin !== PACK_ORIGIN) return row;
+      if (!copiedText(row)) return row;
+      if (row.origin !== PACK_ORIGIN) {
+        bytes += utf8Length(String(row.name ?? "")) + utf8Length(typeof row.text === "string" ? row.text : "");
+        return row;
+      }
       let next = row;
       if ((typeof row.text !== "string" || row.text === "") && index.has(row.ref) && textLists.has(key)) {
         next = { ...row, text: index.rowText(row) };

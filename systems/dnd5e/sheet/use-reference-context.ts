@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useMessages, useTranslations } from "next-intl";
+import type { HomebrewStamp } from "../homebrew/domain/rows";
 import type { LoadedSystem } from "@skald/types/system";
 import { useSystemPluginUi } from "@skald/sheet-sdk/modules/systems/ui/system-plugin-provider";
 import type { EntriesRenderContext } from "../reference/entries-renderer";
@@ -62,6 +63,7 @@ export interface ReferenceContextValue {
   packRefs: ReadonlySet<string>;
   /** The `packId` that supplies a ref (entry or overlay), or undefined. */
   packSupplier: (ref: string) => string | undefined;
+  homebrewOf?: (ref: string) => HomebrewStamp | undefined;
   /** Names and snapshot text of the enabled packs, in the viewer's locale. */
   packText: PackTextIndex | null;
   renderContext: Omit<EntriesRenderContext, "onOpenRef">;
@@ -247,6 +249,7 @@ export function useReferenceContext(
       packIds: packs?.keys ?? [],
       packRefs,
       packSupplier,
+      homebrewOf: (ref) => packs?.homebrew?.[aliases[ref] ?? ref],
       packText,
       renderContext: {
         resolveRef,

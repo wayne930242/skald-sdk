@@ -6,6 +6,7 @@ import type { EntriesRenderContext } from "../reference/entries-renderer";
 import { useHostPort } from "@skald/sheet-sdk/modules/systems/ui/host-ports";
 import { loadReferenceMessages, type ReferenceCatalog } from "../reference/load-corpus";
 import { TIER_A_TAG_LABELS, type DndKind } from "../reference/tags";
+import { loadPlayMessages } from "./play/play-messages";
 import { dndPackSourcePort } from "./pack-source-port";
 import type { ReferenceContextValue } from "./use-reference-context";
 
@@ -26,7 +27,8 @@ export function ReferenceIntl({ children }: { children: ReactNode }) {
     if (loaded) return;
     let live = true;
     // A failed chunk load stays unhandled, so it reaches the error reporting; the next open retries.
-    void loadReferenceMessages(locale).then((value) => {
+    void Promise.all([loadReferenceMessages(locale), loadPlayMessages(locale)]).then(([reference, play]) => {
+      const value = { ...reference, referenceUi: { ...reference.referenceUi, homebrewFrom: play.homebrewFrom } };
       ready.set(locale, value);
       if (live) setCatalog({ locale, value });
     });
@@ -52,7 +54,7 @@ export function ReferenceIntl({ children }: { children: ReactNode }) {
  * The pack names the host gives (`DndPackSource.packNames`), as `referenceUi.packNames`; null until
  * they load, or without the port. A failed load leaves the badges on the pack ids.
  */
-function useHostPackNames(locale: string): Readonly<Record<string, string>> | null {
+export function useHostPackNames(locale: string, packIds?: readonly string[]): Readonly<Record<string, string>> | null {
   const source = useHostPort(dndPackSourcePort);
   const [names, setNames] = useState<{ locale: string; value: Readonly<Record<string, string>> } | null>(null);
   useEffect(() => {
@@ -62,7 +64,7 @@ function useHostPackNames(locale: string): Readonly<Record<string, string>> | nu
     return () => {
       live = false;
     };
-  }, [source, locale]);
+  }, [source, locale, packIds]);
   return names?.locale === locale ? names.value : null;
 }
 

@@ -1,13 +1,21 @@
 "use client";
 
-import { createContext, lazy, Suspense, useContext, useState, type ReactNode } from "react";
+import { createContext, lazy, Suspense, useContext, useEffect, useState, type ReactNode } from "react";
 import { MoreHorizontal, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@skald/sheet-sdk/components/ui/dropdown-menu";
 import { useSheetMode } from "@skald/sheet-sdk/modules/character/ui/renderer/sheet-mode";
 import { cn } from "@skald/sheet-sdk/lib/utils";
-import type { CompendiumStart } from "../compendium-rows";
+import { useHostPort } from "@skald/sheet-sdk/modules/systems/ui/host-ports";
+import { dndHomebrewStorePort, type DndHomebrewStore } from "../../homebrew/store-port";
+import { asHomebrewRow, hasNewerHomebrew, stampOf } from "../../homebrew/domain/rows";
+import { PACK_LIMITS } from "../../content-pack/domain/limits";
+import { packSnapshotBytes } from "../../content-pack/domain/overlay";
+import { packLabel } from "../pack-label";
+import { homebrewKey } from "../../homebrew/domain/limits";
+import { useHostPackNames } from "../reference-intl";
+import { copySpellFields, type CompendiumStart } from "../compendium-rows";
 import { CUSTOM_FORM_FIELDS, appendRow, buildCustomRow, buildSrdRow, patchRow, removeRow, restoreRow, rowIndex, type CustomList } from "../custom-rows";
 import { usePlay } from "./play-context";
 import { rows, text } from "./play-model";
@@ -24,6 +32,10 @@ const CustomEntryDialog = lazy(() => import("../custom-entry-form").then((module
 const RowTextDialog = lazy(() => import("./text-editor").then((module) => ({ default: module.RowTextDialog })));
 
 type Row = Record<string, unknown>;
+
+const HomebrewContext = createContext<DndHomebrewStore | null>(null);
+const PackNamesContext = createContext<Readonly<Record<string, string>> | null>(null);
+const homebrewList = (list: string): list is "feats" | "spells" => list === "feats" || list === "spells";
 
 const hasForm = (list: string): list is CustomList => Object.hasOwn(CUSTOM_FORM_FIELDS, list);
 const hasPlayerText = (list: string) => (PLAYER_TEXT_LISTS as readonly string[]).includes(list);
@@ -53,17 +65,51 @@ function catalogFields(context: ReferenceContextValue, row: Row): string[] {
 /** Writes through the play view's whole-data path, with the toasts the row menu promises. */
 export function useRowWrites() {
   const t = useTranslations("edit");
-  const { update, schema } = usePlay();
+  const tPack = useTranslations("pack");
+  const { update, schema, reference, data } = usePlay();
+  function withinCap(next: Row) {
+    const bytes = packSnapshotBytes(next);
+    if (bytes <= PACK_LIMITS.snapshotBytes) return true;
+    queueMicrotask(() => toast.error(tPack("tooMuchText", { kb: Math.ceil(bytes / 1024) })));
+    return false;
+  }
+  const store = useContext(HomebrewContext);
+  async function saveHomebrew(list: string, row: Row) {
+    if (!store || !homebrewList(list)) return null;
+    // The unstamped custom row does not count yet. Check its new snapshot before creating a library item.
+    const index = rowIndex(data[list], row);
+    const snapshot = { ...row, origin: "pack" };
+    if (!withinCap(index < 0 ? appendRow(data, list, snapshot) : patchRow(data, list, index, snapshot))) return null;
+    try {
+      const { saveCustomHomebrew } = await import("../custom-entry-form");
+      return await saveCustomHomebrew(store, list, row, reference.locale);
+    } catch {
+      toast.error(t("custom.homebrewFailed"));
+      return null;
+    }
+  }
   return {
     canWrite: update !== null,
-    addCustom: (list: CustomList, values: Row) => {
+    canSaveHomebrew: (list: string) => !!store && homebrewList(list),
+    canUpdateHomebrew: !!store,
+    saveHomebrew,
+    addCustom: async (list: CustomList, values: Row, alsoHomebrew = false, onAdded?: () => void) => {
       if (!update) return;
       const row = buildCustomRow(schema, list, values);
+      if (alsoHomebrew) {
+        const stamp = await saveHomebrew(list, row);
+        if (!stamp) return;
+        Object.assign(row, stamp);
+      }
       update((previous) => appendRow(previous, list, row));
       toast.success(t("custom.added", { name: String(row.name) }));
+      onAdded?.();
     },
     patch: (list: string, row: Row, patch: Row) => {
-      update?.((previous) => patchRow(previous, list, rowIndex(previous[list], row), patch));
+      update?.((previous) => {
+        const next = patchRow(previous, list, rowIndex(previous[list], row), patch);
+        return stampOf(patch) && !withinCap(next) ? previous : next;
+      });
     },
     /** Deletes at once; the toast's 復原 puts the row back at its index. */
     remove: (list: string, row: Row, name: string) => {
@@ -122,6 +168,14 @@ export function RowEditorHost({ children }: { children: ReactNode }) {
   const tCustom = useTranslations("edit.custom");
   const tField = useTranslations("field");
   const { schema, reference } = usePlay();
+  const store = useHostPort(dndHomebrewStorePort);
+  const [account, setAccount] = useState<DndHomebrewStore | null>(null);
+  const names = useHostPackNames(reference.locale, reference.packIds);
+  useEffect(() => {
+    let live = true;
+    store?.owner().then((owner) => { if (live) setAccount(owner === "account" ? store : null); }, () => { if (live) setAccount(null); });
+    return () => { live = false; };
+  }, [store]);
   const writes = useRowWrites();
   const [open, setOpen] = useState<RowEditor | null>(null);
   const close = () => setOpen(null);
@@ -131,7 +185,9 @@ export function RowEditorHost({ children }: { children: ReactNode }) {
   };
   return (
     <OpenRowEditorContext.Provider value={setOpen}>
-      {children}
+      <HomebrewContext.Provider value={account === store ? store : null}>
+        <PackNamesContext.Provider value={names}>{children}</PackNamesContext.Provider>
+      </HomebrewContext.Provider>
       <Suspense fallback={null}>
         {open?.kind === "text" &&
           (open.shown === null || open.shown === undefined ? (
@@ -163,14 +219,22 @@ export function RowEditorHost({ children }: { children: ReactNode }) {
 /** The row 「⋯」 menu: 編輯文字, 編輯欄位 (a custom row; any row in edit mode) and 刪除. */
 export function RowMenu({ list, row, name, shown = null, className }: { list: string; row: Row; name: string; shown?: string | null; loading?: boolean; className?: string }) {
   const t = useTranslations("edit.row");
-  const { editable } = usePlay();
+  const { editable, reference } = usePlay();
+  const names = useContext(PackNamesContext);
+  const tPlay = useTranslations("play");
   const mode = useSheetMode();
   const writes = useRowWrites();
   const openEditor = useOpenRowEditor();
-  if (!editable || !writes.canWrite) return null;
+  const own = stampOf(row);
+  const ref = text(row.ref);
+  const latest = own && reference.homebrewOf?.(ref);
+  const pack = own && homebrewKey(own.pack);
+  const badge = pack ? <span className="rounded-full border px-2 text-xs">{names?.[pack] ? packLabel(tPlay, pack, names[pack]) : tPlay("homebrewBadge")}</span> : null;
+  if (!editable || !writes.canWrite) return badge;
   const fields = hasForm(list) && (row.origin === "custom" || (!row.origin && !row.ref) || mode === "edit");
   return (
     <>
+      {badge}
       <DropdownMenu>
         <DropdownMenuTrigger
           aria-label={t("menu", { name })}
@@ -181,6 +245,16 @@ export function RowMenu({ list, row, name, shown = null, className }: { list: st
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           {hasPlayerText(list) && <DropdownMenuItem onSelect={() => openEditor({ kind: "text", list, row, name, shown })}>{t("editText")}</DropdownMenuItem>}
+          {writes.canUpdateHomebrew && latest && reference.packText && hasNewerHomebrew(row, { [ref]: latest }) && <DropdownMenuItem onSelect={() => {
+            const resolved = reference.resolveRef(ref) ?? ref;
+            const spell = list === "spells" ? reference.gameSpells.get(resolved.slice(6)) : undefined;
+            const fields = spell ? copySpellFields(spell, reference.token) : {};
+            writes.patch(list, row, asHomebrewRow(fields, reference.packText!.rowText({ ...row, ref: resolved }), latest));
+          }}>{t("updateHomebrew")}</DropdownMenuItem>}
+          {!own && row.origin === "custom" && writes.canSaveHomebrew(list) && <DropdownMenuItem onSelect={async () => {
+            const patch = await writes.saveHomebrew(list, row);
+            if (patch) writes.patch(list, row, patch);
+          }}>{t("saveHomebrew")}</DropdownMenuItem>}
           {fields && <DropdownMenuItem onSelect={() => openEditor({ kind: "fields", list, row, name })}>{t("editFields")}</DropdownMenuItem>}
           <DropdownMenuItem variant="destructive" onSelect={() => writes.remove(list, row, name)}>
             {t("delete")}
@@ -236,16 +310,14 @@ export function AddControls({
             schema={schema}
             list={list}
             listLabel={listLabel}
+            allowHomebrew={writes.canSaveHomebrew(list)}
             chips={chips}
             onPick={(chip) => {
               onPickChip?.(chip);
               setForm(false);
             }}
             onClose={() => setForm(false)}
-            onSubmit={(values) => {
-              writes.addCustom(list, values);
-              setForm(false);
-            }}
+            onSubmit={(values, also) => writes.addCustom(list, values, also, () => setForm(false))}
           />
         </Suspense>
       )}
@@ -272,11 +344,9 @@ export function CustomLink({ list }: { list: CustomList }) {
             schema={schema}
             list={list}
             listLabel={listLabel}
+            allowHomebrew={writes.canSaveHomebrew(list)}
             onClose={() => setForm(false)}
-            onSubmit={(values) => {
-              writes.addCustom(list, values);
-              setForm(false);
-            }}
+            onSubmit={(values, also) => writes.addCustom(list, values, also, () => setForm(false))}
           />
         </Suspense>
       )}

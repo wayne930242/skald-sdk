@@ -92,6 +92,7 @@ export async function validateOpenPackText(text: string, deps: ValidateOpenPackD
   if (!result.ok) return result;
   return {
     ...result,
+    pack: { ...result.pack, manifest: { ...result.pack.manifest, name: pack.manifest.name } },
     report: { ...result.report, bytes: new TextEncoder().encode(text).length },
     name: pack.manifest.name,
   };
