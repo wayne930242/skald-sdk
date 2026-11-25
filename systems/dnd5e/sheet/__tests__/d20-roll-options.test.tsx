@@ -5,7 +5,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vite
 import { zhWithheld } from "../../__tests__/zh-withheld";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode } from "react";
 import { toast } from "sonner";
 import type { LoadedSystem } from "@skald/types/system";
 import { executeExpressionWithMacros, type RollMacroRegistry } from "@skald/dice";
@@ -18,6 +18,7 @@ import { SystemProvider } from "@skald/sheet-sdk/components/providers/system-pro
 import schemaJson from "@skald/system-dnd5e/data/dnd5e-2024/schema.json";
 import templateJson from "@skald/system-dnd5e/data/dnd5e-2024/template.json";
 import { SystemPluginProvider } from "@skald/sheet-sdk/modules/systems/ui/system-plugin-provider";
+import type { SheetRollControlProps } from "@skald/sheet-sdk/modules/systems/ui/system-plugin-ui";
 import { AdvantageRollControl } from "../advantage-roll-control";
 import { d20ExtraDiceArgs, d20ModifierApplies, withCriticalDice, withD20Modifier } from "../d20-roll-args";
 import D20RollOptions from "../d20-roll-options";
@@ -62,7 +63,7 @@ function Providers({ children, locale = "zh-TW", loaded = system }: { children: 
   return (
     <NextIntlClientProvider locale={locale} messages={messages} timeZone="UTC">
       <SystemProvider system={loaded}>
-        <SystemPluginProvider catalog={(parent) => ({ rollControls: new Map([...parent.rollControls, ["dnd5e", AdvantageRollControl]]) })}>
+        <SystemPluginProvider catalog={(parent) => ({ rollControls: new Map<string, ComponentType<SheetRollControlProps>>([...parent.rollControls, ["dnd5e", AdvantageRollControl]]) })}>
           {children}
         </SystemPluginProvider>
       </SystemProvider>

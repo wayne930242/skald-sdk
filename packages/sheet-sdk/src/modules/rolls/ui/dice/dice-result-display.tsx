@@ -95,8 +95,8 @@ const successLevelStyles: Record<CoC7eSuccessLevel, SuccessLevelStyleInfo> = {
   },
 };
 
-// Success levels from other systems' dsl-roll-rules.json (Fate Condensed,
-// Brindlewood Bay, Avatar Legends) that aren't in the CoC7e table above.
+// Success levels from other systems' dsl-roll-rules.json (Fate Condensed and
+// others) that aren't in the CoC7e table above.
 // Colors picked from their DSL `style` category.
 const otherSystemSuccessLevelStyles: Record<string, SuccessLevelStyleInfo> = {
   "success-with-style": successLevelStyles.critical,
