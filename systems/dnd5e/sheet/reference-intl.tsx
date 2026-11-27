@@ -8,6 +8,7 @@ import { loadReferenceMessages, type ReferenceCatalog } from "../reference/load-
 import { TIER_A_TAG_LABELS, type DndKind } from "../reference/tags";
 import { loadPlayMessages } from "./play/play-messages";
 import { dndPackSourcePort } from "./pack-source-port";
+import { useTablePackScope } from "./pack-scope";
 import type { ReferenceContextValue } from "./use-reference-context";
 
 /**
@@ -28,7 +29,8 @@ export function ReferenceIntl({ children }: { children: ReactNode }) {
     let live = true;
     // A failed chunk load stays unhandled, so it reaches the error reporting; the next open retries.
     void Promise.all([loadReferenceMessages(locale), loadPlayMessages(locale)]).then(([reference, play]) => {
-      const value = { ...reference, referenceUi: { ...reference.referenceUi, homebrewFrom: play.homebrewFrom } };
+      const { homebrewFrom, gmHomebrew, gmHomebrewFrom } = play;
+      const value = { ...reference, referenceUi: { ...reference.referenceUi, homebrewFrom, gmHomebrew, gmHomebrewFrom } };
       ready.set(locale, value);
       if (live) setCatalog({ locale, value });
     });
@@ -52,19 +54,22 @@ export function ReferenceIntl({ children }: { children: ReactNode }) {
 
 /**
  * The pack names the host gives (`DndPackSource.packNames`), as `referenceUi.packNames`; null until
- * they load, or without the port. A failed load leaves the badges on the pack ids.
+ * they load, or without the port. A failed load leaves the badges on the pack ids. On a table copy
+ * whose setup takes the GM's homebrew (`useTablePackScope`), the host also names the table's sharers.
  */
 export function useHostPackNames(locale: string, packIds?: readonly string[]): Readonly<Record<string, string>> | null {
   const source = useHostPort(dndPackSourcePort);
+  const tableId = useTablePackScope()?.tableId;
   const [names, setNames] = useState<{ locale: string; value: Readonly<Record<string, string>> } | null>(null);
   useEffect(() => {
     if (!source?.packNames) return;
     let live = true;
-    source.packNames(locale).then((value) => live && setNames({ locale, value }), () => {});
+    const read = tableId === undefined ? source.packNames(locale) : source.packNames(locale, { tableId });
+    read.then((value) => live && setNames({ locale, value }), () => {});
     return () => {
       live = false;
     };
-  }, [source, locale, packIds]);
+  }, [source, locale, packIds, tableId]);
   return names?.locale === locale ? names.value : null;
 }
 

@@ -5,7 +5,7 @@
 // the web and the Discord bot have written can be tested without rendering.
 import { isFateRoll, isPbtaTier, keptRollFlags, type DiceRoll } from "@skald/dice";
 
-export type RollCardVariant = "percentile" | "tier" | "fate" | "check" | "plain" | "opposed";
+export type RollCardVariant = "percentile" | "tier" | "fate" | "check" | "plain" | "pool" | "opposed";
 
 export const BWB_TIERS = [
   { id: "bwb-extraordinary" }, { id: "bwb-strong" }, { id: "bwb-weak" }, { id: "bwb-miss" },
@@ -25,10 +25,12 @@ export function rollCardVariant(roll: DiceRoll): RollCardVariant {
     case "opposed":
       return "opposed";
     case "skill_check":
+      if (roll.checkDisplay) return "check";
       return roll.tensDice?.length || roll.unitsDice?.length || COC_LEVELS.has(roll.successLevel)
         ? "percentile"
         : "check";
     default:
+      if (roll.pool) return "pool";
       if (isFateRoll(roll.rolls, roll.notation)) return "fate";
       return isPbtaTier(roll.successLevel) || isBwbTier(roll.successLevel) ? "tier" : "plain";
   }
@@ -57,6 +59,7 @@ export function simpleFaces(roll: Pick<SimpleRoll, "rolls" | "notation">): Simpl
 
 /** The number a simple roll adds to its dice: what the total holds beyond the kept faces */
 export function simpleModifier(roll: SimpleRoll): number {
+  if (roll.pool) return 0;
   const faces = simpleFaces(roll).reduce((sum, face) => (face.kept ? sum + face.value : sum), 0);
   const derived = roll.total - faces;
   if (Number.isFinite(derived)) return derived;
@@ -69,7 +72,7 @@ export function tensFace(value: number): number {
 }
 
 export function isFollowUp(roll: DiceRoll): roll is SkillCheck {
-  return roll.type === "skill_check" && (roll.pushed === true || roll.luckSpent !== undefined);
+  return roll.type === "skill_check" && (roll.pushed === true || roll.luckSpent !== undefined || !!roll.followsRollId);
 }
 
 /** A Luck spend keeps `roll` as rolled; the figure that counts is the roll less the spend. */

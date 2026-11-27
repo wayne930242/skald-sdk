@@ -18,6 +18,8 @@ export type {
   DiceRollBase,
   SimpleDiceRoll,
   SkillCheckRoll,
+  CheckDisplay,
+  RollDisplayLabels,
   OpposedRoll,
   DiceRoll,
   // Chat types
@@ -28,8 +30,10 @@ export type {
   TableBroadcastPayload,
 } from "./types";
 
+export * from "./pool-highest";
+
 // Roll kind
-export { isFateRoll, isPbtaTier, PBTA_TIERS } from "./roll-kind";
+export { isFateRoll, isPbtaTier, PBTA_TIERS, rollDisplayLabel, checkDisplayTone } from "./roll-kind";
 export type { PbtaTierId } from "./roll-kind";
 export { keptRollFlags } from "./kept-rolls";
 
@@ -47,8 +51,9 @@ export {
   rollDiceExpression,
   rollD100,
   rollCoC7eSkillCheck,
+  dieFaces,
 } from "./roller";
-export type { RandomSource, SkillCheckInput } from "./roller";
+export type { DiceSource, DieFaceSource, RandomSource, SkillCheckInput } from "./roller";
 
 // Check
 export { getSuccessLevel, calculateSuccessLevel, performCheck } from "./check";

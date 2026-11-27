@@ -7,6 +7,7 @@ import { EditSlot, rowFieldRoll, usePlay } from "./play-context";
 import { PlayRollButton } from "./play-roll-button";
 import { OverrideMark } from "@skald/sheet-sdk/modules/character/ui/derived/override-mark";
 import { cantripDice, num, rows, signed, text, weaponAttack } from "./play-model";
+import { attackText } from "./snapshot-labels";
 import { castingClasses } from "./casting-classes";
 import { useSheetNames } from "./use-sheet-names";
 import { CastButton, SlotPips, SpellDamageButtons } from "./spells-tab";
@@ -15,7 +16,7 @@ import { displayName, spellLine, summaryOf, useSpellFacts } from "./row-text";
 import { rowBodyText } from "./row-body";
 import { SnapshotText } from "../../reference/snapshot-text";
 import { CARD, CARD_TITLE } from "./card-styles";
-import { EditIntl } from "./edit-messages";
+import { EditIntl, useSnapshotLabels } from "./edit-messages";
 import { AddControls, CustomLink, RowEditorHost, RowMenu, useOpenRowEditor } from "./row-actions";
 
 const ATTACK_LIBRARY = { tab: "equipment", category: "weapon", intent: "attack" } as const;
@@ -29,13 +30,14 @@ function WeaponRow({ row, compact }: { row: Record<string, unknown>; compact: bo
   const t = useTranslations("play");
   const { values, schema, reference } = usePlay();
   const openRow = useOpenRowEditor();
-  const name = text(row.name) || (text(row.ref) ? reference.nameOf(text(row.ref)) : "—");
+  const labels = attackText(row, useSnapshotLabels());
+  const name = labels.name || (text(row.ref) ? reference.nameOf(text(row.ref)) : "—");
   // B-023: in edit mode the attack and damage open the attack's fields
   const editFields = () => openRow({ kind: "fields", list: "weapons", row, name });
   const { attack, damageMod } = weaponAttack(values, row);
   const data = { ...values, ...row, attack, damageMod };
-  const damage = damageText(text(row.damageDice), damageMod, text(row.damageType));
-  const sub = [text(row.notes), text(row.mastery)].filter(Boolean).join(" · ");
+  const damage = damageText(text(row.damageDice), damageMod, labels.damageType);
+  const sub = [labels.notes, labels.mastery].filter(Boolean).join(" · ");
   // The attack's own description (編輯文字): a weapon row has no rules text of its own.
   const body = rowBodyText(row, null).trim();
   const summary = summaryOf(body);

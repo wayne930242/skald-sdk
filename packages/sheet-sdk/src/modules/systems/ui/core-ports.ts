@@ -4,6 +4,7 @@ import type { ExcelFormulaEvaluator } from "@skald/dice/formula";
 import type { GameIconSource } from "@skald/sheet-sdk/lib/game-icons/client";
 import { defineHostPort } from "./host-ports";
 import type { RuleNode } from "../domain/system-pack/rule-nodes";
+import type { SystemExtensionsPort } from "../domain/system-extensions";
 import type { PdfRenderer } from "./system-print";
 
 export interface RulesTitle { key: string; title: string }
@@ -62,6 +63,8 @@ export const corePorts = {
   /** Renders the serialized print pages to a PDF (下載 PDF). */
   pdfRenderer: defineHostPort<PdfRenderer>("pdfRenderer"),
   excelFormulaEvaluator: defineHostPort<ExcelFormulaEvaluatorFactory>("excelFormulaEvaluator"),
+  /** A System's private extensions the signed-in caller reads (ADR 0021); read it with `useSystemExtensions`. */
+  systemExtensions: defineHostPort<SystemExtensionsPort>("systemExtensions"),
 } as const;
 
 export type CorePortId = keyof typeof corePorts;

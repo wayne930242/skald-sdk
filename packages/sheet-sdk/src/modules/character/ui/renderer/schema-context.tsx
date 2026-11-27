@@ -45,6 +45,12 @@ export interface SchemaStaticContextValue {
       | Record<string, unknown>
       | ((prev: Record<string, unknown>) => Record<string, unknown>),
   ) => void;
+  /**
+   * Computes a write from the sheet's latest data — other tabs' merged changes included, even before
+   * they render — and writes the top-level keys `update` returns; `null` writes nothing. True when
+   * something was written. A host without it offers `setData` only.
+   */
+  updateData?: (update: (data: Record<string, unknown>) => Record<string, unknown> | null) => boolean;
   handlers?: FieldHandlers;
   /** Dynamic option sources for select fields with optionModule */
   optionSources?: OptionSources;

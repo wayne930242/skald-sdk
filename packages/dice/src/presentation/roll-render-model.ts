@@ -1,7 +1,10 @@
 import type { DiceRoll, SuccessLevel } from "../types";
 import type { RollExpressionResult } from "../roll-expression/types";
 
+import { poolSelected, type PoolOutcome } from "../pool-highest";
+
 export type RollRuleId =
+  | "poolHighest"
   | "coc7-normal"
   | "coc7-bonus"
   | "coc7-penalty"
@@ -19,6 +22,7 @@ export interface RollDieGroup {
   label: "tens" | "units" | "dice";
   values: number[];
   selected?: number;
+  selectedIndices?: number[];
 }
 
 export interface RollRenderModel {
@@ -28,6 +32,7 @@ export interface RollRenderModel {
   target?: number;
   successLevel?: SuccessLevel | string;
   rule: RollRuleMeta;
+  pool?: PoolOutcome;
   diceGroups: RollDieGroup[];
 }
 
@@ -81,9 +86,17 @@ function buildDieGroups(input: {
   return [];
 }
 
+function poolModel(pool: PoolOutcome, rolls: number[], total: number, expression: string): RollRenderModel {
+  return {
+    kind: "simple", expression, total, pool, rule: { id: "poolHighest" }, successLevel: `pool-${pool.tier}`,
+    diceGroups: [{ id: "dice", label: "dice", values: rolls, selectedIndices: poolSelected(pool, rolls, total) }],
+  };
+}
+
 export function buildRollRenderModelFromExpressionResult(
   result: RollExpressionResult,
 ): RollRenderModel {
+  if (result.pool) return poolModel(result.pool, result.rolls, result.rolled, result.expression);
   const hasCocDice =
     (result.tensDice?.length ?? 0) > 0 || (result.unitsDice?.length ?? 0) > 0;
 
@@ -113,6 +126,7 @@ export function buildRollRenderModelFromExpressionResult(
 
 export function buildRollRenderModelFromDiceRoll(roll: DiceRoll): RollRenderModel {
   if (roll.type === "simple") {
+    if (roll.pool) return poolModel(roll.pool, roll.rolls, roll.total, roll.notation);
     return {
       kind: "simple",
       expression: roll.notation,

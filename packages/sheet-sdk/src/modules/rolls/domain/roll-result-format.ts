@@ -1,9 +1,10 @@
 import type { RollExpressionResult } from "@skald/dice/roll-expression";
-import type { DeclaredDifficulty, DiceVisibility, SuccessLevel } from "@skald/dice";
+import type { CheckDisplay, DeclaredDifficulty, DiceVisibility, SuccessLevel } from "@skald/dice";
 import {
   createRollEvaluator,
   judgePercentileCheck,
   keptRollFlags,
+  poolRowFields,
   ruleSupportsDifficulty,
 } from "@skald/dice";
 import type { RollRulesDefinition } from "@skald/dice";
@@ -147,6 +148,7 @@ export function toToastDiceRoll(
   defaultSkillName: string,
   visibility: DiceVisibility,
   totalOnlyGrade?: string,
+  checkDisplay?: CheckDisplay,
 ): SkillCheckWithFaces | SimpleDiceRoll {
   const basePayload = {
     id: nanoid(),
@@ -171,6 +173,7 @@ export function toToastDiceRoll(
       targetValue: result.targetValue,
       roll: result.rolled,
       successLevel: successLevelId as SuccessLevel,
+      ...(checkDisplay && { checkDisplay }),
       ...(result.difficulty && { difficulty: result.difficulty }),
       bonusDice: result.bonusDice,
       unitsDice: result.unitsDice,
@@ -188,5 +191,6 @@ export function toToastDiceRoll(
     rolls: result.rolls,
     total: result.rolled,
     ...(totalOnlyGrade && { successLevel: totalOnlyGrade }),
+    ...poolRowFields(result),
   };
 }

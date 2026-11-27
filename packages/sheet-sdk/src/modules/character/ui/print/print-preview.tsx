@@ -205,6 +205,7 @@ function PrintPreviewBody({
         paper,
         locale,
         title: printTitle(data, system.config.name),
+        system: system.config.id,
         droppedImagesNote,
       }, renderPdf);
       if (!result.ok && result.code === "disabled") {
@@ -217,7 +218,7 @@ function PrintPreviewBody({
       console.error("PDF download failed", error);
       setPdf({ status: "failed", result: { ok: false, code: "failed" } });
     }
-  }, [root, paper, locale, data, system.config.name, renderPdf]);
+  }, [root, paper, locale, data, system.config.name, system.config.id, renderPdf]);
 
   const current = loaded.status === "ready" ? loaded.print : null;
   const Document = current?.Document ?? null;

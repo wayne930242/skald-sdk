@@ -20,6 +20,21 @@ export function isFateRoll(rolls: number[], notation?: string): boolean {
   return rolls.length === 4 && /^\s*1d6\s*([+-]\s*\d+)?\s*$/i.test(notation);
 }
 
+/** Read an optional label from persisted dice data. */
+export function rollDisplayLabel(labels: unknown, locale: string): string | undefined {
+  if (!labels || typeof labels !== "object") return undefined;
+  const key = locale === "zh-TW" ? "zh-TW" : "en";
+  const localized: unknown = (labels as Record<string, unknown>)[key];
+  return typeof localized === "string" && localized.trim() ? localized.trim() : undefined;
+}
+
+export function checkDisplayTone(tone: unknown) {
+  switch (tone) {
+    case "critical": case "success": case "failure": case "fumble": return tone;
+    default: return undefined;
+  }
+}
+
 /** The three PbtA tiers a 2d6 + stat total falls into, best first (ids from the systems' dsl-roll-rules). */
 export const PBTA_TIERS = [
   { id: "strong", min: 10, max: null },

@@ -1,3 +1,5 @@
+import zh from "@skald/system-dnd5e/data/dnd5e-2024/messages/zh-TW.json";
+import tabs from "@skald/system-dnd5e/data/dnd5e-2024/messages/play-tabs/zh-TW.json";
 import { screen, waitFor, within } from "@testing-library/react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { loadDndHarness, mountDnd, openTab, type DndHarness } from "./dnd-harness";
@@ -59,6 +61,25 @@ describe("names in the viewer's locale (UAT M10)", () => {
     const row = document.querySelector('[data-play-spell="spell:fire-bolt"]') as HTMLElement;
     expect(row.querySelector('[data-play-casting-class="wizard"]')).toHaveTextContent("Wizard");
     expect(document.body.textContent).not.toMatch(/牧師|法師/);
+  });
+
+  it("renders a stored weapon attack in English without changing its saved text", async () => {
+    const weapon = { id: "w1", ref: "baseItem:scimitar", origin: "srd", name: zh.ref.baseItem.scimitar, damageDice: "1d6", damageType: tabs.damageType.S,
+      notes: [zh.ref.itemProperty.finesse, zh.ref.itemProperty.light].join(" · ") };
+    const sheet = await mountDnd(harness, { locale: "en", extra: { weapons: [weapon] } });
+    await openTab("Combat");
+    const row = document.querySelector("[data-play-weapon]");
+    expect(row).toHaveTextContent("Scimitar");
+    expect(row).toHaveTextContent("Slashing");
+    expect(row).toHaveTextContent("Finesse · Light");
+    expect(sheet.data().weapons).toMatchObject([weapon]);
+  });
+
+  it("renders the picked option in Features using its saved id, not the Chinese snapshot", async () => {
+    const feature = { id: "f1", ref: "subclassFeature:ranger/hunter/hunters-prey-l3", origin: "srd", name: "Prey", option: "Colossus Slayer", optionName: "巨獸殺手" };
+    await mountDnd(harness, { locale: "en", extra: { features: [feature] } });
+    await openTab("Features");
+    expect(await screen.findByText("Hunter's Prey: Colossus Slayer")).toBeInTheDocument();
   });
 
   it("a background's spell shows its source, not a class", async () => {

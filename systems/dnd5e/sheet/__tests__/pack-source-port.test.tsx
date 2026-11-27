@@ -5,6 +5,8 @@ import { describe, expect, it, vi } from "vitest";
 import type { LoadedSystem } from "@skald/types/system";
 import { bindHostPort, HostPortsProvider } from "@skald/sheet-sdk/modules/systems/ui/host-ports";
 import { SystemPluginProvider } from "@skald/sheet-sdk/modules/systems/ui/system-plugin-provider";
+import { TABLE_SETUP_SCHEMA, type TableSetupSheetPort } from "@skald/sheet-sdk/modules/systems";
+import { TableSetupSheetProvider } from "@skald/sheet-sdk/modules/systems/ui/table-setup-sheet";
 import { singlePackView } from "../../content-pack/domain/effective";
 import type { EffectivePacks, ValidatedPack } from "../../content-pack/domain/types";
 import { PLAY_VIEW_FIELDS } from "../play/play-model";
@@ -49,13 +51,27 @@ function fakeSource(cached: EffectivePacks | null = view) {
   return { source, update: (packs: EffectivePacks | null) => notify?.(packs) };
 }
 
-function wrapperWith(source: DndPackSource | null) {
+/** A table copy's setup port, as the host gives it (ADR 0016 §5), with these content sources. */
+function tablePort(sources: string[]): TableSetupSheetPort {
+  return {
+    tableId: "T",
+    setup: { config: { schema: TABLE_SETUP_SCHEMA, sources }, revision: 1 },
+    appliedRevision: null,
+    locksApply: true,
+    ApplyPrompt: () => null,
+  };
+}
+
+function wrapperWith(source: DndPackSource | null, table?: TableSetupSheetPort) {
   const ports = source ? [bindHostPort(dndPackSourcePort, source)] : [];
+  const setup = table ? { port: table, request: () => {} } : null;
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
       <NextIntlClientProvider locale="en" messages={{}} timeZone="UTC" onError={() => {}}>
         <SystemPluginProvider catalog={{ getClientSystemMessages: () => ({}) }}>
-          <HostPortsProvider ports={ports}>{children}</HostPortsProvider>
+          <TableSetupSheetProvider value={setup}>
+            <HostPortsProvider ports={ports}>{children}</HostPortsProvider>
+          </TableSetupSheetProvider>
         </SystemPluginProvider>
       </NextIntlClientProvider>
     );
@@ -121,5 +137,27 @@ describe("dndPackSourcePort: the sheet's content packs", () => {
     expect(reference.packText).toBeNull();
     expect(reference.packRefs.size).toBe(0);
     expect(withPackRowText(reference, tableRow)).toBe(tableRow);
+  });
+
+  it("reads a table copy's packs with the table's GM homebrew when its setup takes it, and checks them when a picker opens", async () => {
+    const { source } = fakeSource();
+    const { result } = renderHook(() => useDnd5eSheetAdapter({ system, inTable: true }), {
+      wrapper: wrapperWith(source, tablePort(["srd52", "gm-homebrew"])),
+    });
+    await waitFor(() => expect(source.readCached).toHaveBeenCalledWith({ tableId: "T" }));
+    expect(source.revalidate).not.toHaveBeenCalled();
+    act(() => result.current.handlers.openCompendium?.({}, () => {}));
+    await waitFor(() => expect(source.revalidate).toHaveBeenCalledWith(expect.any(Function), { tableId: "T" }));
+  });
+
+  it("keeps a table copy without the GM's homebrew source, and a vault sheet, on the device's packs alone", async () => {
+    const atTable = fakeSource();
+    renderHook(() => useDnd5eSheetAdapter({ system, inTable: true }), { wrapper: wrapperWith(atTable.source, tablePort(["srd52", "device-packs"])) });
+    await waitFor(() => expect(atTable.source.readCached).toHaveBeenCalled());
+    expect(atTable.source.readCached).toHaveBeenCalledWith();
+    const vault = fakeSource();
+    renderHook(() => useDnd5eSheetAdapter({ system }), { wrapper: wrapperWith(vault.source) });
+    await waitFor(() => expect(vault.source.readCached).toHaveBeenCalled());
+    expect(vault.source.readCached).toHaveBeenCalledWith();
   });
 });

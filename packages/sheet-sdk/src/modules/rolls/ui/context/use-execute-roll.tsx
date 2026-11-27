@@ -15,6 +15,8 @@ import type { DiceBoxResult } from "@skald/sheet-sdk/modules/rolls/domain/dice-b
 import type { DiceVisibility, SuccessLevel } from "@skald/dice";
 import type { useSystemOptional } from "@skald/sheet-sdk/components/providers/system-provider";
 import {
+  gradePool,
+  poolRowFields,
   judgePercentileCheck,
   findPostRollActions,
   resolveRollRuleId,
@@ -162,7 +164,7 @@ export function useExecuteRoll({
       const resolvedExpression = result.resolvedDiceExpr ?? expression;
       const notation = extractDiceNotation(resolvedExpression);
       const graded = gradesFromTotal(rollRules, resolvedExpression, notation);
-      const totalOnlyGrade = graded?.allSurfaces && result.targetValue === undefined;
+      const totalOnlyGrade = !result.pool && graded?.allSurfaces && result.targetValue === undefined;
       const optedInComparison = result.targetValue !== undefined && usesOptedInTotalGrades(rollRules, resolvedExpression);
       const gradeTotal = () => evaluateWithDSLRules(result.rolled, 0, resolvedExpression, rollRules)?.id;
       if (totalOnlyGrade) result.successLevel = gradeTotal();
@@ -184,8 +186,14 @@ export function useExecuteRoll({
         // Override result with actual 3D dice values
         if (diceBoxResults && diceBoxResults.length > 0) {
           const normalized = normalizeDiceBoxRoll(diceBoxResults);
-          result.rolled = normalized.total;
-          result.rolls = normalized.rolls;
+          if (result.pool) {
+            const actual = gradePool(result.pool, normalized.rolls);
+            if (!actual) throw new Error("Physical dice do not match the requested pool");
+            Object.assign(result, actual);
+          } else {
+            result.rolled = normalized.total;
+            result.rolls = normalized.rolls;
+          }
           // The pre-computed tens/units dice belong to the discarded virtual roll and
           // would contradict the 3D total (chat card and roll desk both print them).
           // Bonus/penalty rolls never take this path, so there is one die of each.
@@ -227,14 +235,7 @@ export function useExecuteRoll({
             }
           }
         }
-      } else if (onDiceRoll) {
-        // Legacy: use onDiceRoll callback if provided (no 3D dice, just callback)
-        await onDiceRoll(notation, {
-          skillName: fieldLabel,
-          targetValue: result.targetValue,
-          successLevel: extractSuccessLevelId(result.successLevel),
-        });
-      } else {
+      } else if (!onDiceRoll) {
         // No 3D dice available - enhance result with DSL success level if needed
         if (rollRules && result.targetValue !== undefined && !optedInComparison) {
           const dslLevel = evaluateWithDSLRules(
@@ -248,6 +249,21 @@ export function useExecuteRoll({
             result.successLevel = dslLevel.id as SuccessLevel;
           }
         }
+      }
+
+      let checkDisplay: SkillCheckRoll["checkDisplay"];
+      if (options?.gradeCheck) {
+        if (result.targetValue === undefined) throw new Error("A custom check requires a target");
+        const { checkDisplay: display, ...grade } = options.gradeCheck(result.rolled, result.targetValue);
+        checkDisplay = display;
+        Object.assign(result, grade);
+      }
+      if (onDiceRoll && !(isRollerReady && !hasCocBonusDice && !options?.fixedDice)) {
+        await onDiceRoll(notation, {
+          skillName: fieldLabel,
+          targetValue: result.targetValue,
+          successLevel: extractSuccessLevelId(result.successLevel),
+        });
       }
 
       // Send result to appropriate destination
@@ -291,16 +307,21 @@ export function useExecuteRoll({
             selectedTens: result.selectedTens ?? tensOfRoll(result.rolled),
             ...skillCheckFaces(result),
             ...(options?.rollKey && { rollKey: options.rollKey }),
+            ...(checkDisplay && { checkDisplay }),
+            ...(options?.gradeCheck && options.followUpOf && {
+              followsRollId: options.followUpOf,
+              ...(options.followUpLabel && { followUpLabel: options.followUpLabel }),
+            }),
             ...(options?.pushOf && { pushed: true as const, followsRollId: options.pushOf }),
           };
         } else {
           // Simple roll
           // Opted-in expressions retain their keep/drop notation and actual modifier in chat.
-          const chatNotation = totalOnlyGrade ? notation : simpleRollNotation(
+          const chatNotation = result.pool || totalOnlyGrade ? notation : simpleRollNotation(
             resolvedExpression, result.rolls, result.rolled,
           );
           const comparison = comparisonExtras(result);
-          const gradedLevel = totalOnlyGrade
+          const gradedLevel = result.pool ? undefined : totalOnlyGrade
             ? extractSuccessLevelId(result.successLevel)
             : gradesFromTotal(rollRules, resolvedExpression, chatNotation) && !graded?.allSurfaces
               ? gradeTotal()
@@ -315,6 +336,7 @@ export function useExecuteRoll({
             ...(fieldLabel ? { label: fieldLabel } : {}),
             ...comparison,
             ...(gradedLevel ? { successLevel: gradedLevel as SuccessLevel } : {}),
+            ...poolRowFields(result),
           };
         }
 
@@ -333,9 +355,9 @@ export function useExecuteRoll({
           const dispatchResult = await diceDispatchManager.dispatch(rollPayload);
           if (dispatchResult.success) {
             sentToChat = true;
-          } else if (isPush && isFollowUpAlreadyPosted(dispatchResult)) {
-            // 同一個目標在別處推過了：再送一次一樣會被擋，擲骰台也不記這一擲
-            toast.error(t("pushAlreadyDone"));
+          } else if (rollPayload.type === "skill_check" && rollPayload.followsRollId && isFollowUpAlreadyPosted(dispatchResult)) {
+            // The child already exists. Do not fall back to a second send or record it on the desk.
+            if (isPush) toast.error(t("pushAlreadyDone"));
             return { result: null, writes: [], followUpAlreadyPosted: true };
           } else {
             console.error("[Roll] Failed to dispatch dice roll:", dispatchResult.error);
@@ -365,6 +387,7 @@ export function useExecuteRoll({
           t("check"),
           visibility,
           totalOnlyGrade ? extractSuccessLevelId(result.successLevel) : undefined,
+          checkDisplay,
         );
 
         toast(title, {
@@ -373,7 +396,7 @@ export function useExecuteRoll({
       }
 
       // 擲後動作：成長勾只在擲骰當下判定一次（之後花幸運把失敗轉成成功不會補勾）
-      const ruleId = resolveRollRuleId(result.resolvedDiceExpr ?? expression, rollRules);
+      const ruleId = resolveRollRuleId(result.pool ? result.expression : result.resolvedDiceExpr ?? expression, rollRules);
       const successLevelId = extractSuccessLevelId(result.successLevel);
       let improve: RollImproveState | undefined;
       const improveDecision = options?.improveTarget
@@ -404,6 +427,7 @@ export function useExecuteRoll({
         timestamp: Date.now(),
         label: fieldLabel ?? t("check"),
         result,
+        checkDisplay,
         visibility,
         sentToChat,
         messageId,

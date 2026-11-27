@@ -2,6 +2,98 @@
   "dndSources": {
     "label": "建卡內容來源",
     "srd": "僅限 SRD",
-    "device": "SRD 與玩家自己的擴充包"
+    "device": "SRD 與玩家自己的擴充包",
+    "gm": "SRD 與 GM 的自製內容",
+    "deviceGm": "SRD、玩家自己的擴充包與 GM 的自製內容",
+    "gmHomebrew": "GM 的自製內容",
+    "options": {
+      "srd": "SRD（一律開啟）",
+      "device": "玩家自己的擴充包",
+      "gm": "GM 的自製內容"
+    },
+    "gmHint": "儲存時，下面勾選的條目會複製一份到這張桌，桌上每個人都看得到。"
+  },
+  "dndShare": {
+    "heading": "帶進這張桌的自製內容",
+    "loading": "正在讀取自製內容…",
+    "loadFailed": "讀不到這張桌的自製內容。",
+    "retry": "重試",
+    "guest": "訪客帳號不能把自製內容帶進遊戲桌。註冊帳號後就能分享你的條目。",
+    "empty": "你還沒有 D&D 自製內容。先到「我的自製內容」建立條目，再回來勾選。",
+    "yours": "你的條目",
+    "kinds": {
+      "spell": "法術",
+      "class": "職業",
+      "subclass": "子職",
+      "species": "種族",
+      "lineage": "血統",
+      "background": "背景",
+      "feat": "專長",
+      "optionalFeature": "選項",
+      "item": "魔法物品",
+      "baseItem": "物品",
+      "other": "其他"
+    },
+    "added": "會一起分享",
+    "addedReason": {
+      "classFeature": "{name} 的職業特性",
+      "subclassFeature": "{name} 的子職特性",
+      "parentClass": "{name} 所屬的職業",
+      "originFeat": "{name} 的起源專長"
+    },
+    "status": {
+      "onTable": "已在桌上",
+      "newer": "有新版本",
+      "deleted": "來源已刪除",
+      "willUpdate": "儲存後更新",
+      "willRemove": "儲存後拿掉"
+    },
+    "refresh": "更新到桌上",
+    "refreshUndo": "保留桌上的版本",
+    "refreshHint": "桌上保留複製當時的版本。按「更新到桌上」並儲存後，才會換成新版本。",
+    "dirtyHint": "儲存時，每個勾選的條目都會依目前的版本重新複製一份。",
+    "deletedHeading": "已從你的自製內容刪除",
+    "deletedHint": "這些條目會留在桌上，直到你拿掉。只要儲存對你條目的任何變更，它們也會一起拿掉。",
+    "remove": "從桌上拿掉",
+    "keep": "保留",
+    "links": "「{from}」提到你的自製內容「{to}」，但它沒有一起分享，玩家只會看到名稱、看不到內容。",
+    "usage": {
+      "label": "這張桌的用量（所有人的自製內容合計）",
+      "items": "{count} / {max} 條",
+      "bytes": "{used} / {max} KB"
+    },
+    "others": "其他人帶進來的",
+    "sharer": "{name} 的條目",
+    "unnamed": "未具名的成員",
+    "owner": "桌主",
+    "count": "{count} 條",
+    "removeOther": {
+      "title": "要從這張桌拿掉 {name} 帶進來的內容嗎？",
+      "description": "新角色將不能再選這些條目；已經加到角色卡上的文字會留著。",
+      "confirm": "拿掉",
+      "cancel": "取消"
+    },
+    "untick": {
+      "title": "不再使用 GM 的自製內容？",
+      "owner": "儲存後，所有人帶進來的自製內容都會從這張桌拿掉；已經加到角色卡上的文字會留著。",
+      "assistant": "儲存後，你帶進來的自製內容會從這張桌拿掉；其他人的會留著，但這張桌不再顯示。",
+      "confirm": "取消勾選",
+      "cancel": "返回"
+    },
+    "removed": "已從桌上拿掉。",
+    "errors": {
+      "signIn": "請重新登入，再把自製內容帶進遊戲桌。",
+      "guest": "訪客帳號不能把自製內容帶進遊戲桌。",
+      "forbidden": "只有桌主與 GM 助手能帶自製內容進桌，也只有桌主能拿掉別人帶進來的內容。",
+      "setupMissing": "請先儲存開團設定。",
+      "notFound": "這張遊戲桌已經不存在。",
+      "conflict": "你帶進這張桌的內容剛在別處改過，已重新載入；你的勾選都還在，再儲存一次就會以它為準。",
+      "invalid": "有條目無法分享（可能剛被刪除）。請重新整理頁面再試一次。",
+      "invalidEntry": "「{name}」無法分享（可能剛被刪除、搬到別的系統，或和另一條相同的條目衝突）。請重新整理頁面再試一次。",
+      "duplicate": "「{first}」和「{second}」是同一個條目（種類與識別碼相同，來自不同的包）。一張桌只能放其中一個：請取消勾選一個，再儲存一次。",
+      "limitItems": "一張桌最多 300 條（所有人合計）。請先取消勾選一些，再儲存一次。",
+      "limitBytes": "一張桌的文字最多 1 MiB（所有人合計）。請先取消勾選一些，再儲存一次。",
+      "network": "現在無法連線。你的勾選都還在，請稍後再儲存一次。"
+    }
   }
 }

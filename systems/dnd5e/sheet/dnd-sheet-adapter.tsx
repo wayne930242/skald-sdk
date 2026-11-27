@@ -7,10 +7,14 @@ import type { EditorHandlers } from "@skald/sheet-sdk/modules/sheet-schema";
 import type { SheetAdapterInput, SheetAdapterOutput } from "@skald/sheet-sdk/modules/systems/ui/system-plugin-ui";
 import type { CharacterUpdater } from "./compendium-dialog";
 import type { CompendiumDialogTab, CompendiumStart } from "./compendium-rows";
+import { isMulticlass } from "./play/casting-classes";
+import { sheetNamesFrom } from "./play/sheet-names";
+import { spellLibrary } from "./play/spell-library";
 import { presentRefs } from "./compendium-present";
 import type { CharacterReferenceRow, ReferenceRequest } from "./reference-dialog";
 import type { LevelUpRequest } from "./play/play-context";
 import { useDevicePacks } from "./use-device-packs";
+import { useTablePackScope } from "./pack-scope";
 import { useReferenceContext } from "./use-reference-context";
 import { DndPlayView } from "./play/play-view";
 import { PLAY_VIEW_FIELDS } from "./play/play-model";
@@ -73,10 +77,13 @@ export function supportsPlayView(system: LoadedSystem): boolean {
  * D&D sheet adapter: the reference and compendium handlers and their dialogs. Rows call
  * `openReference` through their name field's action (it receives the row, and the character as
  * the handler context); the toolbar calls `openReferenceBrowser` and `openCompendium` with the
- * character. Every request carries the character's level.
+ * character. Every request carries the character's level. A table copy whose setup takes the GM's
+ * homebrew reads the table's shared copies with its packs (`useTablePackScope`); a vault sheet
+ * reads the device's packs alone.
  */
 export function useDnd5eSheetAdapter({ system, initialData, inTable = false }: SheetAdapterInput): SheetAdapterOutput {
-  const { packs, revalidate } = useDevicePacks();
+  const scope = useTablePackScope();
+  const { packs, revalidate } = useDevicePacks(scope);
   const [reference, setReference] = useState<ReferenceRequest | null>(null);
   const [compendium, setCompendium] = useState<{ update: CharacterUpdater; level?: number; start: CompendiumStart } | null>(null);
   const [levelUp, setLevelUp] = useState<LevelUpRequest | null>(null);
@@ -89,6 +96,16 @@ export function useDnd5eSheetAdapter({ system, initialData, inTable = false }: S
   if (!dialogOpened && (reference !== null || compendium !== null || levelUp !== null)) setDialogOpened(true);
   const context = useReferenceContext(system, packs, { english: dialogOpened, reference: dialogOpened });
 
+  const libraryStart = useCallback((character: Record<string, unknown> = {}, start: CompendiumStart = { tab: lastTab.current }): CompendiumStart => {
+    const base = { ...start, present: presentRefs(character) };
+    // Every entry point can switch to Spells. Keep the caller's filters and the level-up target intact.
+    if (start.spellClasses || start.castingClassOf || !isMulticlass(character)) return base;
+    const { spellClasses } = spellLibrary(system, character, context, {
+      names: sheetNamesFrom(context.names), subclassMeta: (id) => context.packMetaOf?.(`subclass:${id}`),
+    });
+    return { ...base, spellClasses };
+  }, [context, system]);
+
   const handlers = useMemo<EditorHandlers>(
     () => ({
       openReference: (row, _setData, handlerContext) =>
@@ -99,10 +116,10 @@ export function useDnd5eSheetAdapter({ system, initialData, inTable = false }: S
       },
       openCompendium: (data, setData) => {
         revalidate();
-        setCompendium({ update: (updater) => setData(updater), ...levelOf(data), start: { tab: lastTab.current, present: presentRefs(data) } });
+        setCompendium({ update: (updater) => setData(updater), ...levelOf(data), start: libraryStart(data) });
       },
     }),
-    [revalidate],
+    [revalidate, libraryStart],
   );
 
   const closeReference = useCallback(() => setReference(null), []);
@@ -121,9 +138,9 @@ export function useDnd5eSheetAdapter({ system, initialData, inTable = false }: S
     (update: CharacterUpdater, character?: Record<string, unknown>, start?: CompendiumStart) => {
       revalidate();
       if (start) lastTab.current = start.tab;
-      setCompendium({ update, ...levelOf(character), start: { ...(start ?? { tab: lastTab.current }), present: presentRefs(character) } });
+      setCompendium({ update, ...levelOf(character), start: libraryStart(character, start) });
     },
-    [revalidate],
+    [revalidate, libraryStart],
   );
   const openLevelUp = useCallback(
     (request: LevelUpRequest) => {

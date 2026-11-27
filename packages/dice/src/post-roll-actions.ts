@@ -280,7 +280,7 @@ export function resolveRollRuleId(
   rollRules: RollRulesDefinition | undefined,
 ): string | undefined {
   if (!rollRules) return undefined;
-  return expression.match(/^([a-z0-9]+):/i)?.[1] ?? rollRules.default;
+  return expression.match(/^pool:([\w-]+):/i)?.[1] ?? expression.match(/^([a-z0-9]+):/i)?.[1] ?? rollRules.default;
 }
 
 /** The post-roll actions a rule declares; none when the rule or the rules are missing */

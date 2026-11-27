@@ -129,11 +129,11 @@ describe("the adapter's compendium start", () => {
     }));
     vi.doMock("../use-reference-context", () => ({ useReferenceContext: () => ({}) }));
     const { useDnd5eSheetAdapter } = await import("../dnd-sheet-adapter");
-    const host: { open?: () => void } = {};
+    const host: { open?: (character?: Record<string, unknown>) => void } = {};
     function Host() {
       const output = useDnd5eSheetAdapter({ system: { ...system, runtime: {} } as LoadedSystem });
       useEffect(() => {
-        host.open = () => void output.handlers.openCompendium({}, () => {});
+        host.open = (character = {}) => void output.handlers.openCompendium(character, () => {});
       });
       return <>{output.dialogs}</>;
     }
@@ -150,6 +150,11 @@ describe("the adapter's compendium start", () => {
     fireEvent.click(screen.getByRole("button", { name: "close" }));
     await act(async () => host.open!());
     await waitFor(() => expect(seen.start).toEqual({ tab: "monsters", present: { spells: [], features: [] } }));
+    fireEvent.click(screen.getByRole("button", { name: "close" }));
+    await act(async () => host.open!({ classId: "ranger", spellAbility: "wis", multiclass: [{ classId: "cleric", spellAbility: "wis", level: 1 }] }));
+    await waitFor(() => expect(seen.start).toMatchObject({ tab: "monsters", spellClasses: [
+      { list: "ranger", castingClass: "" }, { list: "cleric", castingClass: "cleric" },
+    ] }));
     vi.doUnmock("../compendium-dialog");
     vi.doUnmock("../use-reference-context");
   });

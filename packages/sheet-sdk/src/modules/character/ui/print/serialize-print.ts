@@ -10,6 +10,8 @@ export interface SerializeOptions {
   paper: PrintPaper;
   locale: string;
   title: string;
+  /** The slug of the sheet's System (optional for SDK callers; Skald's host always passes it). */
+  system?: string;
   /** Printed on every PDF page when an image had to be left out. */
   droppedImagesNote: string;
 }
@@ -118,6 +120,7 @@ export function serializePrint(root: HTMLElement, options: SerializeOptions): Se
       paper: options.paper,
       locale: options.locale,
       title: options.title.slice(0, 200),
+      system: options.system,
       buildId: process.env.NEXT_PUBLIC_SKALD_BUILD_ID ?? "",
       htmlClass: document.documentElement.className,
       bodyClass: document.body.className,

@@ -136,6 +136,9 @@ export interface DiceRollBase {
 
 /** Simple dice roll for network context (e.g., 1d6, 2d10) */
 export interface SimpleDiceRoll extends DiceRollBase {
+  pool?: import("./pool-highest").PoolOutcome;
+  /** Reader-only marker: the stored row claimed a pool but its inputs and faces disagree. */
+  invalidPool?: true;
   type: "simple";
   notation: string; // e.g., "1d100", "2d6+3"
   rolls: number[];
@@ -155,6 +158,16 @@ export interface SimpleDiceRoll extends DiceRollBase {
 }
 
 /** CoC 7e skill/attribute check for network context */
+export interface RollDisplayLabels {
+  en: string;
+  "zh-TW": string;
+}
+
+export interface CheckDisplay {
+  labels: RollDisplayLabels;
+  tone: "critical" | "success" | "failure" | "fumble";
+}
+
 export interface SkillCheckRoll extends DiceRollBase {
   type: "skill_check";
   skillName: string;
@@ -194,6 +207,10 @@ export interface SkillCheckRoll extends DiceRollBase {
   previousSuccessLevel?: SuccessLevel;
   /** `DiceRoll.id` of the roll this message follows (a push or a Luck spend) */
   followsRollId?: string;
+  /** Portable labels and tone for a check graded by a system plugin. */
+  checkDisplay?: CheckDisplay;
+  /** A linked result-only follow-up's action, in the viewer's locale. */
+  followUpLabel?: RollDisplayLabels;
 }
 
 /** Opposed roll result for network context */

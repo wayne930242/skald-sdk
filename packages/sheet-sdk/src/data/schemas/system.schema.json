@@ -50,7 +50,7 @@
     "sheetComponent": {
       "type": "string",
       "description": "Character sheet component to use. If not specified, uses generic renderer.",
-      "enum": ["coc7e", "avatar-legends", "dnd5e", "fate", "generic"]
+      "enum": ["coc7e", "avatar-legends", "dnd5e", "fate", "eclipse-phase-2e", "generic"]
     },
     "mappings": {
       "type": "object",
@@ -68,6 +68,11 @@
     "wizard": {
       "type": "string",
       "description": "Path to the Character Creation Wizard (skald/wizard/v1) the built-in template publishes; omit for none"
+    },
+    "pregens": {
+      "type": "string",
+      "const": "./pregens/index.json",
+      "description": "Sample characters (skald/pregens/v1) players may copy at the start of creation; omit for none"
     },
     "i18n": {
       "type": "object",

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { printName, type PrintNaming } from "../../../print/print-reference";
 import { OPTION_ROW_MESSAGE } from "../../level-up/option-row";
 import type { ReferenceContextValue } from "../../use-reference-context";
+import { loadSnapshotLabels } from "../snapshot-labels";
 import { catalogName, displayName } from "../row-text";
 
 /** A named choice's pick on a built-in feature row (UAT F005): "Feature: Option" in the viewer's locale. */
@@ -26,6 +27,15 @@ describe("a feature row with a picked option", () => {
     // Only the stable id: it names the option.
     expect(displayName(context, { ...row, option: "Slayer" })).toBe("虛構特性：Slayer");
     expect(printName(naming, { ...row, option: "Slayer" })).toBe("虛構特性：Slayer");
+  });
+
+  it("names a built-in choice by its stable id in English after a Chinese level-up", async () => {
+    const labels = await loadSnapshotLabels("en");
+    const id = "ranger/hunter/hunters-prey-l3";
+    const en = { ...naming, locale: "en", names: { subclassFeature: { [id]: "Hunter's Prey" } }, nameOf: () => "Hunter's Prey", token: () => "{feature}: {option}" };
+    const picked = { ref: `subclassFeature:${id}`, option: "Colossus Slayer", optionName: "巨獸殺手" };
+    expect(displayName(en as unknown as ReferenceContextValue, picked, labels)).toBe("Hunter's Prey: Colossus Slayer");
+    expect(printName(en, picked, labels)).toBe("Hunter's Prey: Colossus Slayer");
   });
 
   it("a row without a pick keeps the catalog name; a pack row its own name", () => {

@@ -1,5 +1,6 @@
 "use client";
 
+import { loadSnapshotLabels } from "../sheet/play/snapshot-labels";
 import { Suspense, use, useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useLocale } from "next-intl";
 import { ClientSystemIntlProvider } from "@skald/sheet-sdk/components/providers/client-system-intl-provider";
@@ -17,6 +18,7 @@ import { MeasureLayer, PrintedPages, continuesOnPage2 } from "./layout-views";
 import { carryLine } from "./page-2";
 import { usePrintLabels } from "./print-labels";
 import { printCasting, printName, usePrintPacks, usePrintReference, type PrintReference } from "./print-reference";
+import { useTablePackScope } from "../sheet/pack-scope";
 import { buildDndPrintModel, type DndPrintModel, type Row } from "./print-model";
 import { loadCantripFacts, loadPrintTexts, type CantripFacts, type PrintText } from "./print-text";
 import { loadPrintMessages } from "./print-messages";
@@ -61,6 +63,7 @@ interface Loaded {
 /** The rules text of every printed row and the damage cantrips' save and type, for one model and locale. */
 function useTexts(model: DndPrintModel, reference: PrintReference): Loaded | null {
   const packSource = useHostPort(dndPackSourcePort);
+  const tableId = useTablePackScope()?.tableId;
   const entries = useMemo(
     () => [
       ...[...model.lists.features, ...model.lists.speciesTraits, ...model.lists.feats, ...model.itemRows, ...model.attackTexts].map(({ line, row }) => ({ key: line.key, row })),
@@ -72,14 +75,15 @@ function useTexts(model: DndPrintModel, reference: PrintReference): Loaded | nul
   const [loaded, setLoaded] = useState<{ entries: typeof entries; refs: string[]; locale: string; value: Loaded } | null>(null);
   useEffect(() => {
     let live = true;
-    const deps = { locale: reference.locale, srd: reference.srd, pack: devicePackLoader(packSource), options: reference.options };
+    const pack = devicePackLoader(packSource, tableId === undefined ? undefined : { tableId });
+    const deps = { locale: reference.locale, srd: reference.srd, pack, options: reference.options };
     void Promise.all([loadPrintTexts(entries, deps), loadCantripFacts(cantripRefs, deps)]).then(([texts, cantrips]) => {
       if (live) setLoaded({ entries, refs: cantripRefs, locale: reference.locale, value: { texts, cantrips } });
     });
     return () => {
       live = false;
     };
-  }, [entries, cantripRefs, reference, packSource]);
+  }, [entries, cantripRefs, reference, packSource, tableId]);
   return loaded && loaded.entries === entries && loaded.refs === cantripRefs && loaded.locale === reference.locale ? loaded.value : null;
 }
 
@@ -105,6 +109,7 @@ function DndPrintPages({ data, formulaRuntime, paper, blanks, onReadyChange }: P
   const locale = useLocale();
   const gameData = system.gameData as Record<string, unknown> | undefined;
   const reference = usePrintReference(gameData);
+  const snapshotLabels = use(loadSnapshotLabels(locale));
   const { catalog, settled: catalogSettled } = useCatalog();
   const { packs, settled: packsSettled } = usePrintPacks();
   const casting = useMemo(() => printCasting(reference.naming, packs, locale), [reference, packs, locale]);
@@ -119,13 +124,14 @@ function DndPrintPages({ data, formulaRuntime, paper, blanks, onReadyChange }: P
     return buildDndPrintModel({
       values,
       blanks,
-      nameOf: (row) => printName(reference.naming, row),
+      snapshotLabels,
+      nameOf: (row) => printName(reference.naming, row, snapshotLabels),
       compare: (a, b) => collator.compare(a, b),
       gameData,
       catalog,
       casting,
     });
-  }, [blanks, casting, catalog, gameData, locale, reference, values]);
+  }, [blanks, casting, catalog, gameData, locale, reference, snapshotLabels, values]);
   const loaded = useTexts(model, reference);
 
   const lineOf: SpellLineOf = useCallback(

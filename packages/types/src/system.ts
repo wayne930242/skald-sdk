@@ -97,6 +97,8 @@ export interface SystemConfig {
   gameData?: Record<string, string>;
   /** 角色建立精靈（skald/wizard/v1）檔案路徑，內建模板發布時一併帶入 */
   wizard?: string;
+  /** Sample characters (skald/pregens/v1): the index path, `./pregens/index.json`; omit for none */
+  pregens?: string;
   /** 國際化檔案路徑 */
   i18n?: Record<string, string>;
 }

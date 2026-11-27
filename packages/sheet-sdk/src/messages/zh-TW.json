@@ -646,7 +646,8 @@
         "chatUnread": "{count} 則未讀訊息",
         "chatUnreadMany": "超過 99 則未讀訊息",
         "rules": "速查",
-        "scenario": "劇本"
+        "scenario": "劇本",
+        "clocks": "時鐘"
       },
       "chatDrawer": {
         "label": "聊天欄",

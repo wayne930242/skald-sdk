@@ -21,6 +21,12 @@ export interface BuiltinLocalSystemData {
    * unchanged.
    */
   wizard?: unknown;
+  /**
+   * The built-in template's own macros (`skald/template-macros/v1`), such as the dice of a System's
+   * own creation method. Omitted when there are none, which keeps the template source and its hash
+   * unchanged.
+   */
+  macros?: unknown;
   /** Optional second built-in template, with its own template macro source. */
   organization?: Pick<BuiltinLocalSystemData, "schema" | "template" | "defaultData" | "wizard"> & {
     macros?: unknown;

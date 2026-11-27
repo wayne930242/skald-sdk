@@ -50,7 +50,11 @@ export function buildBuiltinTemplateSource(
   systemId: string,
   data: BuiltinLocalSystemData,
 ): TemplateDraftSource {
-  return buildSource(data, isCoc7eFamilySlug(systemId) ? { cthulhuMythos: "number" } : {});
+  return {
+    ...buildSource(data, isCoc7eFamilySlug(systemId) ? { cthulhuMythos: "number" } : {}),
+    // Absent unless the System's built-in template has macros of its own, so other sources keep their hash.
+    ...(data.macros === undefined ? {} : { macros: data.macros as Json }),
+  };
 }
 
 export function buildBuiltinOrganizationSource(

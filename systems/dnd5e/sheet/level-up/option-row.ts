@@ -6,6 +6,8 @@
  * the print imports it without row-text.
  */
 
+import type { SnapshotLabels } from "../play/snapshot-labels";
+
 export const OPTION_FIELDS = { id: "option", name: "optionName" } as const;
 
 /** The message token of the "{feature}: {option}" pattern (root catalog, read with `token`). */
@@ -24,8 +26,9 @@ export function optionFields(id: string, name: string): Record<string, string> {
 }
 
 /** `feature` with the row's picked option ("Feature: Option" in the viewer's catalog), else `feature`. */
-export function withRowOption(token: (value: unknown) => string, feature: string, row: Record<string, unknown>): string {
-  const option = rowOption(row);
+export function withRowOption(token: (value: unknown) => string, feature: string, row: Record<string, unknown>, labels?: SnapshotLabels): string {
+  const known = labels?.target.options[str(row.ref)]?.[str(row[OPTION_FIELDS.id])];
+  const option = typeof known === "string" ? known : rowOption(row);
   if (!option) return feature;
   const pattern = token(OPTION_ROW_MESSAGE);
   return pattern.includes("{feature}") && pattern.includes("{option}")

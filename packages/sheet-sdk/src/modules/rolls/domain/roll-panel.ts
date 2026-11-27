@@ -2,7 +2,7 @@
 //
 // 擲骰台與擲骰選項視窗用的純函式：獎懲骰選項、門檻、結果卡資料。
 // 沒有 React、沒有 store，所以可以直接測。
-import type { DeclaredDifficulty, DiceVisibility, RollExpressionResult } from "@skald/dice";
+import type { CheckDisplay, DeclaredDifficulty, DiceVisibility, RollExpressionResult } from "@skald/dice";
 import type { RollConfig } from "@skald/dice/roll-expression";
 
 /** 擲骰對象：只有「所有人」與「暗骰」（GM 與擲骰者）。RLS 讓桌主看得到所有訊息，所以沒有「僅自己」 */
@@ -66,6 +66,7 @@ export type RollImproveState =
 
 /** 擲骰台上的一筆結果 */
 export interface RollPanelEntry {
+  pool?: RollExpressionResult["pool"];
   id: string;
   timestamp: number;
   label: string;
@@ -74,6 +75,11 @@ export interface RollPanelEntry {
   targetValue?: number;
   thresholds?: RollThresholds;
   successLevel?: string;
+  /**
+   * The System's own label and tone for `successLevel` (a plugin's `gradeCheck`), for a level
+   * the shared `dice.successLevel` messages do not name (Eclipse Phase's superior success).
+   */
+  checkDisplay?: CheckDisplay;
   /**
    * 擲之前宣告的難度（只有困難、極難才有）；判定的目標是 `difficultyTarget(targetValue, difficulty)`，
    * `targetValue` 仍是完整的技能值
@@ -124,6 +130,7 @@ export interface BuildRollPanelEntryInput {
   timestamp: number;
   label: string;
   result: RollExpressionResult;
+  checkDisplay?: CheckDisplay;
   visibility: DiceVisibility;
   sentToChat: boolean;
   messageId?: string;
@@ -141,6 +148,7 @@ export function buildRollPanelEntry({
   timestamp,
   label,
   result,
+  checkDisplay,
   visibility,
   sentToChat,
   messageId,
@@ -164,11 +172,13 @@ export function buildRollPanelEntry({
     timestamp,
     label,
     total: result.rolled,
+    ...(result.pool && { pool: result.pool }),
     targetValue: result.targetValue,
     // 十位／個位的百分骰才有「一般／困難／極限」三個門檻
     thresholds:
       hasTarget && isPercentile ? thresholdsFor(result.targetValue as number) : undefined,
     successLevel,
+    ...(checkDisplay && { checkDisplay }),
     ...(result.difficulty && { difficulty: result.difficulty }),
     bonusDice: result.bonusDice || undefined,
     tensDice: result.tensDice,

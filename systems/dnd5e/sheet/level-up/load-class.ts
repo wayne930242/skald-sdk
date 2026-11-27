@@ -109,9 +109,10 @@ export async function loadClass(input: LoadClassInput): Promise<LoadedClass | nu
  */
 async function localizeTexts(input: LoadClassInput, info: ClassInfo): Promise<void> {
   if (input.locale === "en") return;
-  const blocksOf = async (ref: string) => {
+  const blocksOf = async (ref: string, preferSrd = false) => {
     const resolved = await input.sources.resolve(ref, input.locale).catch(() => null);
-    return resolved ? resolved.blocks.map((entry) => entry.block) : null;
+    const blocks = (preferSrd && resolved?.srdBlocks) || resolved?.blocks;
+    return blocks?.map((entry) => entry.block) ?? null;
   };
   const features = [...info.features, ...info.subclasses.flatMap((subclass) => subclass.features)];
   await Promise.all([
@@ -119,7 +120,8 @@ async function localizeTexts(input: LoadClassInput, info: ClassInfo): Promise<vo
       const choice = feature.choice;
       const named = choice?.kind === "named" ? choice : choice?.kind === "feat" ? choice.alternatives : undefined;
       if (!choice || choice.kind === "feature" || !named) return;
-      const blocks = await blocksOf(feature.ref);
+      // Fighting Style alternatives come from the SRD's named options. A book overlay may use feat refs instead.
+      const blocks = await blocksOf(feature.ref, choice.kind === "feat");
       const names = blocks ? namedOptionsIn(blocks, named) : null;
       if (!names) return;
       feature.choice = choice.kind === "feat" ? { ...choice, alternatives: { ...named, options: names } } : { ...choice, options: names };

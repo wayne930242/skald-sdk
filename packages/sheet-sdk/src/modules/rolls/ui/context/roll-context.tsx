@@ -19,7 +19,7 @@ import type {
   ExecuteRollOptions,
   RollContextValue,
   RollFollowUpRequest,
-  RollFollowUpRolled,
+  RollFollowUpOutcome,
   RollResultListener,
 } from "../../domain/roll-context-types";
 
@@ -220,7 +220,7 @@ export function RollProvider({
   );
 
   const rollFollowUp = React.useCallback(
-    async (entryId: string, request: RollFollowUpRequest): Promise<RollFollowUpRolled | null> => {
+    async (entryId: string, request: RollFollowUpRequest): Promise<RollFollowUpOutcome | null> => {
       const root = useRollPanelStore.getState().results.find((item) => item.id === entryId);
       if (!root) return null;
       const outcome = await executeRollInternal(
@@ -233,9 +233,12 @@ export function RollProvider({
           visibility: root.visibility,
           followUpOf: root.id,
           fixedDice: request.fixedDice,
+          gradeCheck: request.gradeCheck,
+          followUpLabel: request.followUpLabel,
           ...(request.deliver && { deliver: request.deliver }),
         },
       );
+      if (outcome?.followUpAlreadyPosted) return { followUpAlreadyPosted: true };
       const entry = outcome?.entry;
       if (!outcome?.result || !entry) return null;
       const faces = entry.tensDice?.length

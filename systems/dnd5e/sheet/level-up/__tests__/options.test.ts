@@ -1,7 +1,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import type { LoadedSystem } from "@skald/types/system";
 import { loadDnd5e2024Data } from "../../../data-access/builtin-local-data";
+import { zhWithheld } from "../../../__tests__/zh-withheld";
+import { createBuiltinSource } from "../../../reference/sources";
 import { buildCompendiumRow } from "../../compendium-rows";
+import { loadClass } from "../load-class";
 import { applyLevelUp, type LevelUpChoices, type LevelUpRowBuilder } from "../apply";
 import { choiceOf, taglineOf } from "../options";
 import { levelUpPlan, offeredFeatures, type ClassInfo, type LevelUpPlan } from "../plan";
@@ -106,6 +109,21 @@ describe("choice features in the level-up offer", () => {
     expect(rows(feat.after, "features").find((row) => row.ref === ref)).not.toHaveProperty("option");
     expect(ok(applyLevelUp(data, offer, average, buildRow)).followUp.feats).toBe("fightingStyle");
     expect(() => applyLevelUp(data, offer, { ...average, options: { [ref]: { name: "Not an option" } } }, buildRow)).toThrow(RangeError);
+  });
+
+  it.for([
+    ["ranger", "Druidic Warrior", "德魯伊戰士"],
+    ["paladin", "Blessed Warrior", "受祝戰士"],
+  ] as const)("%s: a pack feat reference does not hide the built-in Fighting Style option's zh label", async ([classId, english, zh], { skip }) => {
+    skip(zhWithheld(`corpus/zh-TW/classFeature-${classId}.json`), "zh-TW text withheld");
+    const ref = `classFeature:${classId}/fighting-style-l2`;
+    // The XPHB overlay refers to a feat instead of repeating the SRD's named option.
+    const sources = createBuiltinSource(new Map(), { [ref]: {
+      source: "XPHB", en: { entries: ["Choose a style.", { type: "entries", entries: [{ type: "refFeat", feat: `${english}|XPHB` }] }] },
+    } });
+    const loaded = await loadClass({ classId, sources, nameOf: String, locale: "zh-TW", packs: null });
+    const style = loaded?.info.features.find((feature) => feature.ref === ref);
+    expect(style?.choice).toMatchObject({ kind: "feat", alternatives: { ids: [english], options: [zh] } });
   });
 
   it("Hunter's Prey offers its two options; the pick joins the row name", () => {

@@ -108,6 +108,7 @@ export interface ParsedRollExpression {
 
 /** 擲骰結果 */
 export interface RollExpressionResult {
+  pool?: import("../pool-highest").PoolOutcome;
   /** 原始表達式 */
   expression: string;
   /**

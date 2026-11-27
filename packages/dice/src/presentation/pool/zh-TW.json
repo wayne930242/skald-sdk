@@ -1,0 +1,11 @@
+{
+  "kind": { "action": "行動骰", "fortune": "運氣骰", "resistance": "抵抗骰", "engagement": "參案骰", "indulgeVice": "沉溺於惡習", "threat": "威脅骰" },
+  "tier": {
+    "action_critical": "關鍵成功", "action_full": "完全成功", "action_partial": "部分成功", "action_bad": "壞結果",
+    "fortune_critical": "非凡結果", "fortune_full": "好結果", "fortune_partial": "好壞參半", "fortune_bad": "差結果",
+    "engagement_critical": "已越過第一道障礙", "engagement_full": "穩妥", "engagement_partial": "險峻", "engagement_bad": "絕望",
+    "threat_full": "成功", "threat_partial": "險境", "threat_bad": "威脅",
+    "pips_critical": "關鍵成功", "pips_full": "6", "pips_partial": "4–5", "pips_bad": "1–3"
+  },
+  "stress": "壓力：{delta}", "edge": "優勢 +1", "lowest": "取最低骰"
+}

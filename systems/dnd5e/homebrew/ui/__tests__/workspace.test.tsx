@@ -8,6 +8,7 @@ import {
   within,
 } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
+import zh from "@skald/system-dnd5e/data/dnd5e-2024/messages/homebrew/zh-TW.json";
 import messages from "@skald/system-dnd5e/data/dnd5e-2024/messages/homebrew/en.json";
 import {
   bindHostPort,
@@ -24,9 +25,9 @@ import { HOMEBREW_FORM_KINDS } from "../../domain/types";
 
 afterEach(cleanup);
 const m = messages.homebrew;
-function mount(store?: MemoryHomebrewStore) {
+function mount(store?: MemoryHomebrewStore, locale = "en") {
   render(
-    <NextIntlClientProvider locale="en" messages={messages} timeZone="UTC">
+    <NextIntlClientProvider locale={locale} messages={locale === "zh-TW" ? zh : messages} timeZone="UTC">
       <HostPortsProvider
         ports={store ? [bindHostPort(dndHomebrewStorePort, store)] : []}
       >
@@ -100,15 +101,21 @@ it("orders, toggles, renames and deletes a named pack", async () => {
   fireEvent.click(row("Grove").getByText(m.rename));
   await screen.findByRole("heading", { name: "Orchard" });
   prompt.mockRestore();
-  const confirm = vi
-    .spyOn(window, "confirm")
-    .mockReturnValueOnce(false)
-    .mockReturnValueOnce(true);
+  const dialog = () => within(screen.getByRole("alertdialog", { name: m.deleteTitle.replace("{name}", "Orchard") }));
   fireEvent.click(row("Orchard").getByText(m.delete));
+  fireEvent.click(dialog().getByText(m.cancel));
   expect(store.snapshot().packs).toHaveLength(2);
   fireEvent.click(row("Orchard").getByText(m.delete));
+  const remove = store.deletePack.bind(store);
+  let resume!: () => void;
+  const hold = new Promise<void>((resolve) => { resume = resolve; });
+  vi.spyOn(store, "deletePack").mockImplementationOnce(async (id) => { await hold; return remove(id); });
+  fireEvent.click(dialog().getByText(m.delete));
+  expect(row("Orchard").getByRole("status")).toHaveTextContent(m.deleting);
+  expect(row("Harbor").queryByRole("status")).toBeNull();
+  resume();
   await screen.findByRole("heading", { name: "Harbor" });
-  confirm.mockRestore();
+
   expect(store.snapshot().packs).toHaveLength(1);
 });
 it("keeps unsupported imported blocks intact on save", async () => {
@@ -167,6 +174,18 @@ it("blocks a built-in clash before saving and shows the store's item limit", asy
   fireEvent.click(button(m.save));
   expect(await screen.findByText(m.error.limitItems)).toBeTruthy();
   expect(store.snapshot().items).toHaveLength(0);
+});
+it.each([["en", "UAT2R-Ironwarden"], ["zh-TW", "UAT2R-鐵衛"]])("truncates the %s name without losing the full label", async (locale, name) => {
+  const store = createMemoryHomebrewStore();
+  const pack = await store.defaultPack();
+  if (!pack.ok) throw Error(pack.error);
+  const feat = HOMEBREW_FORMS.feat;
+  const payload = feat.toPayload({ ...feat.empty(), id: "ironwarden", nameEn: "UAT2R-Ironwarden", nameZh: "UAT2R-鐵衛" });
+  await store.saveItem(pack.value.id, { kind: "feat", key: "ironwarden", payload });
+  mount(store, locale);
+  const entry = await screen.findByRole("button", { name });
+  expect(entry).toHaveClass("truncate", "min-w-0");
+  expect(entry).toHaveAttribute("title", name);
 });
 it("lists a subclass's feature rows under it and keeps other feature rows in their own section", async () => {
   const store = createMemoryHomebrewStore();

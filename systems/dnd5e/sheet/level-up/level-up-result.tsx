@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { useTranslations } from "next-intl";
 import { Undo2 } from "lucide-react";
 import { Button } from "@skald/sheet-sdk/components/ui/button";
@@ -30,6 +31,7 @@ export function AppliedView({
   onClose: () => void;
 }) {
   const t = useTranslations("levelUp");
+  const changesId = useId();
   const notice = useLevelUpNotice(request);
   const latest = useLatestLevelUp();
   const { feats, spells } = applied.followUp;
@@ -39,9 +41,9 @@ export function AppliedView({
     <>
       <div className="-mx-1 min-h-0 flex-1 space-y-3 overflow-y-auto px-1" data-level-up-body>
         {applied.summary.length > 0 && (
-          <section className="space-y-1 rounded-lg border border-border p-3" aria-label={t("result.changes")} data-level-up-summary>
-            <h3 className="text-sm font-semibold">{t("result.changes")}</h3>
-            <ul className="list-disc space-y-0.5 pl-5 text-sm tabular-nums">
+          <section className="space-y-1 rounded-lg border border-border p-3" data-level-up-summary>
+            <h3 id={changesId} className="text-sm font-semibold">{t("result.changes")}</h3>
+            <ul aria-labelledby={changesId} className="list-disc space-y-0.5 pl-5 text-sm tabular-nums">
               {applied.summary.map((line) => <li key={line}>{line}</li>)}
             </ul>
           </section>

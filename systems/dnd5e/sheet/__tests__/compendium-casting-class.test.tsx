@@ -100,6 +100,14 @@ describe("a multiclass sheet's spell class (UAT M5)", () => {
     expect(spellCastersFor({ tab: "spells" }, ["cleric"])).toEqual([]);
   });
 
+  it.skipIf(zhWithheld("messages/zh-TW.json"))("keeps spells outside the character's lists browsable without assigning them to the starting class", async () => {
+    const { data } = await open({ tab: "spells", spellClasses: RANGER_CLERIC.spellClasses!.slice(0, 1) });
+    const button = addButton("spell:sacred-flame")!;
+    expect(button).toBeDisabled();
+    fireEvent.click(button);
+    expect(spellRows(data())).toEqual([]);
+  });
+
   it.skipIf(zhWithheld("messages/zh-TW.json"))("聖焰 added under 我的職業 on 遊俠 5 / 牧師 1 casts as 牧師", async () => {
     const { data } = await open(RANGER_CLERIC);
     expect(row("spell:sacred-flame").querySelector("[data-compendium-caster]")).toBeNull();

@@ -183,6 +183,11 @@ export function validateDiceExpression(expr: string): ValidationResult {
   const trimmed = expr.trim();
   const normalized = normalizeRollInput(trimmed);
 
+  // Pool expressions name a rule on the active sheet; only their shape is knowable here.
+  if (/^pool:/i.test(normalized) && /^pool:[\w-]+:(?:-?\d+|\{\{[^{}]+\}\})d6(?:\+(?:\d+|\{\{[^{}]+\}\})d6)?$/i.test(normalized)) {
+    return { valid: true, errors };
+  }
+
   // Check for common mistakes
   if (/^[+-]/.test(trimmed)) {
     errors.push({

@@ -126,7 +126,30 @@ export interface TableSetupCharacterRecipe {
   readonly recipe: unknown;
 }
 
+/** What a registered after-save hook is told: the table, and the revision the setup was just saved at. */
+export interface TableSetupAfterSaveInput {
+  readonly tableId: string;
+  readonly revision: number;
+}
+
+/**
+ * A hook's result. A failure carries a message already in the viewer's language; the host shows
+ * it and the setup stays saved.
+ */
+export type TableSetupAfterSaveResult = { readonly ok: true } | { readonly ok: false; readonly message: string };
+
+export type TableSetupAfterSaveHook = (input: TableSetupAfterSaveInput) => Promise<TableSetupAfterSaveResult>;
+
 export interface TableSetupEditorProps<C> {
+  /** The table this setup belongs to (ADR 0016 §after-save). */
+  readonly tableId: string;
+  /**
+   * Registers work that follows a successful save of the setup, for content an editor keeps outside
+   * the config (such as a copy to the table). The host runs the hooks in registration order, one at
+   * a time; a hook's failure is shown and does not undo the save or stop the later hooks. Returns
+   * the unregister function; register in an effect and unregister in its cleanup.
+   */
+  readonly registerAfterSave: (hook: TableSetupAfterSaveHook) => () => void;
   readonly config: C;
   readonly onChange: (config: C) => void;
   readonly disabled?: boolean;
@@ -187,4 +210,32 @@ export interface TableSetupSheetPort {
    * `apply` would change the card; dismissible, never blocking. A sheet mounts it for its editors.
    */
   readonly ApplyPrompt: ComponentType<TableSetupApplyPromptProps>;
+}
+
+/** `locked`: the player cannot change it. `default`: preset, changeable. An item without one is locked (D1). */
+export type WizardSetupPolicy = "locked" | "default";
+
+/**
+ * The one reading of a stored item's policy, shared by the wizard seed, the setup page, the server
+ * book-lock check and the sheet catalog filter: none is `locked` (D1), an unknown one undefined.
+ */
+export function readSetupPolicy(policy: unknown): WizardSetupPolicy | undefined {
+  if (policy === undefined) return "locked";
+  return policy === "locked" || policy === "default" ? policy : undefined;
+}
+
+/**
+ * The wizard variables a setup locks for the table's players (`config.wizard`, policy `locked` or none),
+ * with their values. A stored config is read as it is: anything malformed locks nothing.
+ */
+export function lockedWizardVariables(config: TableSetupConfig | null | undefined): Record<string, unknown> {
+  const variables: unknown = config?.wizard?.variables;
+  if (typeof variables !== "object" || variables === null || Array.isArray(variables)) return {};
+  return Object.fromEntries(
+    Object.entries(variables as Record<string, unknown>).flatMap(([id, item]) =>
+      typeof item === "object" && item !== null && readSetupPolicy((item as { policy?: unknown }).policy) === "locked" && "value" in item
+        ? [[id, (item as { value: unknown }).value]]
+        : [],
+    ),
+  );
 }

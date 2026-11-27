@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import type { ReactNode } from "react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@skald/sheet-sdk/components/ui/alert-dialog";
 import { Button } from "@skald/sheet-sdk/components/ui/button";
 import { ArrowDown, ArrowUp, Pencil, Trash2 } from "lucide-react";
 import { Switch } from "@skald/sheet-sdk/components/ui/switch";
@@ -76,6 +77,7 @@ function AccountWorkspace({
   );
   const [error, setError] = useState<HomebrewErrorCode | null>(null);
   const [busy, setBusy] = useState(false);
+  const [deletingPackId, setDeletingPackId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<ReadonlySet<string>>(new Set());
   const [editorGeneration, resetEditor] = useState(0);
   const [packId, setPack] = useState("");
@@ -253,18 +255,30 @@ function AccountWorkspace({
             >
               <Pencil /><span className="sr-only">{t("rename")}</span>
             </Button>
-            <Button
-              variant="ghost" size="icon-sm" title={t("delete")}
-              onClick={() => {
-                if (window.confirm(t("confirm", { name: p.name })))
-                  void run(
-                    () => store.deletePack(p.id),
-                    () => select(null),
-                  );
-              }}
-            >
-              <Trash2 /><span className="sr-only">{t("delete")}</span>
-            </Button>
+            {deletingPackId === p.id ? (
+              <span role="status" className="text-xs text-muted-foreground">{t("deleting")}</span>
+            ) : <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="icon-sm" title={t("delete")}>
+                  <Trash2 /><span className="sr-only">{t("delete")}</span>
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{t("deleteTitle", { name: p.name })}</AlertDialogTitle>
+                  <AlertDialogDescription>{t("confirm", { name: p.name })}</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => {
+                    setDeletingPackId(p.id);
+                    void run(() => store.deletePack(p.id), () => select(null)).finally(() => setDeletingPackId(null));
+                  }}>
+                    {t("delete")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>}
             </div>
           </li>
         ))}

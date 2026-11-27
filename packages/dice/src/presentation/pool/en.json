@@ -1,0 +1,11 @@
+{
+  "kind": { "action": "Action", "fortune": "Fortune", "resistance": "Resistance", "engagement": "Engagement", "indulgeVice": "Indulge vice", "threat": "Threat roll" },
+  "tier": {
+    "action_critical": "Critical success", "action_full": "Full success", "action_partial": "Partial success", "action_bad": "Bad outcome",
+    "fortune_critical": "Exceptional result", "fortune_full": "Good result", "fortune_partial": "Mixed result", "fortune_bad": "Poor result",
+    "engagement_critical": "Past the first obstacle", "engagement_full": "Controlled", "engagement_partial": "Risky", "engagement_bad": "Desperate",
+    "threat_full": "Success", "threat_partial": "Peril", "threat_bad": "Threat",
+    "pips_critical": "Critical", "pips_full": "6", "pips_partial": "4–5", "pips_bad": "1–3"
+  },
+  "stress": "Stress: {delta}", "edge": "Edge +1", "lowest": "Keep lowest"
+}

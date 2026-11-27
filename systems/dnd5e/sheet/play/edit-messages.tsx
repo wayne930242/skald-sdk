@@ -1,9 +1,10 @@
 "use client";
 
-import { use, useMemo, type ReactNode } from "react";
+import { createContext, use, useContext, useMemo, type ReactNode } from "react";
 import { createTranslator, NextIntlClientProvider, useLocale, useMessages } from "next-intl";
 import type { LaterText } from "./later-text";
 import { cachedUntilRejected } from "./play-messages";
+import { loadSnapshotLabels, type SnapshotLabels } from "./snapshot-labels";
 import { loadPlayTabsMessages } from "./play-tabs-messages";
 
 /**
@@ -15,7 +16,11 @@ import { loadPlayTabsMessages } from "./play-tabs-messages";
  */
 type Messages = Record<string, unknown>;
 
+const SnapshotContext = createContext<SnapshotLabels | undefined>(undefined);
+export const useSnapshotLabels = () => useContext(SnapshotContext);
+
 export interface LazyPlayMessages {
+  snapshotLabels: SnapshotLabels;
   edit: Messages;
   /** Merged into `play.*` under the tabs. */
   play: Messages;
@@ -32,7 +37,7 @@ const editPart = (locale: "en" | "zh-TW") =>
 export function loadEditMessages(locale: string): Promise<LazyPlayMessages> {
   const key = locale === "zh-TW" ? "zh-TW" : "en";
   return cachedUntilRejected(loaded, key, () => {
-    const pending = Promise.all([editPart(key), loadPlayTabsMessages(key)]).then(([edit, play]) => ({ edit, play }));
+    const pending = Promise.all([editPart(key), loadPlayTabsMessages(key), loadSnapshotLabels(key)]).then(([edit, play, snapshotLabels]) => ({ edit, play, snapshotLabels }));
     void pending.then((value) => Object.assign(pending, { status: "fulfilled", value }), () => {});
     return pending;
   });
@@ -65,7 +70,7 @@ export function EditIntl({ children }: { children: ReactNode }) {
   const merged = useMemo(() => ({ ...messages, edit: lazy.edit, play: mergePlay(messages.play as Messages | undefined, lazy.play) }), [messages, lazy]);
   return (
     <NextIntlClientProvider locale={locale} messages={merged}>
-      {children}
+      <SnapshotContext.Provider value={lazy.snapshotLabels}>{children}</SnapshotContext.Provider>
     </NextIntlClientProvider>
   );
 }

@@ -25,6 +25,7 @@ import {
 import { rowBodyText } from "../sheet/play/row-body";
 import { classLine, hitDicePools, subclassLine } from "../sheet/play/class-model";
 import { originName } from "../sheet/play/sheet-names";
+import { attackText, type SnapshotLabels } from "../sheet/play/snapshot-labels";
 import { castingClasses, spellCasting, type CastingOptions } from "../sheet/play/casting-classes";
 import { inventorySummary, type CarryStatus } from "../sheet/economy/carry";
 import { catalogItem, type Catalog } from "../sheet/economy/catalog";
@@ -201,6 +202,7 @@ export interface DndPrintModel {
 }
 
 export interface DndPrintInput {
+  snapshotLabels?: SnapshotLabels;
   values: CharacterValues;
   blanks: boolean;
   /** A row's name in the viewer's locale (`displayName` of the play view). */
@@ -312,7 +314,7 @@ function damageCantrip(gameData: Record<string, unknown> | undefined, ref: strin
 
 const tenth = (value: number) => Math.round(value * 10) / 10;
 
-export function buildDndPrintModel({ values, blanks, nameOf, compare = (a, b) => a.localeCompare(b), gameData, catalog = null, casting = {} }: DndPrintInput): DndPrintModel {
+export function buildDndPrintModel({ values, snapshotLabels, blanks, nameOf, compare = (a, b) => a.localeCompare(b), gameData, catalog = null, casting = {} }: DndPrintInput): DndPrintModel {
   const names = casting.names;
   const level = Math.max(1, num(values.level, 1));
 
@@ -349,7 +351,8 @@ export function buildDndPrintModel({ values, blanks, nameOf, compare = (a, b) =>
   spells.sort((a, b) => a.level - b.level || compare(a.name, b.name));
 
   const weapons: PrintAttack[] = rows(values.weapons).flatMap((row, index) => {
-    const name = text(row.name).trim();
+    const labels = attackText(row, snapshotLabels);
+    const name = labels.name.trim();
     if (!name) return [];
     const { attack, damageMod } = weaponAttack(values, row);
     const dice = text(row.damageDice).trim();
@@ -360,8 +363,8 @@ export function buildDndPrintModel({ values, blanks, nameOf, compare = (a, b) =>
       attack,
       dc: null,
       dice: dice ? `${dice}${signedMod(damageMod)}` : signedMod(damageMod).replace(/^\+/, ""),
-      damageType: text(row.damageType).trim(),
-      notes: [text(row.mastery).trim(), text(row.notes).trim()].filter(Boolean).join(" · "),
+      damageType: labels.damageType.trim(),
+      notes: [labels.mastery.trim(), labels.notes.trim()].filter(Boolean).join(" · "),
       spellKey: null,
       ref: text(row.ref),
     }];

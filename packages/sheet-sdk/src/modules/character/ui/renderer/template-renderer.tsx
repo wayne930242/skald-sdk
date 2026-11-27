@@ -77,6 +77,8 @@ export interface TemplateRendererProps {
       | Record<string, unknown>
       | ((prev: Record<string, unknown>) => Record<string, unknown>),
   ) => void;
+  /** 以此刻的文件資料計算再寫入（見 SchemaStaticContextValue.updateData） */
+  updateData?: SchemaStaticContextValue["updateData"];
   /** 欄位 handlers */
   handlers?: FieldHandlers;
   /** 動態選項來源（用於 select 欄位的 optionModule） */
@@ -137,6 +139,7 @@ export function TemplateRenderer({
   data,
   onChange,
   setData,
+  updateData,
   handlers,
   optionSources,
   editable = false,
@@ -222,6 +225,7 @@ export function TemplateRenderer({
       schema,
       onChange,
       setData,
+      updateData,
       handlers,
       optionSources,
       editable,
@@ -240,6 +244,7 @@ export function TemplateRenderer({
       schema,
       onChange,
       setData,
+      updateData,
       handlers,
       optionSources,
       editable,

@@ -51,7 +51,7 @@ export interface ComparisonRule {
   postRollActions?: PostRollAction[];
 }
 
-export type RollRule = RollUnderRule | RollOverRule | ComparisonRule;
+export type RollRule = RollUnderRule | RollOverRule | ComparisonRule | import("./pool-highest").PoolHighestRule;
 
 export interface RollRulesDefinition {
   default?: string;

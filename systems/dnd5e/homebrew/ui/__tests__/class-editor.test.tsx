@@ -60,7 +60,15 @@ function feature(at: number, name: string) {
 it("copies Wizard, saves generated rows, then edits, re-levels and changes the ASI ladder", async () => {
   const store = await start(undefined, "wizard");
   expect(screen.getByLabelText(c.castingKind)).toHaveProperty("value", "full");
+  const usage = await store.usage();
+  let resume!: () => void;
+  const hold = new Promise<void>((resolve) => { resume = resolve; });
+  vi.spyOn(store, "usage").mockImplementationOnce(async () => { await hold; return usage; });
   await save();
+  expect(button(m.save)).toBeDisabled();
+  expect(button(m.save)).toHaveAttribute("aria-busy", "true");
+  expect(button(m.save).querySelector(".animate-spin")).not.toBeNull();
+  resume();
   await closed();
   expect(keys(store)).toEqual(["ember-sage", ...WIZARD_GENERATED].sort());
   expect(items(store).filter((r) => r.kind === "classFeature").every((r) => r.payload.entry!.meta!.generated)).toBe(true);

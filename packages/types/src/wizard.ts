@@ -12,6 +12,7 @@
  * `apps/web/lib/template-publishing/wizard-artifact-validator.ts`.
  */
 
+import { wizardSpecializationEntryKey, type WizardEntryFields, type WizardPickFilter, type WizardPickStep } from "./wizard-selection";
 import type { MacroParamDefinition } from "@skald/dice";
 
 export const WIZARD_SCHEMA = "skald/wizard/v1" as const;
@@ -54,6 +55,8 @@ export const WIZARD_LIMITS = {
   maxSystemResourceBytes: 4 * 1024 * 1024,
   /** Plain (non `{{i18n:…}}`) LocalizedText length in characters. */
   maxPlainTextLength: 2000,
+  /** Characters of one text a user types for a picked owned row (`WizardInstanceText`), after trimming. */
+  maxInstanceTextLength: 200,
   /** Serialized size of the whole `wizard` value. */
   maxWizardBytes: 256 * 1024,
   /** Body length of a System roll macro a wizard references. */
@@ -152,7 +155,17 @@ export type WizardValueType = "number" | "string" | "boolean";
  */
 export type WizardFormulaOrLiteral = WizardFormula | WizardLiteral;
 
+export interface WizardDraftList {
+  columns: Record<WizardId, WizardValueType>;
+  /** Read-only numeric variables computed from the current rows. */
+  projections?: Record<WizardId, ({ count: true } | { sum: WizardId }) & {
+    where?: { field: WizardId; equals: WizardLiteral };
+  }>;
+}
+
 export interface CharacterWizard {
+  /** Typed staging Lists, addressed by List operations but never committed. */
+  draftLists?: Record<WizardId, WizardDraftList>;
   $schema: typeof WIZARD_SCHEMA;
   title?: LocalizedText;
   variables?: Record<WizardId, WizardVariable>;
@@ -200,6 +213,8 @@ export interface WizardTableSetupStep {
 
 /** A value that lives only while the wizard runs and is never written to the Character. */
 export interface WizardVariable {
+  /** Name shown when a step settles this balance. */
+  label?: LocalizedText;
   type: WizardValueType;
   /** Must match `type`. */
   default: WizardLiteral;
@@ -279,6 +294,10 @@ export type WizardValueSource =
    * Dotted path into the picked data item (or the array element being
    * applied). `localize` writes the i18n token's text in the current locale;
    * `chooseOne` lets the user pick one value when the path holds an array.
+   * Written into a List row (an entries op, `appendEntry`, an
+   * `instancesFrom.update` column), a `null` at the path is copied as `null`
+   * ("none"), so the column must be a number or text column of a sheet List;
+   * anywhere else `null` is refused.
    */
   | { item: string; default?: WizardLiteral; localize?: boolean; chooseOne?: boolean }
   /** Path to a number or a `=formula` string in the data item; written as a number. */
@@ -291,6 +310,13 @@ export type WizardValueSource =
 export interface WizardCheck {
   /** Must return boolean. */
   rule: WizardFormula;
+  /**
+   * A row check: `rule` is a List-row formula evaluated once per entry of
+   * this List (`[@column]` reads the entry) on the values after the step's
+   * writes. It fails once when any entry fails, its `details.entries` the
+   * keys of those entries; a List without entries passes.
+   */
+  list?: WizardId;
   /** `error` blocks "next"; `warning` asks for confirmation. */
   severity: "error" | "warning";
   message: LocalizedText;
@@ -324,6 +350,11 @@ export interface WizardStepBase {
   checks?: WizardCheck[];
   /** Applied in order after the step's own writes. */
   effects?: WizardEffect[];
+  /**
+   * A detail reference for the step as a whole: an opaque string the System
+   * reads (e.g. a rules book section id) to show its rules for this step.
+   */
+  detail?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -473,183 +504,7 @@ export interface WizardGenerateStep extends WizardStepBase {
   rerollable?: boolean;
 }
 
-// ---------------------------------------------------------------------------
-// pick
-// ---------------------------------------------------------------------------
-
-export type WizardPickFilter = WizardPickValueFilter | WizardPickListFilter;
-
-export interface WizardPickValueFilter {
-  path: string;
-  op: "equals" | "includes" | "absentOrIncludes";
-  value: WizardFormulaOrLiteral;
-}
-
-/**
- * Extension E3: compares an item with the entries a List of the draft holds
- * on entering the step. `inList` lets an item through when its scalar at
- * `path` equals row field `field` of an entry of `list` (among the entries
- * `where` selects); `notInList` lets through only the items no such entry
- * matches, so a later step does not offer what an earlier one already gave.
- */
-export interface WizardPickListFilter {
-  path: string;
-  op: "inList" | "notInList";
-  list: WizardId;
-  /** A row field of the List, or `id` for the entry key. */
-  field: WizardId;
-  where?: { field: WizardId; equals: WizardLiteral };
-}
-
-/**
- * Stable key of the List Entry a chosen specialization becomes:
- * `<group id>:<option id>`. Publish validation and the wizard engine share it.
- */
-export function wizardSpecializationEntryKey(groupId: string, optionId: string): string {
-  return `${groupId}:${optionId}`;
-}
-
-/**
- * Row fields of a List that a chosen specialization fills, each a row field
- * key. Without the map the engine writes only the entry key.
- *
- * The `optionsFrom` group of a specialization may carry two optional keys:
- * `base` (a number or a `=formula`), the base of a custom name instead of 0,
- * and `entryDefaults` (row field → literal), written first on every row the
- * choice places.
- */
-export interface WizardEntryFields {
-  /** Receives the group id. */
-  group?: WizardId;
-  /**
-   * Receives the entry key `<group>:<option>` when an option was chosen;
-   * nothing for a custom name. Written after `group`, so it wins when both
-   * name the same row field.
-   */
-  option?: WizardId;
-  /** Receives the option's label, or the custom name. */
-  name?: WizardId;
-  /** Receives the option's `base`; a custom name starts at its group's `base`, else 0. */
-  base?: WizardId;
-}
-
-/**
- * "Pick one of a group" elements inside an applied array. A chosen option
- * becomes (or fills) the List Entry keyed by `wizardSpecializationEntryKey`.
- */
-export interface WizardChooseSpec {
-  /** An element that has this path needs a choice. */
-  when: string;
-  /** Element path to the group id. */
-  group: string;
-  /** Element path to the allowed option ids; the whole group when absent. */
-  options?: string;
-  /** Groups: `[{ id, options: [{ id, … }] }]`. */
-  optionsFrom: WizardDataRef;
-  /** Which groups and options are offered; see `WizardAddEntries.filter`. */
-  filter?: WizardPickFilter[];
-  allowCustomName: boolean;
-  entryFields?: WizardEntryFields;
-  /**
-   * A numeric row field that moves with the base: when the chosen option's
-   * base (`entryFields.base`) replaces a number `set` wrote to the same
-   * field, a number `set` wrote here moves by the same difference, as
-   * `WizardEntryBases.valueField` does. Absent, `set`'s value is kept.
-   */
-  valueField?: WizardId;
-}
-
-export type WizardApplyOp =
-  | { op: "set"; target: WizardTargetRef; value: WizardValueSource }
-  /** Rebuilds the whole List from an array in the item; `key` is the element path of the entry key. */
-  | {
-      op: "replaceEntries";
-      list: WizardId;
-      from: string;
-      key: string;
-      set: Record<WizardId, WizardValueSource>;
-    }
-  /** Updates the entry with that key, or adds it. */
-  | {
-      op: "upsertEntries";
-      list: WizardId;
-      from: string;
-      key: string;
-      set: Record<WizardId, WizardValueSource>;
-      choose?: WizardChooseSpec;
-    }
-  /** Updates existing entries only. */
-  | {
-      op: "updateEntries";
-      list: WizardId;
-      from: string;
-      key: string;
-      set: Record<WizardId, WizardValueSource>;
-    }
-  | { op: "appendEntry"; list: WizardId; set: Record<WizardId, WizardValueSource> };
-
-/**
- * How many items a pick takes; defaults to exactly one. Each bound is a
- * literal integer or a numeric formula. A formula is evaluated on the values
- * the step starts from. When either bound is a formula, the pair must be
- * integers with 0 <= min <= max and 1 <= max <=
- * `WIZARD_LIMITS.maxPickSourceItems`, or the step fails (`count_invalid`) and
- * writes nothing. Literal bounds are checked at Publish.
- */
-export interface WizardPickCount {
-  min: number | WizardFormula;
-  max: number | WizardFormula;
-}
-
-/**
- * A list of game data a pick step shows beside its items. Without `apply`
- * it is read-only: nothing in it can be picked, and it writes nothing and
- * takes no part in the step's completion, replay or draft. The filter is
- * evaluated on the values the step starts from. A `presentation: "hidden"`
- * step cannot have one.
- */
-export interface WizardPickReference {
-  title: LocalizedText;
-  /** An array whose items each have a unique string `id`. */
-  source: WizardDataRef;
-  filter?: WizardPickFilter[];
-  /** Item paths shown per entry; the id stands in for a missing label. */
-  display: { label: string; description?: string };
-  /**
-   * Makes the list pickable: the user may complete the step with one of its
-   * items instead of the step's own (`referenceId`). These ops are applied
-   * to that item in place of the step's `apply`; `store` is not written.
-   */
-  apply?: WizardApplyOp[];
-}
-
-export interface WizardPickStep extends WizardStepBase {
-  type: "pick";
-  /** An array whose items each have a unique string `id`. */
-  source: WizardDataRef;
-  filter?: WizardPickFilter[];
-  /** Defaults to exactly one. */
-  count?: WizardPickCount;
-  /** Automatic selection (returns an item id); with `presentation: "hidden"` no screen is shown. */
-  select?: WizardFormula;
-  pickByRoll?: WizardMacroRef;
-  /** A "custom" option that only sets a variable and applies no item. */
-  allowCustom?: { var: WizardId; value: WizardLiteral; label: LocalizedText };
-  /**
-   * Receives the picked item id. A pure-data `object` field whose
-   * `defaultValue` is an array of strings (an id list) receives every picked
-   * id as an array, in pick order, whatever the count; any other target
-   * receives one id, so it needs `count.max` 1 (a literal, or a constant
-   * formula).
-   */
-  store?: WizardTargetRef;
-  /** Item paths shown on the card; `label` defaults to `"label"`. */
-  display?: { label: string; description?: string; badges?: string[] };
-  reference?: WizardPickReference;
-  apply: WizardApplyOp[];
-  /** See `WizardGenerateStep.rerollable`; applies to `pickByRoll`. */
-  rerollable?: boolean;
-}
+export * from "./wizard-selection";
 
 // ---------------------------------------------------------------------------
 // allocate
@@ -729,7 +584,25 @@ export interface WizardAllocateTargetRule {
   warnMax?: number | WizardFormula;
 }
 
+export interface WizardGrantFold {
+  list: WizardId;
+  key: WizardId;
+  amount: WizardId;
+  /** Destination field -> draft column. */
+  columns: Record<WizardId, WizardId>;
+  /** Numeric List-row formula; the maximum invested value. */
+  cap: WizardFormula;
+  /**
+   * Rows whose `field` equals `equals` hold restricted points: they fund only rows of
+   * the same kind. `label` names those rows for the user, such as Know skills.
+   */
+  restricted: { field: WizardId; equals: WizardLiteral; label?: LocalizedText };
+}
+
 export interface WizardAllocateStep extends WizardStepBase {
+  /** Price the total increase across targets. Its sum must be a multiple of units; debit (sum / units) × cost. */
+  price?: { balance: WizardId; units: number; cost: number };
+  grantsFrom?: WizardGrantFold;
   type: "allocate";
   targets: WizardAllocateTargets;
   /** The user first picks the subset to allocate to. List targets only. */
@@ -965,7 +838,11 @@ export interface CreationRollLogEntry {
  */
 export interface CreationRollLog {
   $schema: typeof CREATION_ROLL_LOG_SCHEMA;
-  /** The Template Version whose wizard produced the rolls. */
+  /**
+   * The Template Version whose wizard the run is committed under. A draft
+   * carried over from an older version of the template keeps the rolls it
+   * made there; its log then names the new version.
+   */
   templateVersionId: string;
   /**
    * How many of the oldest entries were dropped to keep the log within

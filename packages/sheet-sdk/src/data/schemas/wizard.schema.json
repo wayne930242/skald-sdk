@@ -9,6 +9,7 @@
   "properties": {
     "$schema": { "const": "skald/wizard/v1" },
     "title": { "$ref": "#/definitions/localizedText" },
+    "draftLists": { "type": "object", "propertyNames": { "$ref": "#/definitions/id" }, "additionalProperties": { "$ref": "#/definitions/draftList" } },
     "variables": {
       "type": "object",
       "propertyNames": { "$ref": "#/definitions/id" },
@@ -103,12 +104,26 @@
       "description": "Dotted path into a game data item"
     },
     "entryKey": { "type": "string", "minLength": 1 },
+    "draftList": {
+      "type": "object", "additionalProperties": false, "required": ["columns"],
+      "properties": {
+        "columns": { "type": "object", "propertyNames": { "$ref": "#/definitions/id" }, "additionalProperties": { "enum": ["number", "boolean", "string"] } },
+        "projections": { "type": "object", "propertyNames": { "$ref": "#/definitions/id" }, "additionalProperties": {
+          "type": "object", "additionalProperties": false,
+          "oneOf": [{ "required": ["count"] }, { "required": ["sum"] }],
+          "properties": { "count": { "const": true }, "sum": { "$ref": "#/definitions/id" }, "where": {
+            "type": "object", "additionalProperties": false, "required": ["field", "equals"], "properties": { "field": { "$ref": "#/definitions/id" }, "equals": { "$ref": "#/definitions/literal" } }
+          } }
+        } }
+      }
+    },
     "variable": {
       "type": "object",
       "required": ["type", "default"],
       "additionalProperties": false,
       "properties": {
         "type": { "enum": ["number", "string", "boolean"] },
+        "label": { "$ref": "#/definitions/localizedText" },
         "default": { "$ref": "#/definitions/literal" }
       }
     },
@@ -223,6 +238,28 @@
         }
       }
     },
+    "instanceValue": {
+      "type": "object",
+      "description": "{ text: { label, maxLength? } } | a value source",
+      "if": { "required": ["text"] },
+      "then": {
+        "type": "object",
+        "required": ["text"],
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "type": "object",
+            "required": ["label"],
+            "additionalProperties": false,
+            "properties": {
+              "label": { "$ref": "#/definitions/localizedText" },
+              "maxLength": { "type": "integer", "minimum": 1, "maximum": 200 }
+            }
+          }
+        }
+      },
+      "else": { "$ref": "#/definitions/valueSource" }
+    },
     "entrySet": {
       "type": "object",
       "minProperties": 1,
@@ -248,6 +285,7 @@
       "additionalProperties": false,
       "properties": {
         "rule": { "$ref": "#/definitions/formula" },
+        "list": { "$ref": "#/definitions/id" },
         "severity": { "enum": ["error", "warning"] },
         "message": { "$ref": "#/definitions/localizedText" }
       }
@@ -443,6 +481,7 @@
         "presentation": { "enum": ["page", "hidden"] },
         "checks": { "type": "array", "items": { "$ref": "#/definitions/check" } },
         "effects": { "type": "array", "items": { "$ref": "#/definitions/effect" } },
+        "detail": { "type": "string", "minLength": 1, "maxLength": 200, "description": "Opaque detail reference for the step, read by the System" },
         "inputs": {
           "type": "array",
           "description": "May be empty for a step that only applies effects",
@@ -561,6 +600,7 @@
         "presentation": { "enum": ["page", "hidden"] },
         "checks": { "type": "array", "items": { "$ref": "#/definitions/check" } },
         "effects": { "type": "array", "items": { "$ref": "#/definitions/effect" } },
+        "detail": { "type": "string", "minLength": 1, "maxLength": 200, "description": "Opaque detail reference for the step, read by the System" },
         "targets": {
           "type": "array",
           "minItems": 1,
@@ -723,6 +763,28 @@
       "properties": {
         "id": { "$ref": "#/definitions/id" },
         "type": { "const": "pick" },
+        "price": {"type":"object","additionalProperties":false,"required":["balance","path","rebateLimit"],"properties":{"balance":{"$ref":"#/definitions/id"},"path":{"$ref":"#/definitions/path"},"rebateLimit":{"type":"integer","minimum":0},"repeat":{"type":"boolean"},"subsequentZero":{"type":"integer","minimum":0},"severalNeedPriced":{"type":"boolean"},"freeWhen":{"type":"object","additionalProperties":false,"required":["path","equals"],"properties":{"path":{"$ref":"#/definitions/path"},"equals":{"$ref":"#/definitions/literal"}}}}},
+        "expand": {"type":"object","additionalProperties":false,"required":["from","catalog","list","ref"],"properties":{
+          "from":{"$ref":"#/definitions/path"},"catalog":{"$ref":"#/definitions/dataRef"},"list":{"$ref":"#/definitions/id"},"ref":{"$ref":"#/definitions/id"},"refPath":{"$ref":"#/definitions/path"},"blueprint":{"$ref":"#/definitions/id"},"columns":{"type":"object","propertyNames":{"$ref":"#/definitions/id"},"additionalProperties":{"$ref":"#/definitions/path"}},
+          "members":{"description":"Library member paths instead of {id,ref,quantity?,alternatives?}; a member is keyed by its index and needs no choice.","type":"object","additionalProperties":false,"required":["ref"],"properties":{"ref":{"$ref":"#/definitions/path"},"quantity":{"$ref":"#/definitions/path"},"columns":{"type":"object","propertyNames":{"$ref":"#/definitions/id"},"additionalProperties":{"$ref":"#/definitions/path"}},"skipWhen":{"type":"object","additionalProperties":false,"required":["path","equals"],"properties":{"path":{"$ref":"#/definitions/path"},"equals":{"$ref":"#/definitions/literal"}}}}},
+          "constants":{"type":"object","propertyNames":{"$ref":"#/definitions/id"},"additionalProperties":{"$ref":"#/definitions/literal"}},
+          "owner":{"oneOf":[
+            {"type":"object","additionalProperties":false,"required":["list","column","label"],"properties":{"list":{"$ref":"#/definitions/id"},"column":{"$ref":"#/definitions/id"},"label":{"$ref":"#/definitions/id"},"where":{"type":"object","additionalProperties":false,"required":["field","equals"],"properties":{"field":{"$ref":"#/definitions/id"},"equals":{"$ref":"#/definitions/literal"}}},
+              "match":{"description":"Per-option owner filter: the option record's values at `option` (absent or null: any owner) allowed in owner row field `field`.","type":"object","additionalProperties":false,"required":["option","field"],"properties":{"option":{"$ref":"#/definitions/path"},"field":{"$ref":"#/definitions/id"}}}}},
+            {"description":"The picked instancesFrom row owns every row; nobody chooses it.","type":"object","additionalProperties":false,"required":["column","self"],"properties":{"column":{"$ref":"#/definitions/id"},"self":{"const":true}}}
+          ]},
+          "exchange":{"type":"object","additionalProperties":false,"required":["balance","path"],"properties":{"balance":{"$ref":"#/definitions/id"},"path":{"$ref":"#/definitions/path"}}}
+        }},
+        "instancesFrom": {"type":"object","additionalProperties":false,"required":["list","ref","label"],"properties":{"list":{"$ref":"#/definitions/id"},"ref":{"$ref":"#/definitions/id"},"label":{"$ref":"#/definitions/id"},
+          "update":{"description":"Columns written on each picked row only: a value source, or { text } the user types for that row.","type":"object","minProperties":1,"propertyNames":{"$ref":"#/definitions/id"},"additionalProperties":{"$ref":"#/definitions/instanceValue"}}}},
+        "retainInputs": {"type":"boolean"},
+        "variantGroups": {"description":"Items sharing the value at path are variants (levels) of one thing: one per pick unless the item holds true at repeatable; distinct rows per repeat.","type":"object","additionalProperties":false,"required":["path"],"properties":{"path":{"$ref":"#/definitions/path"},"repeatable":{"$ref":"#/definitions/path"},
+          "distinct":{"type":"object","additionalProperties":false,"required":["list","columns"],"properties":{"list":{"$ref":"#/definitions/id"},"columns":{"type":"array","minItems":1,"uniqueItems":true,"items":{"$ref":"#/definitions/id"}}}}}},
+        "countedCustom": { "type":"object", "additionalProperties":false, "required":["label"], "properties":{"label":{"$ref":"#/definitions/localizedText"},"price":{"type":"integer"},
+          "distinctFrom":{"type":"object","additionalProperties":false,"required":["list","field"],"properties":{"list":{"$ref":"#/definitions/id"},"field":{"$ref":"#/definitions/id"}}}} },
+        "grants": { "description":"Each source slot may have a localized label. unresolvedLabel is required when any source slot allows unresolved choices.", "type":"object", "additionalProperties":false, "required":["from","list","identity","label","state"], "properties": {
+          "from":{"type":"string","minLength":1}, "optionPools":{"$ref":"#/definitions/dataRef"}, "list":{"$ref":"#/definitions/id"}, "identity":{"$ref":"#/definitions/id"}, "label":{"$ref":"#/definitions/id"}, "state":{"$ref":"#/definitions/id"}, "amount":{"$ref":"#/definitions/id"}, "unresolvedLabel":{"$ref":"#/definitions/localizedText"}, "customVariantLabel":{"$ref":"#/definitions/localizedText"}, "customVariantColumns":{"type":"array","minItems":1,"uniqueItems":true,"items":{"$ref":"#/definitions/id"}}
+        } },
         "title": { "$ref": "#/definitions/localizedText" },
         "description": { "$ref": "#/definitions/localizedText" },
         "when": { "$ref": "#/definitions/formula" },
@@ -730,6 +792,7 @@
         "presentation": { "enum": ["page", "hidden"] },
         "checks": { "type": "array", "items": { "$ref": "#/definitions/check" } },
         "effects": { "type": "array", "items": { "$ref": "#/definitions/effect" } },
+        "detail": { "type": "string", "minLength": 1, "maxLength": 200, "description": "Opaque detail reference for the step, read by the System" },
         "source": { "$ref": "#/definitions/dataRef" },
         "filter": {
           "type": "array",
@@ -738,6 +801,7 @@
         },
         "count": { "$ref": "#/definitions/pickCount" },
         "select": { "$ref": "#/definitions/formula" },
+        "selectAll": { "const": true, "description": "Take every candidate with no input; hidden steps only." },
         "pickByRoll": { "$ref": "#/definitions/macroRef" },
         "allowCustom": {
           "type": "object",
@@ -761,7 +825,9 @@
               "type": "array",
               "maxItems": 8,
               "items": { "$ref": "#/definitions/path" }
-            }
+            },
+            "detail": { "$ref": "#/definitions/path" },
+            "icon": { "$ref": "#/definitions/path" }
           }
         },
         "reference": { "$ref": "#/definitions/pickReference" },
@@ -828,6 +894,11 @@
       "properties": {
         "id": { "$ref": "#/definitions/id" },
         "type": { "const": "allocate" },
+        "price": {"type":"object","additionalProperties":false,"description":"The total increase across all targets must be a multiple of units. Each complete bundle debits cost from balance.","required":["balance","units","cost"],"properties":{"balance":{"$ref":"#/definitions/id"},"units":{"type":"integer","minimum":1},"cost":{"type":"integer","minimum":1}}},
+        "grantsFrom": { "type":"object", "additionalProperties":false, "required":["list","key","amount","columns","cap","restricted"], "properties": {
+          "list":{"$ref":"#/definitions/id"}, "key":{"$ref":"#/definitions/id"}, "amount":{"$ref":"#/definitions/id"}, "cap":{"$ref":"#/definitions/formula"}, "columns":{"type":"object","propertyNames":{"$ref":"#/definitions/id"},"additionalProperties":{"$ref":"#/definitions/id"}},
+          "restricted":{"type":"object","additionalProperties":false,"required":["field","equals"],"properties":{"field":{"$ref":"#/definitions/id"},"equals":{"$ref":"#/definitions/literal"},"label":{"$ref":"#/definitions/localizedText"}}}
+        } },
         "title": { "$ref": "#/definitions/localizedText" },
         "description": { "$ref": "#/definitions/localizedText" },
         "when": { "$ref": "#/definitions/formula" },
@@ -835,6 +906,7 @@
         "presentation": { "enum": ["page", "hidden"] },
         "checks": { "type": "array", "items": { "$ref": "#/definitions/check" } },
         "effects": { "type": "array", "items": { "$ref": "#/definitions/effect" } },
+        "detail": { "type": "string", "minLength": 1, "maxLength": 200, "description": "Opaque detail reference for the step, read by the System" },
         "targets": { "$ref": "#/definitions/allocateTargets" },
         "pickTargets": {
           "type": "object",

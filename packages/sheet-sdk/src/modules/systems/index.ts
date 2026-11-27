@@ -1,11 +1,15 @@
 export type {
   BuiltinSystemRegistration,
+  LockedTableOption,
   SystemMessages,
   SystemPlugin,
   SystemPresentation,
 } from "./domain/system-plugin";
 export type { BuiltinLocalSystemData } from "./domain/builtin-local-system-data";
 export {
+  lockedWizardVariables,
+  readSetupPolicy,
+  type WizardSetupPolicy,
   TABLE_SETUP_SCHEMA,
   type TableContentSource,
   type TableSetupApplyPromptProps,
@@ -16,6 +20,9 @@ export {
   type TableSetupCharacterRecipe,
   type TableSetupCharacterRules,
   type TableSetupConfig,
+  type TableSetupAfterSaveHook,
+  type TableSetupAfterSaveInput,
+  type TableSetupAfterSaveResult,
   type TableSetupEditorProps,
   type TableSetupIssue,
   type TableSetupItem,
@@ -76,3 +83,25 @@ export {
   type SystemPackSystem,
   type SystemPackSystemData,
 } from "./domain/system-pack";
+export {
+  creativeCommonsLabel,
+  localizePregenIndex,
+  mergeSheetPatch,
+  pregenIndexSchema,
+  pregenSheetLocale,
+  PREGENS_SCHEMA,
+  sheetPatchSchema,
+  type PregenCard,
+  type PregenFiles,
+  type PregenIndex,
+  type PregenList,
+  type SheetPatch,
+} from "./domain/pregens";
+export {
+  isSystemExtensionPart,
+  NO_SYSTEM_EXTENSIONS,
+  SYSTEM_EXTENSION_PARTS,
+  type SystemExtensionPart,
+  type SystemExtensionsPort,
+  type SystemExtensionSummary,
+} from "./domain/system-extensions";

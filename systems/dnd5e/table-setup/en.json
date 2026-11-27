@@ -2,6 +2,98 @@
   "dndSources": {
     "label": "Character content sources",
     "srd": "SRD only",
-    "device": "SRD and players’ own expansion packs"
+    "device": "SRD and players’ own expansion packs",
+    "gm": "SRD and the GM’s homebrew",
+    "deviceGm": "SRD, players’ own expansion packs and the GM’s homebrew",
+    "gmHomebrew": "The GM’s homebrew",
+    "options": {
+      "srd": "SRD (always on)",
+      "device": "Players’ own expansion packs",
+      "gm": "The GM’s homebrew"
+    },
+    "gmHint": "When you save, the entries you tick below are copied to this table for everyone at it."
+  },
+  "dndShare": {
+    "heading": "Homebrew on this table",
+    "loading": "Loading homebrew…",
+    "loadFailed": "Couldn’t load the homebrew for this table.",
+    "retry": "Try again",
+    "guest": "Guest accounts can’t bring homebrew to a table. Register an account to share your entries.",
+    "empty": "You have no D&D homebrew yet. Create entries in My homebrew, then come back to tick them.",
+    "yours": "Your entries",
+    "kinds": {
+      "spell": "Spells",
+      "class": "Classes",
+      "subclass": "Subclasses",
+      "species": "Species",
+      "lineage": "Lineages",
+      "background": "Backgrounds",
+      "feat": "Feats",
+      "optionalFeature": "Options",
+      "item": "Magic items",
+      "baseItem": "Items",
+      "other": "Other"
+    },
+    "added": "Shared with it",
+    "addedReason": {
+      "classFeature": "Class feature of {name}",
+      "subclassFeature": "Subclass feature of {name}",
+      "parentClass": "Class of {name}",
+      "originFeat": "Origin feat of {name}"
+    },
+    "status": {
+      "onTable": "On the table",
+      "newer": "Newer version",
+      "deleted": "Source deleted",
+      "willUpdate": "Updates on save",
+      "willRemove": "Removed on save"
+    },
+    "refresh": "Update on the table",
+    "refreshUndo": "Keep the table’s version",
+    "refreshHint": "The table keeps the version it copied. Press Update on the table and save to bring the newer versions.",
+    "dirtyHint": "When you save, every ticked entry is copied again at its current version.",
+    "deletedHeading": "Deleted from your homebrew",
+    "deletedHint": "The table keeps these until you remove them. Saving any change to your entries removes them too.",
+    "remove": "Remove from the table",
+    "keep": "Keep",
+    "links": "“{from}” mentions your homebrew “{to}”, which isn’t shared. Players see the name without its text.",
+    "usage": {
+      "label": "Use of this table (everyone’s homebrew)",
+      "items": "{count} / {max} entries",
+      "bytes": "{used} / {max} KB"
+    },
+    "others": "Brought by others",
+    "sharer": "{name}’s entries",
+    "unnamed": "A member without a name",
+    "owner": "Table owner",
+    "count": "{count, plural, one {# entry} other {# entries}}",
+    "removeOther": {
+      "title": "Remove {name}’s homebrew from this table?",
+      "description": "New characters can no longer pick these entries. Text already on character cards stays.",
+      "confirm": "Remove",
+      "cancel": "Cancel"
+    },
+    "untick": {
+      "title": "Stop using the GM’s homebrew?",
+      "owner": "When you save, everyone’s homebrew leaves this table. Text already on character cards stays.",
+      "assistant": "When you save, your homebrew leaves this table. Others’ stays, but this table no longer shows it.",
+      "confirm": "Untick",
+      "cancel": "Cancel"
+    },
+    "removed": "Removed from the table.",
+    "errors": {
+      "signIn": "Sign in again to bring homebrew to the table.",
+      "guest": "Guest accounts can’t bring homebrew to a table.",
+      "forbidden": "Only the table owner and GM assistants can bring homebrew, and only the owner can remove someone else’s.",
+      "setupMissing": "Save the table setup first.",
+      "notFound": "This table no longer exists.",
+      "conflict": "Your homebrew on this table just changed somewhere else. It’s reloaded and your ticks are kept: save again to use them.",
+      "invalid": "An entry can’t be shared (it may have just been deleted). Reload the page and try again.",
+      "invalidEntry": "“{name}” can’t be shared (it may have just been deleted, moved to another system, or clash with an identical entry). Reload the page and try again.",
+      "duplicate": "“{first}” and “{second}” are the same entry (same kind and id, from different packs). A table takes only one: untick one, then save again.",
+      "limitItems": "Too many entries for one table (300 across everyone). Untick some, then save again.",
+      "limitBytes": "Too much text for one table (1 MiB across everyone). Untick some, then save again.",
+      "network": "Can’t connect right now. Your ticks are kept: save again later."
+    }
   }
 }

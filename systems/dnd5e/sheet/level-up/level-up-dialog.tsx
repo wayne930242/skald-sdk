@@ -224,11 +224,11 @@ function LevelUpBody({ request, system, context, packs, inTable = false, onClose
 
   return (
     <Dialog open onOpenChange={(next) => !next && onClose()}>
-      <DialogContent className="flex max-h-[90dvh] flex-col gap-3 p-4 sm:max-w-lg sm:p-6" data-level-up-dialog>
+      <DialogContent className="flex max-h-[90dvh] flex-col gap-3 p-4 sm:max-w-lg sm:p-6" data-level-up-dialog {...(applied ? { "aria-describedby": undefined } : {})}>
         <DialogHeader>
           <DialogTitle>{applied ? t("result.title", { level: applied.level }) : t("title")}</DialogTitle>
           {/* The instruction is for choosing; the result screen summarizes instead (UAT m8). */}
-          <DialogDescription className={applied ? "sr-only" : undefined}>{applied ? t("result.changes") : t("description")}</DialogDescription>
+          {!applied && <DialogDescription>{t("description")}</DialogDescription>}
         </DialogHeader>
         {!applied && (
           <div className="flex flex-wrap items-center gap-2" data-level-up-class-slot>

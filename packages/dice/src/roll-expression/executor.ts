@@ -5,8 +5,9 @@ import type {
   TableDefinition,
 } from "./types";
 import { parseRollExpression } from "./parser";
+import { rollPool } from "../pool-highest";
 import { parseFormula, evaluateFormula } from "../formula/parser";
-import { rollCoC7eSkillCheck, rollDiceExpression, type RandomSource } from "../roller";
+import { rollCoC7eSkillCheck, rollDiceExpression, type DieFaceSource, type RandomSource } from "../roller";
 import type { SuccessLevel } from "../types";
 import {
   createRollEvaluator,
@@ -34,6 +35,12 @@ export interface ExecuteRollExpressionOptions {
    * that must reproduce a roll (a seeded test run) passes a seeded source.
    */
   random?: RandomSource;
+  /**
+   * Where the dice get their faces, in draw order; taken over `random`. A
+   * caller that records a roll's exact faces, or rolls it again with them,
+   * passes one.
+   */
+  faces?: DieFaceSource;
 }
 
 /**
@@ -57,7 +64,9 @@ export function executeRollExpression(
     return null;
   }
 
-  const parsed = parseRollExpression(expression);
+  // pool:<rule id>:<rating>d6[+<extra threats>d6]. Plain Nd6 always remains a sum.
+  const poolPrefix = /^pool:([\w-]+):/i.exec(expression.trim());
+  const parsed = parseRollExpression(poolPrefix ? expression.trim().slice(poolPrefix[0].length) : expression);
   if (!parsed) {
     return null;
   }
@@ -101,10 +110,18 @@ export function executeRollExpression(
   const resolvedDiceExpr = parsed.system ? `${parsed.system}:${diceExpr}` : diceExpr;
 
   // 3. 如果有比較運算符，計算目標值並比較
-  if (parsed.comparator && parsed.targetFormula) {
-    const targetAst = parseFormula(parsed.targetFormula);
-    if (targetAst) {
-      const targetValue = evaluateFormula(targetAst, context);
+  if (poolPrefix) {
+    const rule = options?.dslRollRules?.rules[poolPrefix[1]];
+    const counts = /^(-?\d+)d6(?:\+(\d+)d6)?$/i.exec(diceExpr);
+    if (rule?.type !== "poolHighest" || rule.dice !== "d6" || !counts || parsed.system || parsed.comparator) return null;
+    const outcome = rollPool({ kind: rule.kind, rating: Number(counts[1]), extraThreats: Number(counts[2] ?? 0) }, options?.faces ?? options?.random);
+    if (!outcome) return null;
+    result = { expression, resolvedDiceExpr: `${outcome.rolls.length}d6`, ...outcome };
+  } else if (parsed.comparator && parsed.targetFormula) {
+    const signedLiteral = /^[+-]\d+$/.test(parsed.targetFormula);
+    const targetAst = signedLiteral ? null : parseFormula(parsed.targetFormula);
+    if (signedLiteral || targetAst) {
+      const targetValue = targetAst ? evaluateFormula(targetAst, context) : Number(parsed.targetFormula);
       if (typeof targetValue === "number") {
         // Accepts either the "b"/"p" letter suffix (buildRollExpression's
         // convention) or a plain signed integer (produced when a macro
@@ -128,7 +145,7 @@ export function executeRollExpression(
               targetValue,
               bonusDice,
             },
-            options?.random,
+            options?.faces ?? options?.random,
           );
           result = {
             expression,
@@ -147,7 +164,7 @@ export function executeRollExpression(
             selectedUnits: cocResult.selectedUnits,
           };
         } else {
-          const diceResult = rollDiceExpression(diceExpr, options?.random);
+          const diceResult = rollDiceExpression(diceExpr, options?.faces ?? options?.random);
           if (!diceResult) {
             return null;
           }
@@ -206,7 +223,7 @@ export function executeRollExpression(
       }
     }
   } else {
-    const diceResult = rollDiceExpression(diceExpr, options?.random);
+    const diceResult = rollDiceExpression(diceExpr, options?.faces ?? options?.random);
     if (!diceResult) {
       return null;
     }

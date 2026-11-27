@@ -1,6 +1,8 @@
 {
   "homebrewBadge": "Homebrew",
   "homebrewFrom": "Homebrew: {name}",
+  "gmHomebrew": "GM's homebrew",
+  "gmHomebrewFrom": "GM's homebrew: {name}",
   "tabs": {
     "label": "Sheet sections",
     "character": "Character",

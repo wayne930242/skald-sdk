@@ -31,7 +31,7 @@ export function EntryRow({ name, kind, features, subclasses, deleting, open, rem
   const multi = kind === "class" || kind === "subclass";
   return (
     <div className="flex items-center justify-between gap-1" aria-busy={deleting || undefined} data-entry-row>
-      <button type="button" className="min-w-0 text-left" disabled={!open || deleting} onClick={() => open?.()}>
+      <button type="button" className="min-w-0 truncate text-left" title={name} disabled={!open || deleting} onClick={() => open?.()}>
         {name}
       </button>
       {multi && (

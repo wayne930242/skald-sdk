@@ -1,11 +1,18 @@
 import type { RollConfig, RollExpressionResult } from "@skald/dice/roll-expression";
 import { type MacroWrite } from "@skald/dice";
 import { type RollPanelEntry } from "@skald/sheet-sdk/modules/rolls/domain/roll-panel";
-import type { DeclaredDifficulty, DiceVisibility, SimpleDiceRoll, SkillCheckRoll } from "@skald/dice";
+import type { CheckDisplay, DeclaredDifficulty, DiceVisibility, RollDisplayLabels, SimpleDiceRoll, SkillCheckRoll } from "@skald/dice";
 import { type SpendOption } from "@skald/dice";
 
 /** 單次擲骰的選項 */
 export interface ExecuteRollOptions {
+  /** Grade this comparison's final die sample (after 3D replacement), before display and delivery. */
+  gradeCheck?: (sample: number, target: number) => {
+    rolled: number;
+    passed: boolean;
+    checkDisplay?: CheckDisplay;
+    successLevel: NonNullable<RollExpressionResult["successLevel"]>;
+  };
   /**
    * 這次擲骰的可見性。沒給時：遊戲桌內用擲骰台選的對象（預設「所有人」），
    * 桌外沒有聊天可送，一律 "all"。
@@ -39,6 +46,7 @@ export interface ExecuteRollOptions {
    * `rollFollowUp`): it goes to chat as its own roll, and the desk keeps showing the entry it follows.
    */
   followUpOf?: string;
+  followUpLabel?: RollDisplayLabels;
   /**
    * Post this roll with the caller's own delivery instead of the chat sink: a table rules port
    * writing the chat row through its RPC in the same transaction as its effects. Only in a table
@@ -64,6 +72,9 @@ export interface FixedDie {
 
 /** A plugin's follow-up roll (`rollFollowUp`): a new roll after the desk's entry, never a change of it. */
 export interface RollFollowUpRequest {
+  /** A result-only check can keep the roll while changing its awarded grade. */
+  gradeCheck?: ExecuteRollOptions["gradeCheck"];
+  followUpLabel?: RollDisplayLabels;
   /** The roll, e.g. `1d6`, or a check such as `coc7:1d100<={{@target}}` with its `context`. */
   expression: string;
   /** The chat title of the new roll. */
@@ -77,6 +88,7 @@ export interface RollFollowUpRequest {
 
 /** What a follow-up roll gave. */
 export interface RollFollowUpRolled {
+  followUpAlreadyPosted?: never;
   /** The roll desk entry of the new roll (not shown as the desk's latest result). */
   id: string;
   total: number;
@@ -107,6 +119,8 @@ export interface RollResultEvent {
 }
 
 export type RollResultListener = (event: RollResultEvent) => void;
+
+export type RollFollowUpOutcome = RollFollowUpRolled | { followUpAlreadyPosted: true };
 
 export interface RollContextValue {
   /** 執行擲骰 */
@@ -145,7 +159,7 @@ export interface RollContextValue {
    * through the same execute path, to chat with the entry's audience and the given label. The entry
    * is never changed. Null when the entry is gone or the roll did not happen.
    */
-  rollFollowUp: (entryId: string, request: RollFollowUpRequest) => Promise<RollFollowUpRolled | null>;
+  rollFollowUp: (entryId: string, request: RollFollowUpRequest) => Promise<RollFollowUpOutcome | null>;
   /**
    * A chat line under the desk's entry `entryId` that records what a follow-up changed (「SAN 70 → 65」):
    * a result-only roll message with the entry's audience, through the same roll sink. Only in a

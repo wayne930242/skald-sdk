@@ -6,6 +6,7 @@ import { Toaster } from "@skald/sheet-sdk/components/ui/sonner";
 import { TooltipProvider } from "@skald/sheet-sdk/components/ui/tooltip";
 import { bindHostPort, HostPortsProvider, type HostPortBinding } from "@skald/sheet-sdk/modules/systems/ui/host-ports";
 import { corePorts } from "@skald/sheet-sdk/modules/systems/ui/core-ports";
+import { NO_SYSTEM_EXTENSIONS } from "@skald/sheet-sdk/modules/systems/domain/system-extensions";
 import { SystemPluginProvider } from "@skald/sheet-sdk/modules/systems/ui/system-plugin-provider";
 import type { GameIconSource } from "@skald/sheet-sdk/lib/game-icons/client";
 import { dndPackSourcePort } from "@skald/system-dnd5e/sheet/pack-source-port";
@@ -41,7 +42,8 @@ function PlainLink(props: AnchorHTMLAttributes<HTMLAnchorElement> & { href: stri
 
 /**
  * The host ports the previewer serves: only harmless local ones, and D&D's content packs from local
- * files kept in memory (`content-packs.ts`). Table sessions, portrait upload, PDF download and the
+ * files kept in memory (`content-packs.ts`). It serves no private System extensions (ADR 0021):
+ * every System shows its public fallbacks. Table sessions, portrait upload, PDF download and the
  * Excel engine stay unregistered, so their controls show as unavailable, as they would in any host
  * that lacks them.
  */
@@ -49,6 +51,7 @@ const PREVIEWER_PORTS: readonly HostPortBinding[] = [
   bindHostPort(corePorts.gameIconSource, localGameIcons),
   bindHostPort(corePorts.navigationLink, PlainLink),
   bindHostPort(dndPackSourcePort, previewerPackSource),
+  bindHostPort(corePorts.systemExtensions, NO_SYSTEM_EXTENSIONS),
 ];
 
 const DATA_CATALOG = {

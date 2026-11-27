@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { entriesToText, type EntriesTextOptions } from "../../reference/entries-to-text";
 import { stampOf } from "../../homebrew/domain/rows";
+import type { SnapshotLabels } from "./snapshot-labels";
 import { withRowOption } from "../level-up/option-row";
 import { slugId, splitRef } from "../../reference/tags";
 import type { ReferenceContextValue } from "../use-reference-context";
@@ -185,7 +186,7 @@ export function useSpellFacts(ref: string): SpellFacts | null {
  * (`option-row.ts`); null when the row's own `name` shows (a pack or custom row, or a ref the
  * catalog does not name).
  */
-export function catalogName(context: ReferenceContextValue, row: Record<string, unknown>): string | null {
+export function catalogName(context: ReferenceContextValue, row: Record<string, unknown>, labels?: SnapshotLabels): string | null {
   const ref = text(row.ref);
   const origin = text(row.origin);
   if (!ref || origin === "pack" || origin === "custom") return null;
@@ -198,7 +199,7 @@ export function catalogName(context: ReferenceContextValue, row: Record<string, 
   const parsed = splitRef(ref);
   const known = parsed && (context.names[parsed.kind]?.[parsed.id] ?? context.englishNames[parsed.kind]?.[parsed.id]);
   // A named choice's pick (Hunter's Prey: Colossus Slayer) follows the catalog name (UAT F005).
-  return known ? withRowOption(context.token, context.nameOf(ref), row) : null;
+  return known ? withRowOption(context.token, context.nameOf(ref), row, labels) : null;
 }
 
 /**
@@ -206,8 +207,8 @@ export function catalogName(context: ReferenceContextValue, row: Record<string, 
  * creator's locale, so a built-in row (a ref the catalog names, not a pack or custom row) is named
  * from the catalog; a species trait row (`species:elf#darkvision`) from its wizard trait label.
  */
-export function displayName(context: ReferenceContextValue, row: Record<string, unknown>): string {
-  const catalog = catalogName(context, row);
+export function displayName(context: ReferenceContextValue, row: Record<string, unknown>, labels?: SnapshotLabels): string {
+  const catalog = catalogName(context, row, labels);
   if (catalog !== null) return catalog;
   const saved = text(row.name);
   const ref = text(row.ref);

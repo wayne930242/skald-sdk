@@ -1,14 +1,17 @@
 "use client";
 
 import { cn } from "@skald/sheet-sdk/lib/utils";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Dices, Target, TrendingUp, TrendingDown } from "lucide-react";
 import {
+  checkDisplayTone,
   difficultyTarget,
+  rollDisplayLabel,
   keptRollFlags,
   type CoC7eSuccessLevel,
   type DiceRoll,
 } from "@skald/dice";
+import { PoolResult } from "../pool";
 import { isBwbTier } from "@skald/sheet-sdk/modules/rolls/domain/roll-card-model";
 import {
   formatRollSummaryLines,
@@ -120,13 +123,15 @@ export function resolveSuccessLevelStyle(level: string): SuccessLevelStyleInfo {
 }
 
 export function DiceResultDisplay({ roll, className }: DiceResultDisplayProps) {
+  const locale = useLocale();
   const t = useTranslations("dice");
   const tRoll = useTranslations("roll");
+  const checkLabel = roll.type === "skill_check" ? rollDisplayLabel(roll.checkDisplay?.labels, locale) : undefined;
   const model = toRollRenderModelFromDiceRoll(roll);
   const summary = formatRollSummaryLines(
     model,
     (key, values) => tRoll(`toast.${key}`, values),
-    (level) => tRoll(`successLevel.${level}`),
+    (level) => checkLabel ?? tRoll(`successLevel.${level}`),
   );
   const ruleLabel =
     model.rule.id === "coc7-bonus"
@@ -159,8 +164,10 @@ export function DiceResultDisplay({ roll, className }: DiceResultDisplayProps) {
   );
 
   if (roll.type === "skill_check") {
-    const styles = resolveSuccessLevelStyle(roll.successLevel);
-    const isSuccess = !["failure", "fumble", "miss"].includes(roll.successLevel);
+    const tone = checkDisplayTone(roll.checkDisplay?.tone) ?? roll.successLevel;
+    const styles = resolveSuccessLevelStyle(tone);
+    const isSuccess = !["failure", "fumble", "miss"].includes(tone);
+    const levelLabel = checkLabel ?? t(`successLevel.${roll.successLevel}`);
 
     return (
       <div
@@ -204,7 +211,7 @@ export function DiceResultDisplay({ roll, className }: DiceResultDisplayProps) {
               cost: roll.luckSpent,
               skill: roll.skillName,
               target: roll.targetValue,
-              level: t(`successLevel.${roll.successLevel}`),
+              level: levelLabel,
             })}
           </p>
         )}
@@ -242,7 +249,7 @@ export function DiceResultDisplay({ roll, className }: DiceResultDisplayProps) {
               isSuccess ? "bg-background/50" : "bg-background/30",
             )}
           >
-            {t(`successLevel.${roll.successLevel}`)}
+            {levelLabel}
           </span>
         </div>
 
@@ -295,6 +302,7 @@ export function DiceResultDisplay({ roll, className }: DiceResultDisplayProps) {
   }
 
   if (roll.type === "simple") {
+    if (roll.pool) return <div className={className}><strong>{roll.total}</strong> <PoolResult pool={roll.pool} rolls={roll.rolls} total={roll.total} /></div>;
     const diceGroup = model.diceGroups.find((group) => group.label === "dice");
     const diceValues = diceGroup?.values ?? [];
     // A keep/drop roll (`2d20kl1+5`) stores every face; only the kept ones add up

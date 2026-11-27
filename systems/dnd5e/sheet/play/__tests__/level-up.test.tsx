@@ -130,7 +130,8 @@ describe("level-up helper UI (phase 2b §4)", () => {
     const dialog = await openLevelUp("Level up");
     await click(within(dialog).getByRole("button", { name: "Apply" }));
     expect(sheet.data()).toMatchObject({ level: 2 });
-    expect(dialog.querySelector("[data-level-up-summary]")).toHaveTextContent("This level: +");
+    expect(within(dialog).getByText("What changed")).toBeVisible();
+    expect(within(dialog).getByRole("list", { name: "What changed" })).toHaveTextContent("This level: +");
     expect(dialog).not.toHaveTextContent("Level up one level at a time");
     await click(within(dialog).getByRole("button", { name: "Continue to level 3" }));
     await waitFor(() => expect(dialog.querySelector("[data-level-up-hp]")).not.toBeNull());

@@ -19,15 +19,31 @@ import { markKeptRolls } from "./kept-rolls";
 export type RandomSource = () => number;
 
 /**
+ * Where the dice of a roll get their faces, one die at a time in the order
+ * they are drawn: `draw` is given the die's size (`"F"` for a Fudge die) and
+ * returns the face that came up. A caller that must record the exact faces of
+ * a roll, or roll it again with them, passes one; `dieFaces` turns a
+ * `RandomSource` into one.
+ */
+export interface DieFaceSource {
+  draw(sides: number | "F"): number;
+}
+
+/** What the dice read: uniform numbers, or faces. */
+export type DiceSource = RandomSource | DieFaceSource;
+
+/** The faces `random` gives: 1 to `sides`, or -1, 0 or +1 for a Fudge die. */
+export function dieFaces(random: RandomSource = Math.random): DieFaceSource {
+  return {
+    draw: (sides) => (sides === "F" ? Math.floor(random() * 3) - 1 : Math.floor(random() * sides) + 1),
+  };
+}
+
+/**
  * Roll a single die (returns the value)
  */
-function rollSingleDie(sides: number | "F", random: RandomSource = Math.random): number {
-  if (sides === "F") {
-    // Fudge die: -1, 0, or +1
-    return Math.floor(random() * 3) - 1;
-  }
-  // Standard die: 1 to sides (inclusive)
-  return Math.floor(random() * sides) + 1;
+function rollSingleDie(sides: number | "F", source: DiceSource = Math.random): number {
+  return (typeof source === "function" ? dieFaces(source) : source).draw(sides);
 }
 
 /**
@@ -46,7 +62,7 @@ function shouldExplode(
 /**
  * Roll a single die specification with modifiers
  */
-export function rollDice(die: Die, random: RandomSource = Math.random): DieRollResult {
+export function rollDice(die: Die, random: DiceSource = Math.random): DieRollResult {
   if (!isValidDie(die)) throw new RangeError("Invalid dice specification or dice limit exceeded");
   const mods = die.modifiers || {};
   const detailedRolls: SingleRoll[] = [];
@@ -124,7 +140,7 @@ export function rollDice(die: Die, random: RandomSource = Math.random): DieRollR
  */
 export function rollDiceExpression(
   expr: string,
-  random: RandomSource = Math.random,
+  random: DiceSource = Math.random,
 ): DiceRollResult | null {
   const parsed = parseDiceExpression(expr);
   if (!parsed) return null;
@@ -156,21 +172,21 @@ export function rollDiceExpression(
 /**
  * Roll D100 (percentile dice)
  */
-export function rollD100(random: RandomSource = Math.random): number {
+export function rollD100(random: DiceSource = Math.random): number {
   return rollSingleDie(100, random);
 }
 
 /**
  * Roll a tens die (0, 10, 20, ..., 90)
  */
-function rollTensDie(random: RandomSource): number {
+function rollTensDie(random: DiceSource): number {
   return (rollSingleDie(10, random) - 1) * 10;
 }
 
 /**
  * Roll a units die (0-9)
  */
-function rollUnitsDie(random: RandomSource): number {
+function rollUnitsDie(random: DiceSource): number {
   return rollSingleDie(10, random) - 1;
 }
 
@@ -189,7 +205,7 @@ export interface SkillCheckInput {
  */
 export function rollCoC7eSkillCheck(
   input: SkillCheckInput,
-  random: RandomSource = Math.random,
+  random: DiceSource = Math.random,
 ): Omit<
   SkillCheckRoll,
   "id" | "timestamp" | "rollerId" | "rollerName" | "visibility"

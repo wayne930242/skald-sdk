@@ -12,7 +12,7 @@ import { CARD, CARD_TITLE } from "./card-styles";
 import { SnapshotText } from "../../reference/snapshot-text";
 import type { CompendiumStart } from "../compendium-rows";
 import type { CustomList } from "../custom-rows";
-import { EditIntl } from "./edit-messages";
+import { EditIntl, useSnapshotLabels } from "./edit-messages";
 import { sheetClasses } from "./class-model";
 import { AddControls, CustomLink, RowEditorHost, RowMenu, useOpenRowEditor, useRowWrites } from "./row-actions";
 
@@ -24,7 +24,8 @@ export function RuleRow({ row, list }: { row: Record<string, unknown>; list: str
   const { reference, openReference, values } = usePlay();
   const openRow = useOpenRowEditor();
   const body = useRowText(reference, row);
-  const name = displayName(reference, row);
+  const labels = useSnapshotLabels();
+  const name = displayName(reference, row, labels);
   const summary = summaryOf(body.text);
   const pack = text(row.origin) === "pack";
   // A feature that rolls (a Proficiency Bonus of d4s, Second Wind) gets its dice next to it (A3-05).

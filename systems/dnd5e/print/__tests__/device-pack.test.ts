@@ -34,4 +34,13 @@ describe("the print's device pack", () => {
     const empty: DndPackSource = { readCached: async () => null, revalidate: async () => null };
     expect(await devicePackLoader(empty)()).toBeNull();
   });
+
+  it("reads a table copy's scope from the cache too: the table's shared GM homebrew prints", async () => {
+    const source: DndPackSource = { readCached: vi.fn(async () => singlePackView("table/T/owner", pack)), revalidate: vi.fn() };
+    const reference = await devicePackLoader(source, { tableId: "T" })();
+    expect(source.readCached).toHaveBeenCalledWith({ tableId: "T" });
+    expect(source.revalidate).not.toHaveBeenCalled();
+    expect(await reference!.resolve("feat:whittler", "en")).toMatchObject({ name: "Whittler" });
+  });
 });
+

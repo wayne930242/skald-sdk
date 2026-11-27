@@ -12,6 +12,11 @@ export interface PrintPdfRequest {
   paper: PrintPaper;
   locale: string;
   title: string;
+  /**
+   * The slug of the sheet's System. Optional for SDK callers; Skald's own host always sends it
+   * and may refuse early a private System the user cannot use.
+   */
+  system?: string;
   buildId: string;
   htmlClass: string;
   bodyClass: string;
@@ -27,6 +32,8 @@ export type PdfErrorCode =
   | "rateLimited"
   | "busy"
   | "tooManyPages"
+  /** The host refused the sheet's System for this user (a private System they do not read). */
+  | "forbidden"
   /** The pages changed (a reset layout, another paper) while the click waited: nothing was sent. */
   | "layoutChanged"
   | "failed";

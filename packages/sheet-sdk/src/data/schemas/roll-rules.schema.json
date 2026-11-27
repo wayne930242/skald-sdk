@@ -16,7 +16,8 @@
         "oneOf": [
           { "$ref": "#/definitions/rollUnderRule" },
           { "$ref": "#/definitions/rollOverRule" },
-          { "$ref": "#/definitions/comparisonRule" }
+          { "$ref": "#/definitions/comparisonRule" },
+          { "$ref": "#/definitions/poolHighestRule" }
         ]
       }
     }
@@ -74,6 +75,17 @@
           "type": "array",
           "items": { "$ref": "#/definitions/postRollAction" }
         }
+      }
+    },
+    "poolHighestRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "dice", "kind"],
+      "properties": {
+        "type": { "const": "poolHighest" },
+        "dice": { "const": "d6" },
+        "kind": { "enum": ["action", "fortune", "resistance", "engagement", "indulgeVice", "threat"] },
+        "postRollActions": { "type": "array", "items": { "$ref": "#/definitions/postRollAction" } }
       }
     },
     "comparisonRule": {

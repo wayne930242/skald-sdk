@@ -646,7 +646,8 @@
         "chatUnread": "{count, plural, one {# unread message} other {# unread messages}}",
         "chatUnreadMany": "More than 99 unread messages",
         "rules": "Rules",
-        "scenario": "Scenario"
+        "scenario": "Scenario",
+        "clocks": "Clocks"
       },
       "chatDrawer": {
         "label": "Chat",

@@ -23,6 +23,7 @@
       "rateLimited": "You have reached the hourly PDF limit. Try again in {minutes, plural, one {# minute} other {# minutes}}.",
       "busy": "The PDF service is busy. Try again in a moment.",
       "tooManyPages": "This sheet runs past 80 pages, too long for a PDF.",
+      "forbidden": "You cannot download a PDF of this system's sheet.",
       "layoutChanged": "The layout changed while the PDF was being made. Select Download PDF again.",
       "failed": "The PDF could not be made. Try again, or use Print instead."
     }

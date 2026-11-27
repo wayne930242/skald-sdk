@@ -6,6 +6,7 @@ import tabsEn from "@skald/system-dnd5e/data/dnd5e-2024/messages/play-tabs/en.js
 import tabsZh from "@skald/system-dnd5e/data/dnd5e-2024/messages/play-tabs/zh-TW.json";
 import playEn from "@skald/system-dnd5e/data/dnd5e-2024/messages/play/en.json";
 import playZh from "@skald/system-dnd5e/data/dnd5e-2024/messages/play/zh-TW.json";
+import { loadSnapshotLabels } from "../snapshot-labels";
 import { loadEditMessages } from "../edit-messages";
 
 type Tree = { [key: string]: string | Tree };
@@ -42,8 +43,8 @@ describe("the lazy play catalogs (messages/edit, messages/play-tabs, plan-uat2 Â
   it("loads once per locale, marked for React's use once resolved", async () => {
     const first = loadEditMessages("zh-TW");
     expect(loadEditMessages("zh-TW")).toBe(first);
-    expect(await first).toEqual({ edit: zh, play: tabsZh });
+    expect(await first).toEqual({ edit: zh, play: tabsZh, snapshotLabels: await loadSnapshotLabels("zh-TW") });
     expect(first).toMatchObject({ status: "fulfilled" });
-    expect(await loadEditMessages("fr")).toEqual({ edit: en, play: tabsEn });
+    expect(await loadEditMessages("fr")).toEqual({ edit: en, play: tabsEn, snapshotLabels: await loadSnapshotLabels("en") });
   });
 });

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { LoaderCircle } from "lucide-react";
 import { Button } from "@skald/sheet-sdk/components/ui/button";
 import { loadBuiltinIdentity, loadOpenPackSchemaCheck } from "../../content-pack/open/load";
 import { nameKey } from "../../content-pack/domain/identity";
@@ -74,6 +75,7 @@ function ClassFormView({ row, rows, pack, store, run, reload, catalog, initial }
   const [draft, setDraft] = useState(initial);
   const [fallback] = useState(() => newHomebrewId(""));
   const [problem, setProblem] = useState("");
+  const [saving, setSaving] = useState(false);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   // The stored class this editor writes: the opened row, or the one a partial save created.
   const [owned, setOwned] = useState(row?.key);
@@ -157,7 +159,12 @@ function ClassFormView({ row, rows, pack, store, run, reload, catalog, initial }
           setProblem(t("invalidFields", { fields: issues.map(issueName).join(", ") }));
           return;
         }
-        void run(save);
+        if (saving) return;
+        setSaving(true);
+        void run(save).finally(() => {
+          setSaving(false);
+          setProgress(null);
+        });
       }}
     >
       <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:items-start xl:gap-5">
@@ -222,7 +229,10 @@ function ClassFormView({ row, rows, pack, store, run, reload, catalog, initial }
       {preview && <GeneratedFeatures rows={preview} zh={zh} />}
       {progress && <p role="status">{t("class.progress", progress)}</p>}
       {problem && <p role="alert">{problem}</p>}
-      <Button type="submit">{t("save")}</Button>
+      <Button type="submit" disabled={saving} aria-busy={saving}>
+        {saving && <LoaderCircle aria-hidden className="size-4 animate-spin" />}
+        {t("save")}
+      </Button>
     </form>
   );
 }

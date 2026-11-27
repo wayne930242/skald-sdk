@@ -207,10 +207,11 @@ function CompendiumDialogBody({
   const [picks, setPicks] = useState<Record<string, string>>({});
   const filterList = classId !== ALL && classId !== MINE ? classId : undefined;
   // The casting classes a spell can still be added under: one per class whose list holds it, less those that already have it.
-  const castersOf = (ref: string) => (start?.spellClasses
-    ? spellCastersFor(start, context.gameSpells.get(ref.slice(ref.indexOf(":") + 1))?.classes, filterList).filter((caster) => !isPresent("spells", spellKey(ref, caster.castingClass)))
-    : []);
-  const listsHolding = (ref: string) => (start?.spellClasses ? spellCastersFor(start, context.gameSpells.get(ref.slice(ref.indexOf(":") + 1))?.classes, filterList).length : 0);
+  const ownFilter = start?.spellClasses?.some((entry) => entry.list === filterList) ? filterList : undefined;
+  const eligible = (ref: string) => spellCastersFor(start, context.gameSpells.get(ref.slice(ref.indexOf(":") + 1))?.classes, ownFilter);
+  const castersOf = (ref: string) => eligible(ref).filter((caster) => !isPresent("spells", spellKey(ref, caster.castingClass)));
+  const listsHolding = (ref: string) => eligible(ref).length;
+  const offList = (list: DialogTab, ref: string) => list === "spells" && start?.spellClasses !== undefined && listsHolding(ref) === 0;
   /** The class a spell added now casts as (decided before the presence check, F003); undefined = the starting class. */
   const castingClassFor = (ref: string): string | undefined => {
     const casters = castersOf(ref);
@@ -284,7 +285,7 @@ function CompendiumDialogBody({
   };
 
   const add = (candidate: Pick<Candidate, "ref" | "name">, listTab: CompendiumTab | null = isListTab(tab) ? tab : null) => {
-    if (!onUpdate || !listTab) return;
+    if (!onUpdate || !listTab || offList(listTab, candidate.ref)) return;
     // A multiclass sheet's spell belongs to the class whose list holds it, or to the one picked in
     // the row when several do (UAT M5); without the sheet's classes (the level-up's follow-up), to
     // the class of the filtered list. Decided first: the presence key names it (F003).
@@ -475,7 +476,7 @@ function CompendiumDialogBody({
                             label={t("castAs", { name: candidate.name })}
                           />
                         )}
-                        <Button type="button" variant="outline" size="sm" disabled={!onUpdate} onClick={() => add(candidate)}>
+                        <Button type="button" variant="outline" size="sm" disabled={!onUpdate || offList(tab, candidate.ref)} onClick={() => add(candidate)}>
                           <Plus className="size-4" />
                           {t("add")}
                         </Button>

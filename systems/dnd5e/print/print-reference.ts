@@ -10,8 +10,10 @@ import type { GameSpell, ReferenceContextValue } from "../sheet/use-reference-co
 import { useHostPort } from "@skald/sheet-sdk/modules/systems/ui/host-ports";
 import type { EffectivePacks } from "../content-pack/domain/types";
 import { dndPackSourcePort } from "../sheet/pack-source-port";
+import { useTablePackScope } from "../sheet/pack-scope";
 import type { CastingOptions } from "../sheet/play/casting-classes";
 import { sheetNamesFrom } from "../sheet/play/sheet-names";
+import type { SnapshotLabels } from "../sheet/play/snapshot-labels";
 import { withRowOption } from "../sheet/level-up/option-row";
 
 /**
@@ -39,7 +41,7 @@ export type PrintNaming = Pick<ReferenceContextValue, "names" | "englishNames" |
  * copy because importing row-text into the print chunk splits the sheet's play chunk in two
  * (Turbopack can no longer merge row-text into it), which grows the sheet's first open.
  */
-export function printName(naming: PrintNaming, row: Record<string, unknown>): string {
+export function printName(naming: PrintNaming, row: Record<string, unknown>, labels?: SnapshotLabels): string {
   const saved = text(row.name);
   const ref = text(row.ref);
   if (!ref) return saved;
@@ -53,7 +55,7 @@ export function printName(naming: PrintNaming, row: Record<string, unknown>): st
   }
   const parsed = splitRef(ref);
   const known = parsed && (naming.names[parsed.kind]?.[parsed.id] ?? naming.englishNames[parsed.kind]?.[parsed.id]);
-  return known ? withRowOption(naming.token, naming.nameOf(ref), row) : saved || naming.nameOf(ref);
+  return known ? withRowOption(naming.token, naming.nameOf(ref), row, labels) : saved || naming.nameOf(ref);
 }
 
 function messagePath(messages: unknown, path: string): unknown {
@@ -121,22 +123,25 @@ export function usePrintReference(gameData: Record<string, unknown> | undefined)
 /**
  * This device's enabled packs from its cache (no network), read once for the print: their class,
  * subclass, species and background names and their subclass entries (a homebrew third caster).
- * `settled` once read, or at once without the host's pack source.
+ * `settled` once read, or at once without the host's pack source. A table copy whose setup takes the
+ * GM's homebrew reads the table's shared copies with them (its sheet's scope), so a shared class
+ * prints its casting.
  */
 export function usePrintPacks(): { packs: EffectivePacks | null; settled: boolean } {
   const source = useHostPort(dndPackSourcePort);
+  const tableId = useTablePackScope()?.tableId;
   const [state, setState] = useState<{ packs: EffectivePacks | null; settled: boolean }>({ packs: null, settled: false });
   useEffect(() => {
     if (!source) return;
     let live = true;
-    source.readCached().then(
+    (tableId === undefined ? source.readCached() : source.readCached({ tableId })).then(
       (packs) => live && setState({ packs, settled: true }),
       () => live && setState({ packs: null, settled: true }),
     );
     return () => {
       live = false;
     };
-  }, [source]);
+  }, [source, tableId]);
   return source ? state : { packs: null, settled: true };
 }
 

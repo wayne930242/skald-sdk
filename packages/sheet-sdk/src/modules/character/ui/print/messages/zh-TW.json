@@ -23,6 +23,7 @@
       "rateLimited": "PDF 下載已達每小時上限，請 {minutes} 分鐘後再試。",
       "busy": "PDF 服務忙碌中，請稍後再試。",
       "tooManyPages": "這張角色卡超過 80 頁，無法產生 PDF。",
+      "forbidden": "你沒有這個系統的使用權，無法下載 PDF。",
       "layoutChanged": "版面在產生 PDF 時變更了，請再按一次「下載 PDF」。",
       "failed": "PDF 產生失敗。請再試一次，或改用「列印」。"
     }

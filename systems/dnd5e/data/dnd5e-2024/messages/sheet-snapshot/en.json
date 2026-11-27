@@ -1,0 +1,260 @@
+{
+  "attacks": {
+    "baseItem:club": {
+      "name": "Club",
+      "damageType": "Bludgeoning",
+      "mastery": "Slow",
+      "notes": "Light"
+    },
+    "baseItem:dagger": {
+      "name": "Dagger",
+      "damageType": "Piercing",
+      "mastery": "Nick",
+      "notes": "Finesse · Light · Thrown · 20/60"
+    },
+    "baseItem:greatclub": {
+      "name": "Greatclub",
+      "damageType": "Bludgeoning",
+      "mastery": "Push",
+      "notes": "Two-Handed"
+    },
+    "baseItem:handaxe": {
+      "name": "Handaxe",
+      "damageType": "Slashing",
+      "mastery": "Vex",
+      "notes": "Light · Thrown · 20/60"
+    },
+    "baseItem:javelin": {
+      "name": "Javelin",
+      "damageType": "Piercing",
+      "mastery": "Slow",
+      "notes": "Thrown · 30/120"
+    },
+    "baseItem:light-hammer": {
+      "name": "Light Hammer",
+      "damageType": "Bludgeoning",
+      "mastery": "Nick",
+      "notes": "Light · Thrown · 20/60"
+    },
+    "baseItem:mace": {
+      "name": "Mace",
+      "damageType": "Bludgeoning",
+      "mastery": "Sap",
+      "notes": ""
+    },
+    "baseItem:quarterstaff": {
+      "name": "Quarterstaff",
+      "damageType": "Bludgeoning",
+      "mastery": "Topple",
+      "notes": "Versatile"
+    },
+    "baseItem:sickle": {
+      "name": "Sickle",
+      "damageType": "Slashing",
+      "mastery": "Nick",
+      "notes": "Light"
+    },
+    "baseItem:spear": {
+      "name": "Spear",
+      "damageType": "Piercing",
+      "mastery": "Sap",
+      "notes": "Thrown · Versatile · 20/60"
+    },
+    "baseItem:dart": {
+      "name": "Dart",
+      "damageType": "Piercing",
+      "mastery": "Vex",
+      "notes": "Finesse · Thrown · 20/60"
+    },
+    "baseItem:light-crossbow": {
+      "name": "Light Crossbow",
+      "damageType": "Piercing",
+      "mastery": "Slow",
+      "notes": "Ammunition · Loading · Two-Handed · 80/320"
+    },
+    "baseItem:shortbow": {
+      "name": "Shortbow",
+      "damageType": "Piercing",
+      "mastery": "Vex",
+      "notes": "Ammunition · Two-Handed · 80/320"
+    },
+    "baseItem:sling": {
+      "name": "Sling",
+      "damageType": "Bludgeoning",
+      "mastery": "Slow",
+      "notes": "Ammunition · 30/120"
+    },
+    "baseItem:staff": {
+      "name": "Staff",
+      "damageType": "Bludgeoning",
+      "mastery": "Topple",
+      "notes": "Versatile"
+    },
+    "baseItem:wooden-staff": {
+      "name": "Wooden Staff",
+      "damageType": "Bludgeoning",
+      "mastery": "Topple",
+      "notes": "Versatile"
+    },
+    "baseItem:battleaxe": {
+      "name": "Battleaxe",
+      "damageType": "Slashing",
+      "mastery": "Topple",
+      "notes": "Versatile"
+    },
+    "baseItem:flail": {
+      "name": "Flail",
+      "damageType": "Bludgeoning",
+      "mastery": "Sap",
+      "notes": ""
+    },
+    "baseItem:glaive": {
+      "name": "Glaive",
+      "damageType": "Slashing",
+      "mastery": "Graze",
+      "notes": "Heavy · Reach · Two-Handed"
+    },
+    "baseItem:greataxe": {
+      "name": "Greataxe",
+      "damageType": "Slashing",
+      "mastery": "Cleave",
+      "notes": "Heavy · Two-Handed"
+    },
+    "baseItem:greatsword": {
+      "name": "Greatsword",
+      "damageType": "Slashing",
+      "mastery": "Graze",
+      "notes": "Heavy · Two-Handed"
+    },
+    "baseItem:halberd": {
+      "name": "Halberd",
+      "damageType": "Slashing",
+      "mastery": "Cleave",
+      "notes": "Heavy · Reach · Two-Handed"
+    },
+    "baseItem:lance": {
+      "name": "Lance",
+      "damageType": "Piercing",
+      "mastery": "Topple",
+      "notes": "Heavy · Reach"
+    },
+    "baseItem:longsword": {
+      "name": "Longsword",
+      "damageType": "Slashing",
+      "mastery": "Sap",
+      "notes": "Versatile"
+    },
+    "baseItem:maul": {
+      "name": "Maul",
+      "damageType": "Bludgeoning",
+      "mastery": "Topple",
+      "notes": "Heavy · Two-Handed"
+    },
+    "baseItem:morningstar": {
+      "name": "Morningstar",
+      "damageType": "Piercing",
+      "mastery": "Sap",
+      "notes": ""
+    },
+    "baseItem:pike": {
+      "name": "Pike",
+      "damageType": "Piercing",
+      "mastery": "Push",
+      "notes": "Heavy · Reach · Two-Handed"
+    },
+    "baseItem:rapier": {
+      "name": "Rapier",
+      "damageType": "Piercing",
+      "mastery": "Vex",
+      "notes": "Finesse"
+    },
+    "baseItem:scimitar": {
+      "name": "Scimitar",
+      "damageType": "Slashing",
+      "mastery": "Nick",
+      "notes": "Finesse · Light"
+    },
+    "baseItem:shortsword": {
+      "name": "Shortsword",
+      "damageType": "Piercing",
+      "mastery": "Vex",
+      "notes": "Finesse · Light"
+    },
+    "baseItem:trident": {
+      "name": "Trident",
+      "damageType": "Piercing",
+      "mastery": "Topple",
+      "notes": "Thrown · Versatile · 20/60"
+    },
+    "baseItem:war-pick": {
+      "name": "War Pick",
+      "damageType": "Piercing",
+      "mastery": "Sap",
+      "notes": "Versatile"
+    },
+    "baseItem:warhammer": {
+      "name": "Warhammer",
+      "damageType": "Bludgeoning",
+      "mastery": "Push",
+      "notes": "Versatile"
+    },
+    "baseItem:whip": {
+      "name": "Whip",
+      "damageType": "Slashing",
+      "mastery": "Slow",
+      "notes": "Finesse · Reach"
+    },
+    "baseItem:blowgun": {
+      "name": "Blowgun",
+      "damageType": "Piercing",
+      "mastery": "Vex",
+      "notes": "Ammunition · Loading · 25/100"
+    },
+    "baseItem:hand-crossbow": {
+      "name": "Hand Crossbow",
+      "damageType": "Piercing",
+      "mastery": "Vex",
+      "notes": "Ammunition · Light · Loading · 30/120"
+    },
+    "baseItem:heavy-crossbow": {
+      "name": "Heavy Crossbow",
+      "damageType": "Piercing",
+      "mastery": "Push",
+      "notes": "Ammunition · Heavy · Loading · Two-Handed · 100/400"
+    },
+    "baseItem:longbow": {
+      "name": "Longbow",
+      "damageType": "Piercing",
+      "mastery": "Slow",
+      "notes": "Ammunition · Heavy · Two-Handed · 150/600"
+    },
+    "baseItem:musket": {
+      "name": "Musket",
+      "damageType": "Piercing",
+      "mastery": "Slow",
+      "notes": "Ammunition · Loading · Two-Handed · 40/120"
+    },
+    "baseItem:pistol": {
+      "name": "Pistol",
+      "damageType": "Piercing",
+      "mastery": "Vex",
+      "notes": "Ammunition · Loading · 30/90"
+    }
+  },
+  "options": {
+    "classFeature:paladin/fighting-style-l2": {
+      "Blessed Warrior": "Blessed Warrior"
+    },
+    "classFeature:ranger/fighting-style-l2": {
+      "Druidic Warrior": "Druidic Warrior"
+    },
+    "subclassFeature:ranger/hunter/defensive-tactics-l7": {
+      "Escape the Horde": "Escape the Horde",
+      "Multiattack Defense": "Multiattack Defense"
+    },
+    "subclassFeature:ranger/hunter/hunters-prey-l3": {
+      "Colossus Slayer": "Colossus Slayer",
+      "Horde Breaker": "Horde Breaker"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 // @skald/dice roll-expression/__tests__/executor.test.ts
 import { describe, it, expect, vi, beforeEach, afterAll } from "vitest";
 import { executeRollExpression } from "../executor";
+import { dieFaces } from "../../roller";
 import type { RollRulesDefinition } from "../../dsl-roll-evaluator";
 
 // Mock random to make tests deterministic
@@ -402,6 +403,62 @@ describe("executeRollExpression random source", () => {
     expect(check?.rolled).toBe(32);
     const plain = executeRollExpression("2d6", {}, { random });
     expect(plain?.rolled).toBe(7);
+  });
+});
+
+describe("executeRollExpression face source", () => {
+  /** A source that hands out scripted faces and records each die's size, in draw order. */
+  function scripted(faces: number[]) {
+    const sizes: Array<number | "F"> = [];
+    return {
+      sizes,
+      source: {
+        draw: (sides: number | "F") => {
+          sizes.push(sides);
+          const face = faces.shift();
+          if (face === undefined) throw new Error("no face left");
+          return face;
+        },
+      },
+    };
+  }
+
+  it("draws every die from options.faces with its size, in draw order, ahead of options.random", () => {
+    const random = () => {
+      throw new Error("random must not be read");
+    };
+    const plain = scripted([6, 2, 5, 4]);
+    expect(executeRollExpression("4d6kh3", {}, { faces: plain.source, random })).toMatchObject({ rolled: 15, rolls: [6, 2, 5, 4] });
+    expect(plain.sizes).toEqual([6, 6, 6, 6]);
+
+    // CoC: the units die first, then the tens dice, each a d10.
+    const check = scripted([3, 8, 2]);
+    expect(executeRollExpression("coc7:1d100b1<=50", {}, { faces: check.source })).toMatchObject({
+      rolled: 12,
+      unitsDice: [2],
+      tensDice: [70, 10],
+    });
+    expect(check.sizes).toEqual([10, 10, 10]);
+
+    const exploding = scripted([6, 6, 1]);
+    expect(executeRollExpression("1d6!", {}, { faces: exploding.source })).toMatchObject({ rolled: 13 });
+    expect(exploding.sizes).toEqual([6, 6, 6]);
+
+    const fudge = scripted([-1, 0, 1, 1]);
+    expect(executeRollExpression("4dF", {}, { faces: fudge.source })?.rolled).toBe(1);
+    expect(fudge.sizes).toEqual(["F", "F", "F", "F"]);
+  });
+
+  it("dieFaces(random) draws the faces options.random would", () => {
+    for (const expression of ["coc7:1d100p1<=50", "4d6kh3+1d8"]) {
+      const values = [0.2, 0.35, 0, 0.99, 0.5];
+      const fromRandom = executeRollExpression(expression, {}, { random: () => values.shift() ?? 0 });
+      const again = [0.2, 0.35, 0, 0.99, 0.5];
+      expect(executeRollExpression(expression, {}, { faces: dieFaces(() => again.shift() ?? 0) })).toEqual(fromRandom);
+    }
+    const fudge = dieFaces(() => 0.99);
+    expect(fudge.draw("F")).toBe(1);
+    expect(fudge.draw(20)).toBe(20);
   });
 });
 

@@ -44,7 +44,7 @@ export function parseRollExpression(expr: string): ParsedRollExpression | null {
     if (compIndex > 0) {
       // 確保比較運算符後面有 {{ 或純數字
       const afterComp = remaining.slice(compIndex + comp.length);
-      if (afterComp.startsWith("{{") || /^\d+/.test(afterComp)) {
+      if (afterComp.startsWith("{{") || /^[+-]?\d+/.test(afterComp)) {
         comparator = comp;
         diceExpr = remaining.slice(0, compIndex);
         targetFormula = afterComp;
